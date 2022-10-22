@@ -107,8 +107,7 @@ pauselogic = False
 
 def toggle_pause():
     global pauselogic
-    print(
-        f'alt+p pressed, toggling pause from {pauselogic} to {not pauselogic}')
+    print(f'alt+p pressed, toggling pause from {pauselogic} to {not pauselogic}')
     pauselogic = not pauselogic
 
 

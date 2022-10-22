@@ -25,6 +25,7 @@ CONSTANTS = {
         "overshadowed": "./captures/tft_logo_overshadowed.png",
     },
     "client": {
+        "screenshot_location": "./screenshots/",
         "pre_match": {
             "quick_play": "./captures/buttons/quick_play.png",
             "find_match_ready": "./captures/buttons/find_match_ready.png",
@@ -51,10 +52,11 @@ CONSTANTS = {
             "surrender_2": "./captures/buttons/surrender_2.png",
         },
         "gamelogic": {
-            "reroll": "./captures/buttons/reroll.png",
             "choose_one": "./captures/buttons/choose_one.png",
+            "reroll": "./captures/buttons/reroll.png",
             "take_all": "./captures/buttons/take_all.png",
             "timer_1": "./captures/buttons/timer_1.png",
+            "xp_buy": "./captures/buttons/xp_buy.png",
         },
         "gold": {
             "0": "./captures/gold/0.png",
@@ -234,7 +236,7 @@ def loading_match():
 
 def start_match():
     while onscreen(CONSTANTS['game']['round']['1-1']):
-        auto.moveTo(888, 376)
+        auto.moveTo(1270, 795)
         click_right()
 
     print("In the match now!")
@@ -243,8 +245,13 @@ def start_match():
 
 def buy(iterations):
     for i in range(iterations):
-        click_to(CONSTANTS['game']['trait']['bruiser'])
-        click_to(CONSTANTS['game']['trait']['mage'])
+        if not onscreen(CONSTANTS['game']['gold']['0']):
+            click_to(CONSTANTS['game']['trait']['bruiser'])
+            time.sleep(0.5)
+            click_to(CONSTANTS['game']['trait']['mage'])
+            time.sleep(0.5)
+            click_to(CONSTANTS['game']['trait']['jade'])
+            time.sleep(0.5)
 
 
 def check_if_game_complete():
@@ -268,6 +275,15 @@ def check_if_post_game():  # checks to see if game was interrupted
         return True
     return attempt_reconnect_to_existing_game()
 
+def check_if_gold_at_least(num):
+    for i in range(num):
+        try:
+            if onscreen(CONSTANTS['game']['gold'][f"{i}"]):
+                return False
+        except:
+            # We don't have this gold as a file
+            return True
+    return True
 
 def main_game_loop():
     exit = False
@@ -276,14 +292,26 @@ def main_game_loop():
             time.sleep(5)
         else:
             # Handle recurring round logic
+            # Treasure dragon, dont reroll just take it
+            if onscreen(CONSTANTS['game']['gamelogic']['take_all']):
+                click_to(CONSTANTS['game']['gamelogic']['take_all'])
+                time.sleep(1)
+                continue
+            # Free champ round
             if onscreen(CONSTANTS['game']['round']['-4']):
                 auto.moveTo(928, 396)
                 click_right()
             elif onscreen(CONSTANTS['game']['round']['1-']) or onscreen(CONSTANTS['game']['round']['2-']):
                 buy(3)
             # If round > 2, attempt re-rolls
+            if check_if_gold_at_least(4) and onscreen(CONSTANTS['game']['gamelogic']['xp_buy']):
+                click_to(CONSTANTS['game']['gamelogic']['xp_buy'])
+                time.sleep(1)
+                continue
             if not onscreen(CONSTANTS['game']['round']['1-']) and not onscreen(CONSTANTS['game']['round']['2-']):
-                click_to(CONSTANTS['game']['gamelogic']['reroll'])
+                if check_if_gold_at_least(2) and onscreen(CONSTANTS['game']['gamelogic']['reroll']):
+                    click_to(CONSTANTS['game']['gamelogic']['reroll'])
+
             time.sleep(1)
 
         if check_if_post_game():
@@ -305,7 +333,14 @@ def end_match():
     # added a main loop for the end match function to ensure you make it to the find match button.
     while not onscreen(CONSTANTS['client']['pre_match']['find_match_ready']):
         while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
-            print("Dismissing missions ok")
+            print("Dismissing mission")
+            #screenshot if you have an "ok" button
+            t = time.localtime()    # added for printing time
+            current_time = time.strftime("%H%M%S", t) #for the changing file name
+            myScreenshot = auto.screenshot()
+            myScreenshot.save(rf'{CONSTANTS["client"]["screenshot_location"]}/{current_time}.png')
+            time.sleep(2)
+            print("SS saved")
             click_to(CONSTANTS['client']['post_game']['missions_ok'])
             time.sleep(3)
         if onscreen(CONSTANTS['client']['post_game']['skip_waiting_for_stats']):

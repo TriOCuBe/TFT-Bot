@@ -11,7 +11,7 @@ import psutil
 
 pkg_resources.require("PyAutoGUI==0.9.50")
 pkg_resources.require("opencv-python==4.6.0.66")
-pkg_resources.require("python-imageseach-drov0==1.0.6")
+pkg_resources.require("python-imagesearch==1.2.2")
 
 CONSTANTS = {
     "executables": {
@@ -55,7 +55,7 @@ CONSTANTS = {
             "choose_one": "./captures/buttons/choose_one.png",
             "reroll": "./captures/buttons/reroll.png",
             "take_all": "./captures/buttons/take_all.png",
-            "timer_1": "./captures/buttons/timer_1.png",
+            "timer_1": "./captures/timer_1.png",
             "xp_buy": "./captures/buttons/xp_buy.png",
         },
         "gold": {
@@ -111,6 +111,10 @@ def toggle_pause():
     global pauselogic
     print(f'alt+p pressed, toggling pause from {pauselogic} to {not pauselogic}')
     pauselogic = not pauselogic
+    if pauselogic:
+        print("Bot now paused, remember to unpause to continue botting!")
+    else:
+        print("Bot playing again!")
 
 
 keyboard.add_hotkey('alt+p', lambda: toggle_pause())
@@ -289,7 +293,7 @@ def main_game_loop():
                 time.sleep(1)
                 continue
             # Free champ round
-            if onscreen(CONSTANTS['game']['round']['-4']):
+            if not onscreen(CONSTANTS['game']['round']['1-']) and onscreen(CONSTANTS['game']['round']['-4']):
                 auto.moveTo(928, 396)
                 click_right()
             elif onscreen(CONSTANTS['game']['round']['1-']) or onscreen(CONSTANTS['game']['round']['2-']):

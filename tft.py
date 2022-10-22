@@ -35,7 +35,7 @@ CONSTANTS = {
             "overshadowed": "./captures/buttons/in_queue_overshadowed.png",
             "accept": "./captures/buttons/accept.png",
         },
-        "dead": "./captures/dead.png",
+        "death": "./captures/death.png",
         "reconnect": "./captures/buttons/reconnect.png",
         "post_game": {
             "skip_waiting_for_stats": "./captures/buttons/skip_waiting_for_stats.png",
@@ -177,52 +177,44 @@ def league_already_running():
     return find_in_processes(CONSTANTS['executables']['league']['game'])
 
 # Start between match logic
-
-
 def queue():
     # Queue search loop
     while True:
-        try:
-            # Not already in queue
+        # Not already in queue
+        if not is_in_queue():
+            if is_in_tft_lobby():
+                print("TFT lobby detected, finding match")
+                click_to(CONSTANTS['client']['pre_match']['find_match_ready'])
+                time.sleep(3)
+            elif league_already_running():
+                print("Already in game!")
+                break
+            # Post-match screen
+            elif check_if_post_game():
+                match_complete()
+            else:
+                print("|WARN| TFT lobby not detected!")
+                time.sleep(60)
+
+        #
+        counter = 0
+        while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']):
+            time.sleep(1)
+            click_to(CONSTANTS['client']['in_queue']['accept'])
+
             if not is_in_queue():
-                if is_in_tft_lobby():
-                    print("TFT lobby detected, finding match")
-                    click_to(CONSTANTS['client']['pre_match']['find_match_ready'])
-                    time.sleep(3)
-                elif league_already_running():
-                    print("Already in game!")
-                    break
-                # Post-match screen
-                elif check_if_post_game():
-                    match_complete()
-                else:
-                    print("|WARN| TFT lobby not detected!")
-                    time.sleep(60)
+                counter = counter + 1
 
-            #
-            counter = 0
-            while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']):
-                time.sleep(1)
-                click_to(CONSTANTS['client']['in_queue']['accept'])
-
-                if not is_in_queue():
-                    counter = counter + 1
-
-                if (counter > 60):
-                    print("Was not in queue for 60 seconds, abort?")
-                    break
-
-            if onscreen(CONSTANTS['game']['loading']):
-                print("Loading!")
+            if (counter > 60):
+                print("Was not in queue for 60 seconds, abort?")
                 break
-            elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_already_running():
-                print("Already in game :O!")
-                break
-        except AttributeError:
-            print("Not already in game, couldn't find game client on screen, looping")
-            time.sleep(5)
-            continue
 
+        if onscreen(CONSTANTS['game']['loading']):
+            print("Loading!")
+            break
+        elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_already_running():
+            print("Already in game :O!")
+            break
     loading_match()
 
 
@@ -255,8 +247,8 @@ def buy(iterations):
 
 
 def check_if_game_complete():
-    if onscreen(CONSTANTS['client']['dead']):
-        click_to(CONSTANTS['client']['dead'])
+    if onscreen(CONSTANTS['client']['death']):
+        click_to(CONSTANTS['client']['death'])
         time.sleep(5)
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
 
@@ -266,8 +258,7 @@ def attempt_reconnect_to_existing_game():
         print("reconnecting!")
         time.sleep(0.5)
         click_to(CONSTANTS['client']['reconnect'])
-        return False
-    return True
+    return False
 
 
 def check_if_post_game():  # checks to see if game was interrupted
@@ -452,6 +443,13 @@ os.system('color 0F')
 global starttimer
 starttimer = time.time()
 
-queue()
+def tft_bot_loop():
+    while True:
+        try:
+            queue()
+        except AttributeError:
+            print("Not already in game, couldn't find game client on screen, looping")
+            time.sleep(5)
+            continue
 
-# End auth + main script
+tft_bot_loop()

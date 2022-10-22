@@ -241,7 +241,7 @@ def start_match():
 
 def buy(iterations):
     for i in range(iterations):
-        if not onscreen(CONSTANTS['game']['gold']['0']):
+        if not onscreen(CONSTANTS['game']['gold']['0'], 1.0):
             click_to(CONSTANTS['game']['trait']['bruiser'])
             time.sleep(0.5)
             click_to(CONSTANTS['game']['trait']['mage'])
@@ -273,7 +273,7 @@ def check_if_post_game():  # checks to see if game was interrupted
 def check_if_gold_at_least(num):
     for i in range(num):
         try:
-            if onscreen(CONSTANTS['game']['gold'][f"{i}"]):
+            if onscreen(CONSTANTS['game']['gold'][f"{i}"], 1.0):
                 return False
         except:
             # We don't have this gold as a file

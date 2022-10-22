@@ -283,6 +283,7 @@ def main_game_loop():
             match_complete()
             break
 
+    # Uncomment this (and change the round) if you'd like to surrender and lot let the match end automatically
     # if onscreen("./captures/2-5.png"):
     #     while not onscreen("./captures/3-1.png"):  # change this if you want to surrender at a different stage, also the image recognition struggles with 5 being it sees it as 3 so i had to do 6 as that's seen as a 5
     #         buy(5)
@@ -352,10 +353,8 @@ def surrender():
 
     time.sleep(5)
     
-    print_timer()
-    
-    print("Surrender - Queuing up again!")
-    queue()
+    print("Surrender Complete")
+    match_complete()
 
 
 def print_timer():
@@ -382,7 +381,7 @@ def print_timer():
 
 os.system('color 0F')
 # Start auth + main script
-print("Initial concept by:")
+print("Initial codebase by:")
 printy(r"""
 [c>] _____       _                            _   @
 [c>]|  __ \     | |                          | |  @
@@ -403,7 +402,7 @@ printy(r"""
 [c>]      /____/                                                                     @
 """, "{k}")
 
-printy(f"Welcome! You're running TFT bot.\nPlease feel free to ask questions or contribute at https://github.com/Detergent13/tft-bot", "nB{k}")
+printy(f"Welcome! \nPlease feel free to ask questions or contribute at https://github.com/Kyrluckechuck/tft-bot", "nB{k}")
 auto.alert("Press OK when you're in a TFT lobby!\n")
 printy("Bot started, queuing up!", "w{k}")
 os.system('color 0F')

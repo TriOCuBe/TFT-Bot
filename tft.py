@@ -293,7 +293,8 @@ def main_game_loop():
                 time.sleep(1)
                 continue
             # Free champ round
-            if not onscreen(CONSTANTS['game']['round']['1-']) and onscreen(CONSTANTS['game']['round']['-4']):
+            if not onscreen(CONSTANTS['game']['round']['1-']) and onscreen(CONSTANTS['game']['round']['-4'], 1.0):
+                print("Round X-4, going to move to mid screen")
                 auto.moveTo(928, 396)
                 click_right()
             elif onscreen(CONSTANTS['game']['round']['1-']) or onscreen(CONSTANTS['game']['round']['2-']):

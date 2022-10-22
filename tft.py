@@ -1,7 +1,3 @@
-# Detergent's TFT Bot
-# Branch: main
-
-from xmlrpc.client import Boolean
 import pkg_resources
 import pyautogui as auto
 from python_imagesearch.imagesearch import imagesearch as search
@@ -12,7 +8,6 @@ from datetime import datetime
 import keyboard
 import os
 import psutil
-
 
 pkg_resources.require("PyAutoGUI==0.9.50")
 pkg_resources.require("opencv-python==4.6.0.66")
@@ -109,15 +104,19 @@ gamecount = -1
 endtimer = time.time()
 pauselogic = False
 
+
 def toggle_pause():
     global pauselogic
-    print(f'alt+p pressed, toggling pause from {pauselogic} to {not pauselogic}')
+    print(
+        f'alt+p pressed, toggling pause from {pauselogic} to {not pauselogic}')
     pauselogic = not pauselogic
 
 
 keyboard.add_hotkey('alt+p', lambda: toggle_pause())
 
 # Start utility methods
+
+
 def onscreen(path, precision=0.8):
     return search(path, precision)[0] != -1
 
@@ -153,11 +152,14 @@ def click_to(path, delay=.1):
         click_left(delay)
 # End utility methods
 
+
 def is_in_queue():
     return onscreen(CONSTANTS['client']['in_queue']['base']) or onscreen(CONSTANTS['client']['in_queue']['overshadowed'])
 
+
 def is_in_tft_lobby():
     return onscreen(CONSTANTS['tft_logo']['base']) or onscreen(CONSTANTS['tft_logo']['overshadowed'])
+
 
 def find_in_processes(executable_path):
     for proc in psutil.process_iter():
@@ -169,10 +171,13 @@ def find_in_processes(executable_path):
             continue
     return False
 
+
 def league_already_running():
     return find_in_processes(CONSTANTS['executables']['league']['game'])
 
 # Start between match logic
+
+
 def queue():
     # Queue search loop
     while True:
@@ -192,8 +197,8 @@ def queue():
                 else:
                     print("|WARN| TFT lobby not detected!")
                     time.sleep(60)
-            
-            # 
+
+            #
             counter = 0
             while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']):
                 time.sleep(1)
@@ -201,7 +206,7 @@ def queue():
 
                 if not is_in_queue():
                     counter = counter + 1
-                
+
                 if (counter > 60):
                     print("Was not in queue for 60 seconds, abort?")
                     break
@@ -242,11 +247,13 @@ def buy(iterations):
         click_to(CONSTANTS['game']['trait']['bruiser'])
         click_to(CONSTANTS['game']['trait']['mage'])
 
+
 def check_if_game_complete():
     if onscreen(CONSTANTS['client']['dead']):
         click_to(CONSTANTS['client']['dead'])
         time.sleep(5)
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
+
 
 def attempt_reconnect_to_existing_game():
     if onscreen(CONSTANTS['client']['reconnect']):
@@ -255,6 +262,7 @@ def attempt_reconnect_to_existing_game():
         click_to(CONSTANTS['client']['reconnect'])
         return False
     return True
+
 
 def check_if_post_game():  # checks to see if game was interrupted
     if check_if_game_complete():
@@ -289,13 +297,14 @@ def main_game_loop():
     #         buy(5)
     #         click_to("./captures/reroll.png")
     #         time.sleep(1)
-    #         checks() 
+    #         checks()
     #     print("Surrendering now!")
     #     surrender()
 
 
 def end_match():
-    while not onscreen(CONSTANTS['client']['pre_match']['find_match_ready']):  # added a main loop for the end match function to ensure you make it to the find match button.
+    # added a main loop for the end match function to ensure you make it to the find match button.
+    while not onscreen(CONSTANTS['client']['pre_match']['find_match_ready']):
         while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
             print("Dismissing missions ok")
             click_to(CONSTANTS['client']['post_game']['missions_ok'])
@@ -314,22 +323,24 @@ def end_match():
             time.sleep(10)
 
 
-def match_complete(): 
+def match_complete():
     print_timer()
     print("Match complete! Cleaning up and restarting")
     time.sleep(3)
     end_match()
 
+
 def surrender():
     counter = 0
-    surrenderwait = random.randint(100,150)
+    surrenderwait = random.randint(100, 150)
     print(f'Waiting {surrenderwait} seconds ({surrenderwait / 60 } minutes) to surrender')
     time.sleep(surrenderwait)
     print("Starting surrender")
     click_to(CONSTANTS['game']['settings'])
 
     while not onscreen(CONSTANTS['game']['surrender']['surrender_1']):
-        click_to(CONSTANTS['game']['settings'])  # just in case it gets interrupted or misses
+        # just in case it gets interrupted or misses
+        click_to(CONSTANTS['game']['settings'])
         time.sleep(1)
         counter = counter + 1
         if (counter > 20):
@@ -337,7 +348,8 @@ def surrender():
     counter = 0
     while not onscreen(CONSTANTS['game']['surrender']['surrender_2']):
         click_to(CONSTANTS['game']['surrender']['surrender_1'])
-        if check_if_post_game():  # added a check here for the rare case that the game ended before the surrender finished.
+        # added a check here for the rare case that the game ended before the surrender finished.
+        if check_if_post_game():
             return
         counter = counter + 1
         if (counter > 20):
@@ -346,13 +358,9 @@ def surrender():
     time.sleep(1)
     click_to(CONSTANTS['game']['surrender']['surrender_2'])
     time.sleep(10)
-
-    time.sleep(1)
-
     end_match()
-
     time.sleep(5)
-    
+
     print("Surrender Complete")
     match_complete()
 
@@ -378,6 +386,7 @@ def print_timer():
     print("-------------------------------------")
     print("End of printing timer!")
 # End main process
+
 
 os.system('color 0F')
 # Start auth + main script

@@ -1,6 +1,6 @@
 import pkg_resources
 import pyautogui as auto
-from python_imagesearch.imagesearch import imagesearch as search
+import python_imagesearch.imagesearch as imagesearch
 import time
 from printy import printy
 import random
@@ -123,11 +123,29 @@ keyboard.add_hotkey('alt+p', lambda: toggle_pause())
 
 
 def onscreen(path, precision=0.8):
-    return search(path, precision)[0] != -1
+    return imagesearch.imagesearch(path, precision)[0] != -1
+
+def onscreen_region(path, x1, y1, x2, y2, precision=0.8):
+    return imagesearch.imagesearcharea(path, x1, y1, x2, y2, precision)[0] != -1
+
+def onscreen_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
+    return imagesearch_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision)[0] != -1
+
+def imagesearch_region_numLoop(image, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
+    pos = imagesearch.imagesearcharea(image, x1, y1, x2, y2, precision)
+    count = 0
+
+    while pos[0] == -1:
+        time.sleep(timesample)
+        pos = imagesearch.imagesearcharea(image, x1, y1, x2, y2, precision)
+        count = count + 1
+        if count > maxSamples:
+            break
+    return pos
 
 
 def search_to(path):
-    pos = search(path)
+    pos = imagesearch.imagesearch(path)
     if onscreen(path):
         auto.moveTo(pos)
         return pos
@@ -153,7 +171,7 @@ def click_right(delay=.1):
 
 def click_to(path, delay=.1):
     if onscreen(path):
-        auto.moveTo(search(path))
+        auto.moveTo(imagesearch.imagesearch(path))
         click_left(delay)
 # End utility methods
 
@@ -180,6 +198,21 @@ def find_in_processes(executable_path):
 def league_already_running():
     return find_in_processes(CONSTANTS['executables']['league']['game'])
 
+def find_match():
+    click_to(CONSTANTS['client']['pre_match']['find_match_ready'])
+    time.sleep(3)
+    counter = 0
+    while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']):
+        time.sleep(1)
+        click_to(CONSTANTS['client']['in_queue']['accept'])
+
+        if not is_in_queue():
+            counter = counter + 1
+
+        if (counter > 60):
+            print("Was not in queue for 60 seconds, abort?")
+            break
+
 # Start between match logic
 def queue():
     # Queue search loop
@@ -188,8 +221,7 @@ def queue():
         if not is_in_queue():
             if is_in_tft_lobby():
                 print("TFT lobby detected, finding match")
-                click_to(CONSTANTS['client']['pre_match']['find_match_ready'])
-                time.sleep(3)
+                find_match()
             elif league_already_running():
                 print("Already in game!")
                 break
@@ -198,20 +230,9 @@ def queue():
                 match_complete()
             else:
                 print("|WARN| TFT lobby not detected!")
-                time.sleep(60)
+                time.sleep(5)
 
         #
-        counter = 0
-        while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']):
-            time.sleep(1)
-            click_to(CONSTANTS['client']['in_queue']['accept'])
-
-            if not is_in_queue():
-                counter = counter + 1
-
-            if (counter > 60):
-                print("Was not in queue for 60 seconds, abort?")
-                break
 
         if onscreen(CONSTANTS['game']['loading']):
             print("Loading!")
@@ -220,7 +241,6 @@ def queue():
             print("Already in game :O!")
             break
     loading_match()
-
 
 def loading_match():
     while not onscreen(CONSTANTS['game']['round']['1-1']) and not onscreen(CONSTANTS['game']['gamelogic']['timer_1']):
@@ -241,17 +261,19 @@ def start_match():
 
 def buy(iterations):
     for i in range(iterations):
-        if not onscreen(CONSTANTS['game']['gold']['0'], 1.0):
+        if check_if_gold_at_least(1):
             click_to(CONSTANTS['game']['trait']['bruiser'])
             time.sleep(0.5)
             click_to(CONSTANTS['game']['trait']['mage'])
             time.sleep(0.5)
             click_to(CONSTANTS['game']['trait']['jade'])
             time.sleep(0.5)
+        time.sleep(0.5)
 
 
 def check_if_game_complete():
     if onscreen(CONSTANTS['client']['death']):
+        print("Death detected")
         click_to(CONSTANTS['client']['death'])
         time.sleep(5)
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
@@ -259,7 +281,7 @@ def check_if_game_complete():
 
 def attempt_reconnect_to_existing_game():
     if onscreen(CONSTANTS['client']['reconnect']):
-        print("reconnecting!")
+        print("Reconnecting!")
         time.sleep(0.5)
         click_to(CONSTANTS['client']['reconnect'])
     return False
@@ -271,11 +293,20 @@ def check_if_post_game():  # checks to see if game was interrupted
     return attempt_reconnect_to_existing_game()
 
 def check_if_gold_at_least(num):
-    for i in range(num):
+    print(f"Looking for at least {num} gold")
+    for i in range(num + 1):
+        # print(f"Checking for {i} gold")
         try:
-            if onscreen(CONSTANTS['game']['gold'][f"{i}"], 1.0):
-                return False
+            if onscreen_region_numLoop(CONSTANTS['game']['gold'][f"{i}"], 0.5, 5, 780, 850, 970, 920, 0.9):
+                print(f"Found {i} gold")
+                if (i == num):
+                    print("Correct")
+                    return True
+                else:
+                    print("Incorrect")
+                    return False
         except:
+            print(f"Exception finding {i} gold")
             # We don't have this gold as a file
             return True
     return True
@@ -293,18 +324,18 @@ def main_game_loop():
                 time.sleep(1)
                 continue
             # Free champ round
-            if not onscreen(CONSTANTS['game']['round']['1-']) and onscreen(CONSTANTS['game']['round']['-4'], 1.0):
+            if not onscreen(CONSTANTS['game']['round']['1-'], 1.0) and onscreen(CONSTANTS['game']['round']['-4'], 1.0):
                 print("Round X-4, going to move to mid screen")
                 auto.moveTo(928, 396)
                 click_right()
-            elif onscreen(CONSTANTS['game']['round']['1-']) or onscreen(CONSTANTS['game']['round']['2-']):
+            elif onscreen(CONSTANTS['game']['round']['1-'], 1.0) or onscreen(CONSTANTS['game']['round']['2-'], 1.0):
                 buy(3)
             # If round > 2, attempt re-rolls
             if check_if_gold_at_least(4) and onscreen(CONSTANTS['game']['gamelogic']['xp_buy']):
                 click_to(CONSTANTS['game']['gamelogic']['xp_buy'])
                 time.sleep(1)
                 continue
-            if not onscreen(CONSTANTS['game']['round']['1-']) and not onscreen(CONSTANTS['game']['round']['2-']):
+            if not onscreen(CONSTANTS['game']['round']['1-'], 0.9) and not onscreen(CONSTANTS['game']['round']['2-'], 0.9):
                 if check_if_gold_at_least(2) and onscreen(CONSTANTS['game']['gamelogic']['reroll']):
                     click_to(CONSTANTS['game']['gamelogic']['reroll'])
 

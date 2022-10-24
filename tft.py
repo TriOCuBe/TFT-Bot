@@ -45,7 +45,11 @@ CONSTANTS = {
     },
     "game": {
         "loading": "./captures/loading.png",
-        "exit_now": "./captures/buttons/exit_now.png",
+        "exit_now": {
+            "exit_now_original": "./captures/buttons/exit_now.png",
+            "exit_now_base": "./captures/buttons/exit_now_base.png",
+            "exit_now_highlighted": "./captures/buttons/exit_now_highlighted.png",
+        },
         "settings": "./captures/buttons/settings.png",
         "surrender": {
             "surrender_1": "./captures/buttons/surrender_1.png",
@@ -131,6 +135,7 @@ def onscreen_region(path, x1, y1, x2, y2, precision=0.8):
 def onscreen_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
     return imagesearch_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision)[0] != -1
 
+# Via https://github.com/drov0/python-imagesearch/blob/master/python_imagesearch/imagesearch.py
 def imagesearch_region_numLoop(image, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
     pos = imagesearch.imagesearcharea(image, x1, y1, x2, y2, precision)
     count = 0
@@ -169,10 +174,13 @@ def click_right(delay=.1):
     auto.mouseUp(button='right')
 
 
-def click_to(path, delay=.1):
-    if onscreen(path):
+def click_to(path, precision=0.8, delay=.1):
+    if onscreen(path, precision):
         auto.moveTo(imagesearch.imagesearch(path))
         click_left(delay)
+    else:
+        print(f"Could not find '{path}', skipping")
+
 # End utility methods
 
 
@@ -199,7 +207,7 @@ def league_already_running():
     return find_in_processes(CONSTANTS['executables']['league']['game'])
 
 def find_match():
-    click_to(CONSTANTS['client']['pre_match']['find_match_ready'])
+    click_to(CONSTANTS['client']['pre_match']['find_match_ready'], 0.7)
     time.sleep(3)
     counter = 0
     while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']):
@@ -275,6 +283,17 @@ def check_if_game_complete():
     if onscreen(CONSTANTS['client']['death']):
         print("Death detected")
         click_to(CONSTANTS['client']['death'])
+        time.sleep(5)
+    if onscreen(CONSTANTS['client']['exit_now']['exit_now_base'], 0.9) or onscreen(CONSTANTS['client']['exit_now']['exit_now_highlighted'], 0.9):
+        print("End of game detected")
+        try:
+            click_to(CONSTANTS['client']['exit_now']['exit_now_base'])
+        except:
+            try:
+                print("Failed to click exit now, might be highlighted, trying again")
+                click_to(CONSTANTS['client']['exit_now']['exit_now_highlighted'])
+            except: 
+                print("Failed to click exit now altogether")
         time.sleep(5)
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
 

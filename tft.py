@@ -1,17 +1,38 @@
+
+import time
+import random
+import keyboard
+import os
+import sys
+
+import argparse
 import pkg_resources
 import pyautogui as auto
 import python_imagesearch.imagesearch as imagesearch
-import time
-from printy import printy
-import random
-from datetime import datetime
-import keyboard
-import os
 import psutil
+from printy import printy
+from datetime import datetime
 
 pkg_resources.require("PyAutoGUI==0.9.50")
 pkg_resources.require("opencv-python==4.6.0.66")
 pkg_resources.require("python-imagesearch==1.2.2")
+
+arg_parser = argparse.ArgumentParser(prog="TFT Bot")
+arg_parser.add_argument("--ffearly", action='store_true', help="If the game should be surrendered at first available time.")
+arg_parser.add_argument("-v", "--verbose", action="store_true", help="Increase output verbosity, mostly useful for debugging")
+parsed_args = arg_parser.parse_args()
+
+FF_EARLY = parsed_args.ffearly
+VERBOSE = parsed_args.verbose
+if FF_EARLY:
+    print("FF Early Specified - Will surrender at first available time")
+else:
+    print("FF Early Not Specified - Will play out games for their duration")
+
+if VERBOSE:
+    print("Will explain everything and be very verbose")
+else:
+    print("Will be quiet and not be very verbose")
 
 CONSTANTS = {
     "executables": {
@@ -124,8 +145,6 @@ def toggle_pause():
 keyboard.add_hotkey('alt+p', lambda: toggle_pause())
 
 # Start utility methods
-
-
 def onscreen(path, precision=0.8):
     return imagesearch.imagesearch(path, precision)[0] != -1
 
@@ -197,7 +216,7 @@ def find_in_processes(executable_path):
         try:
             if (proc.exe() == executable_path):
                 return True
-        except:
+        except Exception:
             # Nothing, we don't care
             continue
     return False
@@ -288,11 +307,11 @@ def check_if_game_complete():
         print("End of game detected")
         try:
             click_to(CONSTANTS['client']['exit_now']['exit_now_base'])
-        except:
+        except Exception:
             try:
                 print("Failed to click exit now, might be highlighted, trying again")
                 click_to(CONSTANTS['client']['exit_now']['exit_now_highlighted'])
-            except: 
+            except Exception:
                 print("Failed to click exit now altogether")
         time.sleep(5)
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
@@ -324,7 +343,7 @@ def check_if_gold_at_least(num):
                 else:
                     print("Incorrect")
                     return False
-        except:
+        except Exception:
             print(f"Exception finding {i} gold")
             # We don't have this gold as a file
             return True
@@ -364,15 +383,14 @@ def main_game_loop():
             match_complete()
             break
 
-    # Uncomment this (and change the round) if you'd like to surrender and lot let the match end automatically
-    # if onscreen("./captures/2-5.png"):
-    #     while not onscreen("./captures/3-1.png"):  # change this if you want to surrender at a different stage, also the image recognition struggles with 5 being it sees it as 3 so i had to do 6 as that's seen as a 5
-    #         buy(5)
-    #         click_to("./captures/reroll.png")
-    #         time.sleep(1)
-    #         checks()
-    #     print("Surrendering now!")
-    #     surrender()
+        if FF_EARLY:
+            # Change the round to end the round early at a different time
+            # change this if you want to surrender at a different stage, also the image recognition struggles with 5 being it sees it as 3 so i had to do 6 as that's seen as a 5
+            if not onscreen(CONSTANTS["game"]["1-"], 0.9) and not onscreen(CONSTANTS["game"]["2-", 0.9]):
+                if not onscreen("./captures/3-1.png", 0.9):
+                    print("Surrendering now!")
+                    surrender()
+                    break
 
 
 def end_match():

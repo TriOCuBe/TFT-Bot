@@ -3,7 +3,6 @@ import time
 import random
 import keyboard
 import os
-import sys
 
 import argparse
 import pkg_resources

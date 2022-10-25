@@ -279,12 +279,23 @@ def loading_match():
 
 def start_match():
     while onscreen(CONSTANTS['game']['round']['1-1']):
-        auto.moveTo(1270, 795)
-        click_right()
+        shared_draft_pathing()
 
     print("In the match now!")
     main_game_loop()
 
+def shared_draft_pathing():
+    auto.moveTo(946, 315)
+    click_right()
+    time.sleep(3)
+    auto.moveTo(700, 450)
+    click_right()
+    time.sleep(3)
+    auto.moveTo(950, 675)
+    click_right()
+    time.sleep(3)
+    auto.moveTo(1200, 460)
+    click_right()
 
 def buy(iterations):
     for i in range(iterations):
@@ -303,14 +314,14 @@ def check_if_game_complete():
         print("Death detected")
         click_to(CONSTANTS['client']['death'])
         time.sleep(5)
-    if onscreen(CONSTANTS['client']['exit_now']['exit_now_base'], 0.9) or onscreen(CONSTANTS['client']['exit_now']['exit_now_highlighted'], 0.9):
+    if onscreen(CONSTANTS['game']['exit_now']['exit_now_base'], 0.9) or onscreen(CONSTANTS['game']['exit_now']['exit_now_highlighted'], 0.9):
         print("End of game detected")
         try:
-            click_to(CONSTANTS['client']['exit_now']['exit_now_base'])
+            click_to(CONSTANTS['game']['exit_now']['exit_now_base'])
         except Exception:
             try:
                 print("Failed to click exit now, might be highlighted, trying again")
-                click_to(CONSTANTS['client']['exit_now']['exit_now_highlighted'])
+                click_to(CONSTANTS['game']['exit_now']['exit_now_highlighted'])
             except Exception:
                 print("Failed to click exit now altogether")
         time.sleep(5)
@@ -335,7 +346,7 @@ def check_if_gold_at_least(num):
     for i in range(num + 1):
         # print(f"Checking for {i} gold")
         try:
-            if onscreen_region_numLoop(CONSTANTS['game']['gold'][f"{i}"], 0.5, 5, 780, 850, 970, 920, 0.9):
+            if onscreen_region_numLoop(CONSTANTS['game']['gold'][f"{i}"], 0.1, 5, 780, 850, 970, 920, 0.9):
                 print(f"Found {i} gold")
                 if (i == num):
                     print("Correct")
@@ -362,11 +373,11 @@ def main_game_loop():
                 time.sleep(1)
                 continue
             # Free champ round
-            if not onscreen(CONSTANTS['game']['round']['1-'], 1.0) and onscreen(CONSTANTS['game']['round']['-4'], 1.0):
-                print("Round X-4, going to move to mid screen")
-                auto.moveTo(928, 396)
-                click_right()
-            elif onscreen(CONSTANTS['game']['round']['1-'], 1.0) or onscreen(CONSTANTS['game']['round']['2-'], 1.0):
+            if not onscreen(CONSTANTS['game']['round']['1-'], 0.9) and onscreen(CONSTANTS['game']['round']['-4'], 0.9):
+                print("Round X-4, draft detected")
+                shared_draft_pathing()
+                continue
+            elif onscreen(CONSTANTS['game']['round']['1-'], 0.9) or onscreen(CONSTANTS['game']['round']['2-'], 0.9):
                 buy(3)
             # If round > 2, attempt re-rolls
             if check_if_gold_at_least(4) and onscreen(CONSTANTS['game']['gamelogic']['xp_buy']):

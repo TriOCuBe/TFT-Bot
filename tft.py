@@ -1,28 +1,174 @@
-# Detergent's TFT Bot
-# Branch: main
 
+import time
+import random
+import keyboard
+import os
+
+import argparse
 import pkg_resources
 import pyautogui as auto
-from python_imagesearch.imagesearch import imagesearch as search
-import time
+import python_imagesearch.imagesearch as imagesearch
+import psutil
 from printy import printy
+from datetime import datetime
 
 pkg_resources.require("PyAutoGUI==0.9.50")
-pkg_resources.require("opencv-python==4.5.1.48")
-pkg_resources.require("python-imageseach-drov0==1.0.6")
+pkg_resources.require("opencv-python==4.6.0.66")
+pkg_resources.require("python-imagesearch==1.2.2")
+
+arg_parser = argparse.ArgumentParser(prog="TFT Bot")
+arg_parser.add_argument("--ffearly", action='store_true', help="If the game should be surrendered at first available time.")
+arg_parser.add_argument("-v", "--verbose", action="store_true", help="Increase output verbosity, mostly useful for debugging")
+parsed_args = arg_parser.parse_args()
+
+FF_EARLY = parsed_args.ffearly
+VERBOSE = parsed_args.verbose
+if FF_EARLY:
+    print("FF Early Specified - Will surrender at first available time")
+else:
+    print("FF Early Not Specified - Will play out games for their duration")
+
+if VERBOSE:
+    print("Will explain everything and be very verbose")
+else:
+    print("Will be quiet and not be very verbose")
+
+CONSTANTS = {
+    "executables": {
+        "league": {
+            "client": "C:\Riot Games\League of Legends\LeagueClient.exe",
+            "game": "C:\Riot Games\League of Legends\Game\League of Legends.exe",
+        },
+    },
+    "tft_logo": {
+        "base": "./captures/tft_logo.png",
+        "overshadowed": "./captures/tft_logo_overshadowed.png",
+    },
+    "client": {
+        "screenshot_location": "./screenshots/",
+        "pre_match": {
+            "quick_play": "./captures/buttons/quick_play.png",
+            "find_match_ready": "./captures/buttons/find_match_ready.png",
+        },
+        "in_queue": {
+            "base": "./captures/buttons/in_queue.png",
+            "overshadowed": "./captures/buttons/in_queue_overshadowed.png",
+            "accept": "./captures/buttons/accept.png",
+        },
+        "death": "./captures/death.png",
+        "reconnect": "./captures/buttons/reconnect.png",
+        "post_game": {
+            "skip_waiting_for_stats": "./captures/buttons/skip_waiting_for_stats.png",
+            "play_again": "./captures/buttons/play_again.png",
+            "missions_ok": "./captures/buttons/missions_ok.png",
+        },
+    },
+    "game": {
+        "loading": "./captures/loading.png",
+        "exit_now": {
+            "exit_now_original": "./captures/buttons/exit_now.png",
+            "exit_now_base": "./captures/buttons/exit_now_base.png",
+            "exit_now_highlighted": "./captures/buttons/exit_now_highlighted.png",
+        },
+        "settings": "./captures/buttons/settings.png",
+        "surrender": {
+            "surrender_1": "./captures/buttons/surrender_1.png",
+            "surrender_2": "./captures/buttons/surrender_2.png",
+        },
+        "gamelogic": {
+            "choose_one": "./captures/buttons/choose_one.png",
+            "reroll": "./captures/buttons/reroll.png",
+            "take_all": "./captures/buttons/take_all.png",
+            "timer_1": "./captures/timer_1.png",
+            "xp_buy": "./captures/buttons/xp_buy.png",
+        },
+        "gold": {
+            "0": "./captures/gold/0.png",
+            "1": "./captures/gold/1.png",
+            "2": "./captures/gold/2.png",
+            "3": "./captures/gold/3.png",
+            "4": "./captures/gold/4.png",
+            "5": "./captures/gold/5.png",
+            "6": "./captures/gold/6.png",
+        },
+        "round": {
+            "-4": "./captures/round/-4.png",
+            "1-": "./captures/round/1-.png",
+            "2-": "./captures/round/2-.png",
+            "1-1": "./captures/round/1-1.png",
+            "2-2": "./captures/round/2-2.png",
+            "2-3": "./captures/round/2-3.png",
+            "2-4": "./captures/round/2-4.png",
+            "2-5": "./captures/round/2-5.png",
+            "3-1": "./captures/round/3-1.png",
+            "3-2": "./captures/round/3-2.png",
+            "3-3": "./captures/round/3-3.png",
+            "3-4": "./captures/round/3-4.png",
+            "3-7": "./captures/round/3-7.png",
+            "4-6": "./captures/round/4-6.png",
+            "4-7": "./captures/round/4-7.png",
+            "6-5": "./captures/round/6-5.png",
+            "6-6": "./captures/round/6-6.png",
+        },
+        "trait": {
+            "astral": "./captures/trait/astral.png",
+            "bruiser": "./captures/trait/bruiser.png",
+            "chemtech": "./captures/trait/chemtech.png",
+            "dragonmancer": "./captures/trait/dragonmancer.png",
+            "jade": "./captures/trait/jade.png",
+            "mage": "./captures/trait/mage.png",
+            "scrap": "./captures/trait/scrap.png",
+        },
+    },
+}
 
 auto.FAILSAFE = False
 
 global gamecount
-gamecount = 0
+global endtimer
+gamecount = -1
+endtimer = time.time()
+pauselogic = False
+
+
+def toggle_pause():
+    global pauselogic
+    print(f'alt+p pressed, toggling pause from {pauselogic} to {not pauselogic}')
+    pauselogic = not pauselogic
+    if pauselogic:
+        print("Bot now paused, remember to unpause to continue botting!")
+    else:
+        print("Bot playing again!")
+
+
+keyboard.add_hotkey('alt+p', lambda: toggle_pause())
 
 # Start utility methods
 def onscreen(path, precision=0.8):
-    return search(path, precision)[0] != -1
+    return imagesearch.imagesearch(path, precision)[0] != -1
+
+def onscreen_region(path, x1, y1, x2, y2, precision=0.8):
+    return imagesearch.imagesearcharea(path, x1, y1, x2, y2, precision)[0] != -1
+
+def onscreen_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
+    return imagesearch_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision)[0] != -1
+
+# Via https://github.com/drov0/python-imagesearch/blob/master/python_imagesearch/imagesearch.py
+def imagesearch_region_numLoop(image, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
+    pos = imagesearch.imagesearcharea(image, x1, y1, x2, y2, precision)
+    count = 0
+
+    while pos[0] == -1:
+        time.sleep(timesample)
+        pos = imagesearch.imagesearcharea(image, x1, y1, x2, y2, precision)
+        count = count + 1
+        if count > maxSamples:
+            break
+    return pos
 
 
 def search_to(path):
-    pos = search(path)
+    pos = imagesearch.imagesearch(path)
     if onscreen(path):
         auto.moveTo(pos)
         return pos
@@ -46,156 +192,313 @@ def click_right(delay=.1):
     auto.mouseUp(button='right')
 
 
-def click_to(path, delay=.1):
-    if onscreen(path):
-        auto.moveTo(search(path))
+def click_to(path, precision=0.8, delay=.1):
+    if onscreen(path, precision):
+        auto.moveTo(imagesearch.imagesearch(path))
         click_left(delay)
+    else:
+        print(f"Could not find '{path}', skipping")
+
 # End utility methods
 
 
-# Start main process
-def queue():
-    if onscreen("./captures/tft logo.png"):
-        click_to("./captures/find match ready.png")
-    while not onscreen("./captures/loading.png"):
+def is_in_queue():
+    return onscreen(CONSTANTS['client']['in_queue']['base']) or onscreen(CONSTANTS['client']['in_queue']['overshadowed'])
+
+
+def is_in_tft_lobby():
+    return onscreen(CONSTANTS['tft_logo']['base']) or onscreen(CONSTANTS['tft_logo']['overshadowed'])
+
+
+def find_in_processes(executable_path):
+    for proc in psutil.process_iter():
+        try:
+            if (proc.exe() == executable_path):
+                return True
+        except Exception:
+            # Nothing, we don't care
+            continue
+    return False
+
+
+def league_already_running():
+    return find_in_processes(CONSTANTS['executables']['league']['game'])
+
+def find_match():
+    click_to(CONSTANTS['client']['pre_match']['find_match_ready'], 0.7)
+    time.sleep(3)
+    counter = 0
+    while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']):
         time.sleep(1)
-        click_to("./captures/accept.png")
-    global starttimer
-    starttimer = time.time()
-    print("Loading!")
-    loading()
+        click_to(CONSTANTS['client']['in_queue']['accept'])
 
+        if not is_in_queue():
+            counter = counter + 1
 
-def loading():
-    while not onscreen("./captures/1-1.png"):
+        if (counter > 60):
+            print("Was not in queue for 60 seconds, abort?")
+            break
+
+# Start between match logic
+def queue():
+    # Queue search loop
+    while True:
+        # Not already in queue
+        if not is_in_queue():
+            if is_in_tft_lobby():
+                print("TFT lobby detected, finding match")
+                find_match()
+            elif league_already_running():
+                print("Already in game!")
+                break
+            # Post-match screen
+            elif check_if_post_game():
+                match_complete()
+            else:
+                print("|WARN| TFT lobby not detected!")
+                time.sleep(5)
+
+        #
+
+        if onscreen(CONSTANTS['game']['loading']):
+            print("Loading!")
+            break
+        elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_already_running():
+            print("Already in game :O!")
+            break
+    loading_match()
+
+def loading_match():
+    while not onscreen(CONSTANTS['game']['round']['1-1']) and not onscreen(CONSTANTS['game']['gamelogic']['timer_1']):
         time.sleep(1)
 
     print("Match starting!")
-    start()
+    start_match()
 
 
-def start():
-    while onscreen("./captures/1-1.png"):
-        auto.moveTo(888, 376)
-        click_right()
+def start_match():
+    while onscreen(CONSTANTS['game']['round']['1-1']):
+        shared_draft_pathing()
 
     print("In the match now!")
-    main()
+    main_game_loop()
 
+def shared_draft_pathing():
+    auto.moveTo(946, 315)
+    click_right()
+    time.sleep(3)
+    auto.moveTo(700, 450)
+    click_right()
+    time.sleep(3)
+    auto.moveTo(950, 675)
+    click_right()
+    time.sleep(3)
+    auto.moveTo(1200, 460)
+    click_right()
 
 def buy(iterations):
     for i in range(iterations):
-        click_to("./captures/trait/bruiser.png")
-        click_to("./captures/trait/mage.png")
-
-    
-def checks():  # checks to see if game was interrupted
-    if onscreen("./captures/play again.png"):
-        won_match()
-    if onscreen("./captures/dead.PNG"):  # check for loss
-        click_to("./captures/dead.PNG")
-        won_match()
-    if onscreen("./captures/reconnect.png"):
-        print("reconnecting!")
+        if check_if_gold_at_least(1):
+            click_to(CONSTANTS['game']['trait']['bruiser'])
+            time.sleep(0.5)
+            click_to(CONSTANTS['game']['trait']['mage'])
+            time.sleep(0.5)
+            click_to(CONSTANTS['game']['trait']['jade'])
+            time.sleep(0.5)
         time.sleep(0.5)
-        click_to("./captures/reconnect.png")
 
 
-def main():
-    while not onscreen("./captures/2-4.png"):
-        buy(5)
-        time.sleep(1)
-        checks() 
-    while onscreen("./captures/2-4.png"):
-        auto.moveTo(928, 396)
-        click_right()
-        time.sleep(0.25)
+def check_if_game_complete():
+    if onscreen(CONSTANTS['client']['death']):
+        print("Death detected")
+        click_to(CONSTANTS['client']['death'])
+        time.sleep(5)
+    if onscreen(CONSTANTS['game']['exit_now']['exit_now_base'], 0.9) or onscreen(CONSTANTS['game']['exit_now']['exit_now_highlighted'], 0.9):
+        print("End of game detected")
+        try:
+            click_to(CONSTANTS['game']['exit_now']['exit_now_base'])
+        except Exception:
+            try:
+                print("Failed to click exit now, might be highlighted, trying again")
+                click_to(CONSTANTS['game']['exit_now']['exit_now_highlighted'])
+            except Exception:
+                print("Failed to click exit now altogether")
+        time.sleep(5)
+    return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
 
-    time.sleep(5)
 
-    if onscreen("./captures/2-5.png"):
-        while not onscreen("./captures/3-1.png"):  # change this if you want to surrender at a different stage, also the image recognition struggles with 5 being it sees it as 3 so i had to do 6 as that's seen as a 5
-            buy(5)
-            click_to("./captures/reroll.png")
+def attempt_reconnect_to_existing_game():
+    if onscreen(CONSTANTS['client']['reconnect']):
+        print("Reconnecting!")
+        time.sleep(0.5)
+        click_to(CONSTANTS['client']['reconnect'])
+    return False
+
+
+def check_if_post_game():  # checks to see if game was interrupted
+    if check_if_game_complete():
+        return True
+    return attempt_reconnect_to_existing_game()
+
+def check_if_gold_at_least(num):
+    print(f"Looking for at least {num} gold")
+    for i in range(num + 1):
+        # print(f"Checking for {i} gold")
+        try:
+            if onscreen_region_numLoop(CONSTANTS['game']['gold'][f"{i}"], 0.1, 5, 780, 850, 970, 920, 0.9):
+                print(f"Found {i} gold")
+                if (i == num):
+                    print("Correct")
+                    return True
+                else:
+                    print("Incorrect")
+                    return False
+        except Exception:
+            print(f"Exception finding {i} gold")
+            # We don't have this gold as a file
+            return True
+    return True
+
+def main_game_loop():
+    exit = False
+    while exit == False:
+        if pauselogic:
+            time.sleep(5)
+        else:
+            # Handle recurring round logic
+            # Treasure dragon, dont reroll just take it
+            if onscreen(CONSTANTS['game']['gamelogic']['take_all']):
+                click_to(CONSTANTS['game']['gamelogic']['take_all'])
+                time.sleep(1)
+                continue
+            # Free champ round
+            if not onscreen(CONSTANTS['game']['round']['1-'], 0.9) and onscreen(CONSTANTS['game']['round']['-4'], 0.9):
+                print("Round X-4, draft detected")
+                shared_draft_pathing()
+                continue
+            elif onscreen(CONSTANTS['game']['round']['1-'], 0.9) or onscreen(CONSTANTS['game']['round']['2-'], 0.9):
+                buy(3)
+            # If round > 2, attempt re-rolls
+            if check_if_gold_at_least(4) and onscreen(CONSTANTS['game']['gamelogic']['xp_buy']):
+                click_to(CONSTANTS['game']['gamelogic']['xp_buy'])
+                time.sleep(1)
+                continue
+            if not onscreen(CONSTANTS['game']['round']['1-'], 0.9) and not onscreen(CONSTANTS['game']['round']['2-'], 0.9):
+                if check_if_gold_at_least(2) and onscreen(CONSTANTS['game']['gamelogic']['reroll']):
+                    click_to(CONSTANTS['game']['gamelogic']['reroll'])
+
             time.sleep(1)
-            checks() 
-        print("Surrendering now!")
-        surrender()
+
+        if check_if_post_game():
+            match_complete()
+            break
+
+        if FF_EARLY:
+            # Change the round to end the round early at a different time
+            # change this if you want to surrender at a different stage, also the image recognition struggles with 5 being it sees it as 3 so i had to do 6 as that's seen as a 5
+            if not onscreen(CONSTANTS["game"]["1-"], 0.9) and not onscreen(CONSTANTS["game"]["2-", 0.9]):
+                if not onscreen("./captures/3-1.png", 0.9):
+                    print("Surrendering now!")
+                    surrender()
+                    break
 
 
 def end_match():
-    while not onscreen("./captures/find match ready.png"):  # added a main loop for the end match function to ensure you make it to the find match button.
-        while onscreen("./captures/missions ok.png"):
-            click_to("./captures/missions ok.png")
+    # added a main loop for the end match function to ensure you make it to the find match button.
+    while not onscreen(CONSTANTS['client']['pre_match']['find_match_ready']):
+        while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
+            print("Dismissing mission")
+            #screenshot if you have an "ok" button
+            t = time.localtime()    # added for printing time
+            current_time = time.strftime("%H%M%S", t) #for the changing file name
+            myScreenshot = auto.screenshot()
+            myScreenshot.save(rf'{CONSTANTS["client"]["screenshot_location"]}/{current_time}.png')
             time.sleep(2)
-        while onscreen("./captures/skip waiting for stats.png"):
-            click_to("./captures/skip waiting for stats.png")
-            time.sleep(5)
-        while onscreen("./captures/play again.png"):
-            click_to("./captures/play again.png")
-            
-            
-def won_match(): 
-    print_timer()    
+            print("SS saved")
+            click_to(CONSTANTS['client']['post_game']['missions_ok'])
+            time.sleep(3)
+        if onscreen(CONSTANTS['client']['post_game']['skip_waiting_for_stats']):
+            print("Skipping waiting for stats")
+            click_to(CONSTANTS['client']['post_game']['skip_waiting_for_stats'])
+            time.sleep(10)
+        if onscreen(CONSTANTS['client']['post_game']['play_again']):
+            print("Attempting to play again")
+            click_to(CONSTANTS['client']['post_game']['play_again'])
+            time.sleep(3)
+        if onscreen(CONSTANTS['client']['pre_match']['quick_play']):
+            print("Attempting to quick play")
+            click_to(CONSTANTS['client']['pre_match']['quick_play'])
+            time.sleep(10)
 
-    time.sleep(3)
 
-    end_match()
-
-    time.sleep(5)
-    print("Queuing up again!")
-    queue()
-
-    
-def surrender():
-    click_to("./captures/settings.png")
-
-    while not onscreen("./captures/surrender 1.png"):
-        click_to("./captures/settings.png")  # just in case it gets interrupted or misses
-        time.sleep(1)
-    while not onscreen("./captures/surrender 2.png"):
-        click_to("./captures/surrender 1.png")
-        checks()  # added a check here for the rare case that the game ended before the surrender finished.
-
-    time.sleep(1)
-    click_to("./captures/surrender 2.png")
-    time.sleep(10)
-
-    time.sleep(1)
-
-    end_match()
-
-    time.sleep(5)
-    
+def match_complete():
     print_timer()
-    
-    print("Queuing up again!")
-    queue()
+    print("Match complete! Cleaning up and restarting")
+    time.sleep(3)
+    end_match()
+
+
+def surrender():
+    counter = 0
+    surrenderwait = random.randint(100, 150)
+    print(f'Waiting {surrenderwait} seconds ({surrenderwait / 60 } minutes) to surrender')
+    time.sleep(surrenderwait)
+    print("Starting surrender")
+    click_to(CONSTANTS['game']['settings'])
+
+    while not onscreen(CONSTANTS['game']['surrender']['surrender_1']):
+        # just in case it gets interrupted or misses
+        click_to(CONSTANTS['game']['settings'])
+        time.sleep(1)
+        counter = counter + 1
+        if (counter > 20):
+            break
+    counter = 0
+    while not onscreen(CONSTANTS['game']['surrender']['surrender_2']):
+        click_to(CONSTANTS['game']['surrender']['surrender_1'])
+        # added a check here for the rare case that the game ended before the surrender finished.
+        if check_if_post_game():
+            return
+        counter = counter + 1
+        if (counter > 20):
+            break
+
+    time.sleep(1)
+    click_to(CONSTANTS['game']['surrender']['surrender_2'])
+    time.sleep(10)
+    end_match()
+    time.sleep(5)
+
+    print("Surrender Complete")
+    match_complete()
 
 
 def print_timer():
-    global gamecount
     global endtimer
     endtimer = time.time()
+    global gamecount
     gamecount += 1
     sec = (endtimer - starttimer)
     hours = sec // 3600
     sec = sec - hours*3600
     mu = sec // 60
     ss = sec - mu*60
-    gamecount2 = str(gamecount)
+    gamecount_string = str(gamecount)
     #result_list = str(datetime.timedelta(seconds=sec)).split(".")
+    print("-------------------------------------")
+    print("Current Time =", datetime.now().strftime("%H:%M:%S"))
     print("-------------------------------------")
     print("Game End")
     print("Play Time : ", int(float(hours)), "Hour", int(float(mu)), "Min", int(float(ss)), "Sec")
-    print("Gamecount : ", gamecount2)
+    print("Gamecount : ", gamecount_string)
     print("-------------------------------------")
-    print("Queuing up again!")
+    print("End of printing timer!")
 # End main process
-    
-    
+
+
+os.system('color 0F')
 # Start auth + main script
-print("Developed by:")
+print("Initial codebase by:")
 printy(r"""
 [c>] _____       _                            _   @
 [c>]|  __ \     | |                          | |  @
@@ -205,11 +508,31 @@ printy(r"""
 [c>]|_____/ \___|\__\___|_|  \__, |\___|_| |_|\__|@
 [c>]                          __/ |               @
 [c>]                         |___/                @
-""")
+""", "{k}")
+print("Re-written by:")
+printy(r"""
+[c>]    __ __              __              __                __                  __  @
+[c>]   / //_/__  __ _____ / /__  __ _____ / /__ ___   _____ / /_   __  __ _____ / /__@
+[c>]  / ,<  / / / // ___// // / / // ___// //_// _ \ / ___// __ \ / / / // ___// //_/@
+[c>] / /| |/ /_/ // /   / // /_/ // /__ / ,<  /  __// /__ / / / // /_/ // /__ / ,<   @
+[c>]/_/ |_|\__, //_/   /_/ \__,_/ \___//_/|_| \___/ \___//_/ /_/ \__,_/ \___//_/|_|  @
+[c>]      /____/                                                                     @
+""", "{k}")
 
-printy(f"Welcome! You're running Detergent's TFT bot.\nPlease feel free to ask questions or contribute at https://github.com/Detergent13/tft-bot", "nB")
+printy(f"Welcome! \nPlease feel free to ask questions or contribute at https://github.com/Kyrluckechuck/tft-bot", "nB{k}")
 auto.alert("Press OK when you're in a TFT lobby!\n")
-print("Bot started, queuing up!")
-queue()
+printy("Bot started, queuing up!", "w{k}")
+os.system('color 0F')
+global starttimer
+starttimer = time.time()
 
-# End auth + main script
+def tft_bot_loop():
+    while True:
+        try:
+            queue()
+        except AttributeError:
+            print("Not already in game, couldn't find game client on screen, looping")
+            time.sleep(5)
+            continue
+
+tft_bot_loop()

@@ -48,7 +48,11 @@ CONSTANTS = {
         "screenshot_location": "./screenshots/",
         "pre_match": {
             "quick_play": "./captures/buttons/quick_play.png",
-            "find_match_ready": "./captures/buttons/find_match_ready.png",
+            "find_match": {
+                "base": "./captures/buttons/find_match.png",
+                "highlighted": "./captures/buttons/find_match_highlighted.png",
+                "original": "./captures/buttons/find_match_original.png",
+            }
         },
         "in_queue": {
             "base": "./captures/buttons/in_queue.png",
@@ -66,9 +70,8 @@ CONSTANTS = {
     "game": {
         "loading": "./captures/loading.png",
         "exit_now": {
-            "exit_now_original": "./captures/buttons/exit_now.png",
-            "exit_now_base": "./captures/buttons/exit_now_base.png",
-            "exit_now_highlighted": "./captures/buttons/exit_now_highlighted.png",
+            "base": "./captures/buttons/exit_now_base.png",
+            "highlighted": "./captures/buttons/exit_now_highlighted.png",
         },
         "settings": "./captures/buttons/settings.png",
         "surrender": {
@@ -122,6 +125,17 @@ CONSTANTS = {
     },
 }
 
+find_match_images = [
+    CONSTANTS['client']['pre_match']['find_match']['base'],
+    CONSTANTS['client']['pre_match']['find_match']['highlighted'],
+    CONSTANTS['client']['pre_match']['find_match']['original'],
+]
+
+exit_now_images = [
+    CONSTANTS['game']['exit_now']['base'],
+    CONSTANTS['game']['exit_now']['highlighted'],
+]
+
 auto.FAILSAFE = False
 
 global gamecount
@@ -146,6 +160,12 @@ keyboard.add_hotkey('alt+p', lambda: toggle_pause())
 # Start utility methods
 def onscreen(path, precision=0.8):
     return imagesearch.imagesearch(path, precision)[0] != -1
+
+def onscreen_multiple_any(paths, precision=0.8):
+    for path in paths:
+        if (imagesearch.imagesearch(path, precision)[0] != -1):
+            return True
+    return False
 
 def onscreen_region(path, x1, y1, x2, y2, precision=0.8):
     return imagesearch.imagesearcharea(path, x1, y1, x2, y2, precision)[0] != -1
@@ -199,6 +219,32 @@ def click_to(path, precision=0.8, delay=.1):
     else:
         print(f"Could not find '{path}', skipping")
 
+def click_to_multiple(images, conditional_func=None, delay=None):
+    for image in images:
+        try:
+            click_to(image)
+        except Exception:
+            print(f"Failed to click {image}")
+        if is_var_number(delay):
+            time.sleep(delay)
+        if is_var_function(conditional_func) and conditional_func():
+            return True
+    return False
+
+def is_var_number(var):
+    try:
+        return type(var) == int or type(var) == float
+    except:
+        pass
+    return False
+
+def is_var_function(var):
+    try:
+        return callable(var)
+    except:
+        pass
+    return False
+
 # End utility methods
 
 
@@ -225,19 +271,21 @@ def league_already_running():
     return find_in_processes(CONSTANTS['executables']['league']['game'])
 
 def find_match():
-    click_to(CONSTANTS['client']['pre_match']['find_match_ready'], 0.7)
-    time.sleep(3)
     counter = 0
-    while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']):
+    while is_in_tft_lobby():
+        find_match_click_success = click_to_multiple(find_match_images, conditional_func=is_in_queue, delay=0.2)
+        print(f"Clicking find match success: {find_match_click_success}")
         time.sleep(1)
-        click_to(CONSTANTS['client']['in_queue']['accept'])
+        while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']) and is_in_queue():
+            click_to(CONSTANTS['client']['in_queue']['accept'])
+            time.sleep(1)
 
-        if not is_in_queue():
-            counter = counter + 1
+            if not is_in_queue():
+                counter = counter + 1
 
-        if (counter > 60):
-            print("Was not in queue for 60 seconds, abort?")
-            break
+            if (counter > 60):
+                print("Was not in queue for 60 seconds, aborting")
+                break
 
 # Start between match logic
 def queue():
@@ -307,22 +355,18 @@ def buy(iterations):
             time.sleep(0.5)
         time.sleep(0.5)
 
+def exit_now_conditional():
+    return not league_already_running()
 
 def check_if_game_complete():
     if onscreen(CONSTANTS['client']['death']):
         print("Death detected")
         click_to(CONSTANTS['client']['death'])
         time.sleep(5)
-    if onscreen(CONSTANTS['game']['exit_now']['exit_now_base'], 0.9) or onscreen(CONSTANTS['game']['exit_now']['exit_now_highlighted'], 0.9):
+    if onscreen_multiple_any(exit_now_images):
         print("End of game detected")
-        try:
-            click_to(CONSTANTS['game']['exit_now']['exit_now_base'])
-        except Exception:
-            try:
-                print("Failed to click exit now, might be highlighted, trying again")
-                click_to(CONSTANTS['game']['exit_now']['exit_now_highlighted'])
-            except Exception:
-                print("Failed to click exit now altogether")
+        exit_now_bool = click_to_multiple(exit_now_images, conditional_func=exit_now_conditional, delay=1.5)
+        print(f"Exit now clicking success: {exit_now_bool}")
         time.sleep(5)
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
 
@@ -405,7 +449,7 @@ def main_game_loop():
 
 def end_match():
     # added a main loop for the end match function to ensure you make it to the find match button.
-    while not onscreen(CONSTANTS['client']['pre_match']['find_match_ready']):
+    while not onscreen_multiple_any(find_match_images):
         while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
             print("Dismissing mission")
             #screenshot if you have an "ok" button
@@ -423,7 +467,7 @@ def end_match():
             time.sleep(10)
         if onscreen(CONSTANTS['client']['post_game']['play_again']):
             print("Attempting to play again")
-            click_to(CONSTANTS['client']['post_game']['play_again'])
+            click_to(CONSTANTS['client']['post_game']['play_again'], delay=0.5)
             time.sleep(3)
         if onscreen(CONSTANTS['client']['pre_match']['quick_play']):
             print("Attempting to quick play")

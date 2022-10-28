@@ -3,6 +3,6 @@ PyAutoGUI==0.9.50
 python-imagesearch==1.2.2
 printy==2.2.0
 psutil==5.9.3
-autopep8==1.7.0
+autopep8==1.7.1
 argparse==1.4.0
 pywin32==304

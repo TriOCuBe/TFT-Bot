@@ -114,7 +114,7 @@ def queue():
             elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_already_running():
                 print("Already in game :O!")
                 break
-        loading_match()
+    loading_match()
 
 def loading_match():
     while not onscreen(CONSTANTS['game']['round']['1-1']) and not onscreen(CONSTANTS['game']['gamelogic']['timer_1']):

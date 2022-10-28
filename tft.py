@@ -1,4 +1,3 @@
-
 import time
 import random
 import keyboard
@@ -7,15 +6,13 @@ import os
 import argparse
 import pkg_resources
 import pyautogui as auto
-import python_imagesearch.imagesearch as imagesearch
-import psutil
 from printy import printy
 from datetime import datetime
 
-import win32gui
-import win32process
-import win32con
-import win32com.client
+from constants import CONSTANTS, find_match_images, exit_now_images
+import system_helpers
+from screen_helpers import onscreen, onscreen_multiple_any, onscreen_region_numLoop
+from click_helpers import click_right, click_to, click_to_multiple
 
 pkg_resources.require("PyAutoGUI==0.9.50")
 pkg_resources.require("opencv-python==4.6.0.66")
@@ -38,139 +35,17 @@ if VERBOSE:
 else:
     print("Will be quiet and not be very verbose")
 
-CONSTANTS = {
-    "executables": {
-        "league": {
-            "client": "C:\Riot Games\League of Legends\LeagueClient.exe",
-            "client_ux": "C:\Riot Games\League of Legends\LeagueClientUx.exe",
-            "game": "C:\Riot Games\League of Legends\Game\League of Legends.exe",
-        },
-    },
-    "tft_logo": {
-        "base": "./captures/tft_logo.png",
-        "overshadowed": "./captures/tft_logo_overshadowed.png",
-    },
-    "client": {
-        "screenshot_location": "./screenshots/",
-        "pre_match": {
-            "quick_play": "./captures/buttons/quick_play.png",
-            "find_match": {
-                "base": "./captures/buttons/find_match.png",
-                "highlighted": "./captures/buttons/find_match_highlighted.png",
-                "original": "./captures/buttons/find_match_original.png",
-            }
-        },
-        "in_queue": {
-            "base": "./captures/buttons/in_queue.png",
-            "overshadowed": "./captures/buttons/in_queue_overshadowed.png",
-            "accept": "./captures/buttons/accept.png",
-        },
-        "death": "./captures/death.png",
-        "reconnect": "./captures/buttons/reconnect.png",
-        "post_game": {
-            "skip_waiting_for_stats": "./captures/buttons/skip_waiting_for_stats.png",
-            "play_again": "./captures/buttons/play_again.png",
-            "missions_ok": "./captures/buttons/missions_ok.png",
-        },
-    },
-    "game": {
-        "loading": "./captures/loading.png",
-        "exit_now": {
-            "base": "./captures/buttons/exit_now_base.png",
-            "highlighted": "./captures/buttons/exit_now_highlighted.png",
-        },
-        "settings": "./captures/buttons/settings.png",
-        "surrender": {
-            "surrender_1": "./captures/buttons/surrender_1.png",
-            "surrender_2": "./captures/buttons/surrender_2.png",
-        },
-        "gamelogic": {
-            "choose_one": "./captures/buttons/choose_one.png",
-            "reroll": "./captures/buttons/reroll.png",
-            "take_all": "./captures/buttons/take_all.png",
-            "timer_1": "./captures/timer_1.png",
-            "xp_buy": "./captures/buttons/xp_buy.png",
-        },
-        "gold": {
-            "0": "./captures/gold/0.png",
-            "1": "./captures/gold/1.png",
-            "2": "./captures/gold/2.png",
-            "3": "./captures/gold/3.png",
-            "4": "./captures/gold/4.png",
-            "5": "./captures/gold/5.png",
-            "6": "./captures/gold/6.png",
-        },
-        "round": {
-            "-4": "./captures/round/-4.png",
-            "1-": "./captures/round/1-.png",
-            "2-": "./captures/round/2-.png",
-            "1-1": "./captures/round/1-1.png",
-            "2-2": "./captures/round/2-2.png",
-            "2-3": "./captures/round/2-3.png",
-            "2-4": "./captures/round/2-4.png",
-            "2-5": "./captures/round/2-5.png",
-            "3-1": "./captures/round/3-1.png",
-            "3-2": "./captures/round/3-2.png",
-            "3-3": "./captures/round/3-3.png",
-            "3-4": "./captures/round/3-4.png",
-            "3-7": "./captures/round/3-7.png",
-            "4-6": "./captures/round/4-6.png",
-            "4-7": "./captures/round/4-7.png",
-            "6-5": "./captures/round/6-5.png",
-            "6-6": "./captures/round/6-6.png",
-        },
-        "trait": {
-            "astral": "./captures/trait/astral.png",
-            "bruiser": "./captures/trait/bruiser.png",
-            "chemtech": "./captures/trait/chemtech.png",
-            "dragonmancer": "./captures/trait/dragonmancer.png",
-            "jade": "./captures/trait/jade.png",
-            "mage": "./captures/trait/mage.png",
-            "scrap": "./captures/trait/scrap.png",
-        },
-    },
-}
-
-find_match_images = [
-    CONSTANTS['client']['pre_match']['find_match']['base'],
-    CONSTANTS['client']['pre_match']['find_match']['highlighted'],
-    CONSTANTS['client']['pre_match']['find_match']['original'],
-]
-
-exit_now_images = [
-    CONSTANTS['game']['exit_now']['base'],
-    CONSTANTS['game']['exit_now']['highlighted'],
-]
-
 auto.FAILSAFE = False
 
-global gamecount
-global endtimer
 gamecount = -1
 endtimer = time.time()
 pauselogic = False
 
-
-def set_active_window(window_id):
-    # Try to account for every scenario
-    shell = win32com.client.Dispatch("WScript.Shell")
-    shell.SendKeys('%')
-    win32gui.BringWindowToTop(window_id)
-    win32gui.SetForegroundWindow(window_id)
-    win32gui.SetActiveWindow(window_id)
-
-def bring_window_to_forefront(window_title, path_to_verify=None):
-    hwnd = win32gui.FindWindowEx(0,0,0, window_title)
-    if (path_to_verify is not None):
-        _, pid = win32process.GetWindowThreadProcessId(hwnd)
-        path = psutil.Process(pid).exe()
-        if path != path_to_verify:
-            print(f"Failed to find process to bring to forefront:\n\t{path} != {path_to_verify}")
-            return
-    set_active_window(hwnd)
-
 def bring_league_client_to_forefront():
-    bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['client_ux'])
+    system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['client_ux'])
+
+def league_already_running():
+    return system_helpers.find_in_processes(CONSTANTS['executables']['league']['game'])
 
 def toggle_pause():
     global pauselogic
@@ -184,118 +59,12 @@ def toggle_pause():
 
 keyboard.add_hotkey('alt+p', lambda: toggle_pause())
 
-# Start utility methods
-def onscreen(path, precision=0.8):
-    return imagesearch.imagesearch(path, precision)[0] != -1
-
-def onscreen_multiple_any(paths, precision=0.8):
-    for path in paths:
-        if (imagesearch.imagesearch(path, precision)[0] != -1):
-            return True
-    return False
-
-def onscreen_region(path, x1, y1, x2, y2, precision=0.8):
-    return imagesearch.imagesearcharea(path, x1, y1, x2, y2, precision)[0] != -1
-
-def onscreen_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
-    return imagesearch_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision)[0] != -1
-
-# Via https://github.com/drov0/python-imagesearch/blob/master/python_imagesearch/imagesearch.py
-def imagesearch_region_numLoop(image, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
-    pos = imagesearch.imagesearcharea(image, x1, y1, x2, y2, precision)
-    count = 0
-
-    while pos[0] == -1:
-        time.sleep(timesample)
-        pos = imagesearch.imagesearcharea(image, x1, y1, x2, y2, precision)
-        count = count + 1
-        if count > maxSamples:
-            break
-    return pos
-
-
-def search_to(path):
-    pos = imagesearch.imagesearch(path)
-    if onscreen(path):
-        auto.moveTo(pos)
-        return pos
-
-
-def click_key(key, delay=.1):
-    auto.keyDown(key)
-    time.sleep(delay)
-    auto.keyUp(key)
-
-
-def click_left(delay=.1):
-    auto.mouseDown()
-    time.sleep(delay)
-    auto.mouseUp()
-
-
-def click_right(delay=.1):
-    auto.mouseDown(button='right')
-    time.sleep(delay)
-    auto.mouseUp(button='right')
-
-
-def click_to(path, precision=0.8, delay=.1):
-    if onscreen(path, precision):
-        auto.moveTo(imagesearch.imagesearch(path))
-        click_left(delay)
-    else:
-        print(f"Could not find '{path}', skipping")
-
-def click_to_multiple(images, conditional_func=None, delay=None):
-    for image in images:
-        try:
-            click_to(image)
-        except Exception:
-            print(f"Failed to click {image}")
-        if is_var_number(delay):
-            time.sleep(delay)
-        if is_var_function(conditional_func) and conditional_func():
-            return True
-    return False
-
-def is_var_number(var):
-    try:
-        return type(var) == int or type(var) == float
-    except:
-        pass
-    return False
-
-def is_var_function(var):
-    try:
-        return callable(var)
-    except:
-        pass
-    return False
-
-# End utility methods
-
-
 def is_in_queue():
     return onscreen(CONSTANTS['client']['in_queue']['base']) or onscreen(CONSTANTS['client']['in_queue']['overshadowed'])
 
 
 def is_in_tft_lobby():
     return onscreen(CONSTANTS['tft_logo']['base']) or onscreen(CONSTANTS['tft_logo']['overshadowed'])
-
-
-def find_in_processes(executable_path):
-    for proc in psutil.process_iter():
-        try:
-            if (proc.exe() == executable_path):
-                return True
-        except Exception:
-            # Nothing, we don't care
-            continue
-    return False
-
-
-def league_already_running():
-    return find_in_processes(CONSTANTS['executables']['league']['game'])
 
 def find_match():
     counter = 0
@@ -319,30 +88,33 @@ def find_match():
 def queue():
     # Queue search loop
     while True:
-        # Not already in queue
-        if not is_in_queue():
-            if is_in_tft_lobby():
-                print("TFT lobby detected, finding match")
-                find_match()
-            elif league_already_running():
-                print("Already in game!")
+        if pauselogic:
+            time.sleep(5)
+        else:
+            # Not already in queue
+            if not is_in_queue():
+                if is_in_tft_lobby():
+                    print("TFT lobby detected, finding match")
+                    find_match()
+                elif league_already_running():
+                    print("Already in game!")
+                    break
+                # Post-match screen
+                elif check_if_post_game():
+                    match_complete()
+                else:
+                    print("|WARN| TFT lobby not detected!")
+                    time.sleep(5)
+
+            #
+
+            if onscreen(CONSTANTS['game']['loading']):
+                print("Loading!")
                 break
-            # Post-match screen
-            elif check_if_post_game():
-                match_complete()
-            else:
-                print("|WARN| TFT lobby not detected!")
-                time.sleep(5)
-
-        #
-
-        if onscreen(CONSTANTS['game']['loading']):
-            print("Loading!")
-            break
-        elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_already_running():
-            print("Already in game :O!")
-            break
-    loading_match()
+            elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_already_running():
+                print("Already in game :O!")
+                break
+        loading_match()
 
 def loading_match():
     while not onscreen(CONSTANTS['game']['round']['1-1']) and not onscreen(CONSTANTS['game']['gamelogic']['timer_1']):
@@ -398,14 +170,12 @@ def check_if_game_complete():
         time.sleep(5)
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
 
-
 def attempt_reconnect_to_existing_game():
     if onscreen(CONSTANTS['client']['reconnect']):
         print("Reconnecting!")
         time.sleep(0.5)
         click_to(CONSTANTS['client']['reconnect'])
     return False
-
 
 def check_if_post_game():  # checks to see if game was interrupted
     if check_if_game_complete():

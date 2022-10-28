@@ -42,7 +42,10 @@ endtimer = time.time()
 pauselogic = False
 
 def bring_league_client_to_forefront():
-    system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['client_ux'])
+    try:
+        system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['client_ux'])
+    except:
+        print("Failed to bring League to forefront, this should be non-fatal so let's continue")
 
 def league_already_running():
     return system_helpers.find_in_processes(CONSTANTS['executables']['league']['game'])
@@ -68,8 +71,8 @@ def is_in_tft_lobby():
 
 def find_match():
     counter = 0
-    bring_league_client_to_forefront()
     while is_in_tft_lobby():
+        bring_league_client_to_forefront()
         find_match_click_success = click_to_multiple(find_match_images, conditional_func=is_in_queue, delay=0.2)
         print(f"Clicking find match success: {find_match_click_success}")
         time.sleep(1)
@@ -92,6 +95,7 @@ def queue():
             time.sleep(5)
         else:
             # Not already in queue
+            bring_league_client_to_forefront()
             if not is_in_queue():
                 if is_in_tft_lobby():
                     print("TFT lobby detected, finding match")

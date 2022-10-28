@@ -12,6 +12,11 @@ import psutil
 from printy import printy
 from datetime import datetime
 
+import win32gui
+import win32process
+import win32con
+import win32com.client
+
 pkg_resources.require("PyAutoGUI==0.9.50")
 pkg_resources.require("opencv-python==4.6.0.66")
 pkg_resources.require("python-imagesearch==1.2.2")
@@ -37,6 +42,7 @@ CONSTANTS = {
     "executables": {
         "league": {
             "client": "C:\Riot Games\League of Legends\LeagueClient.exe",
+            "client_ux": "C:\Riot Games\League of Legends\LeagueClientUx.exe",
             "game": "C:\Riot Games\League of Legends\Game\League of Legends.exe",
         },
     },
@@ -144,6 +150,27 @@ gamecount = -1
 endtimer = time.time()
 pauselogic = False
 
+
+def set_active_window(window_id):
+    # Try to account for every scenario
+    shell = win32com.client.Dispatch("WScript.Shell")
+    shell.SendKeys('%')
+    win32gui.BringWindowToTop(window_id)
+    win32gui.SetForegroundWindow(window_id)
+    win32gui.SetActiveWindow(window_id)
+
+def bring_window_to_forefront(window_title, path_to_verify=None):
+    hwnd = win32gui.FindWindowEx(0,0,0, window_title)
+    if (path_to_verify is not None):
+        _, pid = win32process.GetWindowThreadProcessId(hwnd)
+        path = psutil.Process(pid).exe()
+        if path != path_to_verify:
+            print(f"Failed to find process to bring to forefront:\n\t{path} != {path_to_verify}")
+            return
+    set_active_window(hwnd)
+
+def bring_league_client_to_forefront():
+    bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['client_ux'])
 
 def toggle_pause():
     global pauselogic
@@ -272,6 +299,7 @@ def league_already_running():
 
 def find_match():
     counter = 0
+    bring_league_client_to_forefront()
     while is_in_tft_lobby():
         find_match_click_success = click_to_multiple(find_match_images, conditional_func=is_in_queue, delay=0.2)
         print(f"Clicking find match success: {find_match_click_success}")
@@ -467,6 +495,7 @@ def end_match():
             time.sleep(10)
         if onscreen(CONSTANTS['client']['post_game']['play_again']):
             print("Attempting to play again")
+            bring_league_client_to_forefront()
             click_to(CONSTANTS['client']['post_game']['play_again'], delay=0.5)
             time.sleep(3)
         if onscreen(CONSTANTS['client']['pre_match']['quick_play']):

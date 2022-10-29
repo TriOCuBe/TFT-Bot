@@ -2,6 +2,8 @@ import time
 import random
 import keyboard
 import os
+import sys
+import logging
 
 import argparse
 import pkg_resources
@@ -11,6 +13,7 @@ from datetime import datetime
 
 from constants import CONSTANTS, find_match_images, exit_now_images
 import system_helpers
+from logging_helper import setup_logging
 from screen_helpers import onscreen, onscreen_multiple_any, onscreen_region_numLoop
 from click_helpers import click_right, click_to, click_to_multiple
 
@@ -18,49 +21,35 @@ pkg_resources.require("PyAutoGUI==0.9.50")
 pkg_resources.require("opencv-python==4.6.0.66")
 pkg_resources.require("python-imagesearch==1.2.2")
 
-arg_parser = argparse.ArgumentParser(prog="TFT Bot")
-arg_parser.add_argument("--ffearly", action='store_true', help="If the game should be surrendered at first available time.")
-arg_parser.add_argument("-v", "--verbose", action="store_true", help="Increase output verbosity, mostly useful for debugging")
-parsed_args = arg_parser.parse_args()
-
-FF_EARLY = parsed_args.ffearly
-VERBOSE = parsed_args.verbose
-if FF_EARLY:
-    print("FF Early Specified - Will surrender at first available time")
-else:
-    print("FF Early Not Specified - Will play out games for their duration")
-
-if VERBOSE:
-    print("Will explain everything and be very verbose")
-else:
-    print("Will be quiet and not be very verbose")
 
 auto.FAILSAFE = False
-
 gamecount = -1
 endtimer = time.time()
 pauselogic = False
+FF_EARLY = False
+VERBOSE = False
+
 
 def bring_league_client_to_forefront():
     try:
         system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['client_ux'])
-    except:
-        print("Failed to bring League to forefront, this should be non-fatal so let's continue")
+    except Exception:
+        logging.warning("Failed to bring League to forefront, this should be non-fatal so let's continue")
+
 
 def league_already_running():
     return system_helpers.find_in_processes(CONSTANTS['executables']['league']['game'])
 
+
 def toggle_pause():
     global pauselogic
-    print(f'alt+p pressed, toggling pause from {pauselogic} to {not pauselogic}')
+    logging.debug(f'alt+p pressed, toggling pause from {pauselogic} to {not pauselogic}')
     pauselogic = not pauselogic
     if pauselogic:
-        print("Bot now paused, remember to unpause to continue botting!")
+        logging.info("Bot now paused, remember to unpause to continue botting!")
     else:
-        print("Bot playing again!")
+        logging.info("Bot playing again!")
 
-
-keyboard.add_hotkey('alt+p', lambda: toggle_pause())
 
 def is_in_queue():
     return onscreen(CONSTANTS['client']['in_queue']['base']) or onscreen(CONSTANTS['client']['in_queue']['overshadowed'])
@@ -69,12 +58,13 @@ def is_in_queue():
 def is_in_tft_lobby():
     return onscreen(CONSTANTS['tft_logo']['base']) or onscreen(CONSTANTS['tft_logo']['overshadowed'])
 
+
 def find_match():
     counter = 0
     while is_in_tft_lobby():
         bring_league_client_to_forefront()
         find_match_click_success = click_to_multiple(find_match_images, conditional_func=is_in_queue, delay=0.2)
-        print(f"Clicking find match success: {find_match_click_success}")
+        logging.debug(f"Clicking find match success: {find_match_click_success}")
         time.sleep(1)
         while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']) and is_in_queue():
             click_to(CONSTANTS['client']['in_queue']['accept'])
@@ -84,8 +74,9 @@ def find_match():
                 counter = counter + 1
 
             if (counter > 60):
-                print("Was not in queue for 60 seconds, aborting")
+                logging.info("Was not in queue for 60 seconds, aborting")
                 break
+
 
 # Start between match logic
 def queue():
@@ -98,42 +89,43 @@ def queue():
             bring_league_client_to_forefront()
             if not is_in_queue():
                 if is_in_tft_lobby():
-                    print("TFT lobby detected, finding match")
+                    logging.info("TFT lobby detected, finding match")
                     find_match()
                 elif league_already_running():
-                    print("Already in game!")
+                    logging.info("Already in game!")
                     break
                 # Post-match screen
                 elif check_if_post_game():
                     match_complete()
                 else:
-                    print("|WARN| TFT lobby not detected!")
+                    logging.warning("TFT lobby not detected!")
                     time.sleep(5)
 
             #
 
             if onscreen(CONSTANTS['game']['loading']):
-                print("Loading!")
+                logging.info("Loading!")
                 break
             elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_already_running():
-                print("Already in game :O!")
+                logging.info("Already in game :O!")
                 break
     loading_match()
+
 
 def loading_match():
     while not onscreen(CONSTANTS['game']['round']['1-1']) and not onscreen(CONSTANTS['game']['gamelogic']['timer_1']):
         time.sleep(1)
 
-    print("Match starting!")
+    logging.info("Match starting!")
     start_match()
 
 
 def start_match():
     while onscreen(CONSTANTS['game']['round']['1-1']):
         shared_draft_pathing()
-
-    print("In the match now!")
+    logging.info("In the match now!")
     main_game_loop()
+
 
 def shared_draft_pathing():
     auto.moveTo(946, 315)
@@ -148,6 +140,7 @@ def shared_draft_pathing():
     auto.moveTo(1200, 460)
     click_right()
 
+
 def buy(iterations):
     for i in range(iterations):
         if check_if_gold_at_least(1):
@@ -159,53 +152,60 @@ def buy(iterations):
             time.sleep(0.5)
         time.sleep(0.5)
 
+
 def exit_now_conditional():
     return not league_already_running()
 
+
 def check_if_game_complete():
     if onscreen(CONSTANTS['client']['death']):
-        print("Death detected")
+        logging.info("Death detected")
         click_to(CONSTANTS['client']['death'])
         time.sleep(5)
     if onscreen_multiple_any(exit_now_images):
-        print("End of game detected")
+        logging.info("End of game detected")
         exit_now_bool = click_to_multiple(exit_now_images, conditional_func=exit_now_conditional, delay=1.5)
-        print(f"Exit now clicking success: {exit_now_bool}")
+        logging.debug(f"Exit now clicking success: {exit_now_bool}")
         time.sleep(5)
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
 
+
 def attempt_reconnect_to_existing_game():
     if onscreen(CONSTANTS['client']['reconnect']):
-        print("Reconnecting!")
+        logging.info("Reconnecting!")
         time.sleep(0.5)
         click_to(CONSTANTS['client']['reconnect'])
     return False
+
 
 def check_if_post_game():  # checks to see if game was interrupted
     if check_if_game_complete():
         return True
     return attempt_reconnect_to_existing_game()
 
+
 def check_if_gold_at_least(num):
-    print(f"Looking for at least {num} gold")
+    logging.debug(f"Looking for at least {num} gold")
     for i in range(num + 1):
-        # print(f"Checking for {i} gold")
+        # logging.info(f"Checking for {i} gold")
         try:
             if onscreen_region_numLoop(CONSTANTS['game']['gold'][f"{i}"], 0.1, 5, 780, 850, 970, 920, 0.9):
-                print(f"Found {i} gold")
+                logging.debug(f"Found {i} gold")
                 if (i == num):
-                    print("Correct")
+                    logging.debug("Correct")
                     return True
                 else:
-                    print("Incorrect")
+                    logging.debug("Incorrect")
                     return False
         except Exception:
-            print(f"Exception finding {i} gold")
+            logging.debug(f"Exception finding {i} gold")
             # We don't have this gold as a file
             return True
     return True
 
+
 def main_game_loop():
+    global FF_EARLY
     exit = False
     while exit == False:
         if pauselogic:
@@ -219,7 +219,7 @@ def main_game_loop():
                 continue
             # Free champ round
             if not onscreen(CONSTANTS['game']['round']['1-'], 0.9) and onscreen(CONSTANTS['game']['round']['-4'], 0.9):
-                print("Round X-4, draft detected")
+                logging.info("Round X-4, draft detected")
                 shared_draft_pathing()
                 continue
             elif onscreen(CONSTANTS['game']['round']['1-'], 0.9) or onscreen(CONSTANTS['game']['round']['2-'], 0.9):
@@ -244,7 +244,7 @@ def main_game_loop():
             # change this if you want to surrender at a different stage, also the image recognition struggles with 5 being it sees it as 3 so i had to do 6 as that's seen as a 5
             if not onscreen(CONSTANTS["game"]["1-"], 0.9) and not onscreen(CONSTANTS["game"]["2-", 0.9]):
                 if not onscreen("./captures/3-1.png", 0.9):
-                    print("Surrendering now!")
+                    logging.info("Surrendering now!")
                     surrender()
                     break
 
@@ -253,34 +253,34 @@ def end_match():
     # added a main loop for the end match function to ensure you make it to the find match button.
     while not onscreen_multiple_any(find_match_images):
         while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
-            print("Dismissing mission")
+            logging.info("Dismissing mission")
             #screenshot if you have an "ok" button
             t = time.localtime()    # added for printing time
             current_time = time.strftime("%H%M%S", t) #for the changing file name
             myScreenshot = auto.screenshot()
             myScreenshot.save(rf'{CONSTANTS["client"]["screenshot_location"]}/{current_time}.png')
             time.sleep(2)
-            print("SS saved")
+            logging.info("Screenshot of mission saved")
             click_to(CONSTANTS['client']['post_game']['missions_ok'])
             time.sleep(3)
         if onscreen(CONSTANTS['client']['post_game']['skip_waiting_for_stats']):
-            print("Skipping waiting for stats")
+            logging.info("Skipping waiting for stats")
             click_to(CONSTANTS['client']['post_game']['skip_waiting_for_stats'])
             time.sleep(10)
         if onscreen(CONSTANTS['client']['post_game']['play_again']):
-            print("Attempting to play again")
+            logging.info("Attempting to play again")
             bring_league_client_to_forefront()
             click_to(CONSTANTS['client']['post_game']['play_again'], delay=0.5)
             time.sleep(3)
         if onscreen(CONSTANTS['client']['pre_match']['quick_play']):
-            print("Attempting to quick play")
+            logging.info("Attempting to quick play")
             click_to(CONSTANTS['client']['pre_match']['quick_play'])
             time.sleep(10)
 
 
 def match_complete():
     print_timer()
-    print("Match complete! Cleaning up and restarting")
+    logging.info("Match complete! Cleaning up and restarting")
     time.sleep(3)
     end_match()
 
@@ -288,9 +288,9 @@ def match_complete():
 def surrender():
     counter = 0
     surrenderwait = random.randint(100, 150)
-    print(f'Waiting {surrenderwait} seconds ({surrenderwait / 60 } minutes) to surrender')
+    logging.info(f'Waiting {surrenderwait} seconds ({surrenderwait / 60 } minutes) to surrender')
     time.sleep(surrenderwait)
-    print("Starting surrender")
+    logging.info("Starting surrender")
     click_to(CONSTANTS['game']['settings'])
 
     while not onscreen(CONSTANTS['game']['surrender']['surrender_1']):
@@ -316,14 +316,13 @@ def surrender():
     end_match()
     time.sleep(5)
 
-    print("Surrender Complete")
+    logging.info("Surrender Complete")
     match_complete()
 
 
 def print_timer():
-    global endtimer
+    global endtimer, gamecount
     endtimer = time.time()
-    global gamecount
     gamecount += 1
     sec = (endtimer - starttimer)
     hours = sec // 3600
@@ -331,55 +330,101 @@ def print_timer():
     mu = sec // 60
     ss = sec - mu*60
     gamecount_string = str(gamecount)
-    #result_list = str(datetime.timedelta(seconds=sec)).split(".")
-    print("-------------------------------------")
-    print("Current Time =", datetime.now().strftime("%H:%M:%S"))
-    print("-------------------------------------")
-    print("Game End")
-    print("Play Time : ", int(float(hours)), "Hour", int(float(mu)), "Min", int(float(ss)), "Sec")
-    print("Gamecount : ", gamecount_string)
-    print("-------------------------------------")
-    print("End of printing timer!")
+
+    logging.info("-------------------------------------")
+    logging.info(f"Current Time = {datetime.now().strftime('%H:%M:%S')}")
+    logging.info("-------------------------------------")
+    logging.info("Game End")
+    logging.info(f"Play Time : {int(float(hours))} Hour, {int(float(mu))} Min, {int(float(ss))} Sec")
+    logging.info(f"Gamecount : {gamecount_string}")
+    logging.info("-------------------------------------")
 # End main process
 
-
-os.system('color 0F')
-# Start auth + main script
-print("Initial codebase by:")
-printy(r"""
-[c>] _____       _                            _   @
-[c>]|  __ \     | |                          | |  @
-[c>]| |  | | ___| |_ ___ _ __ __ _  ___ _ __ | |_ @
-[c>]| |  | |/ _ \ __/ _ \ '__/ _` |/ _ \ '_ \| __|@
-[c>]| |__| |  __/ ||  __/ | | (_| |  __/ | | | |_ @
-[c>]|_____/ \___|\__\___|_|  \__, |\___|_| |_|\__|@
-[c>]                          __/ |               @
-[c>]                         |___/                @
-""", "{k}")
-print("Re-written by:")
-printy(r"""
-[c>]    __ __              __              __                __                  __  @
-[c>]   / //_/__  __ _____ / /__  __ _____ / /__ ___   _____ / /_   __  __ _____ / /__@
-[c>]  / ,<  / / / // ___// // / / // ___// //_// _ \ / ___// __ \ / / / // ___// //_/@
-[c>] / /| |/ /_/ // /   / // /_/ // /__ / ,<  /  __// /__ / / / // /_/ // /__ / ,<   @
-[c>]/_/ |_|\__, //_/   /_/ \__,_/ \___//_/|_| \___/ \___//_/ /_/ \__,_/ \___//_/|_|  @
-[c>]      /____/                                                                     @
-""", "{k}")
-
-printy(f"Welcome! \nPlease feel free to ask questions or contribute at https://github.com/Kyrluckechuck/tft-bot", "nB{k}")
-auto.alert("Press OK when you're in a TFT lobby!\n")
-printy("Bot started, queuing up!", "w{k}")
-os.system('color 0F')
-global starttimer
-starttimer = time.time()
 
 def tft_bot_loop():
     while True:
         try:
             queue()
         except AttributeError:
-            print("Not already in game, couldn't find game client on screen, looping")
+            logging.info("Not already in game, couldn't find game client on screen, looping")
             time.sleep(5)
             continue
 
-tft_bot_loop()
+
+def main():
+    global FF_EARLY, VERBOSE
+
+    arg_parser = argparse.ArgumentParser(prog="TFT Bot")
+    arg_parser.add_argument("--ffearly", action='store_true', help="If the game should be surrendered at first available time.")
+    arg_parser.add_argument("-v", "--verbose", action="store_true", help="Increase output verbosity, mostly useful for debugging")
+    parsed_args = arg_parser.parse_args()
+
+    FF_EARLY = parsed_args.ffearly
+    VERBOSE = parsed_args.verbose
+    logging_handlers = [logging.StreamHandler()]
+    if VERBOSE:
+        logging_handlers.append(logging.FileHandler("debug.log"))
+
+    if VERBOSE:
+        logging.info("Will explain everything and be very verbose")
+    else:
+        logging.info("Will be quiet and not be very verbose")
+
+    if FF_EARLY:
+        logging.info("FF Early Specified - Will surrender at first available time")
+    else:
+        logging.info("FF Early Not Specified - Will play out games for their duration")
+
+    os.system('color 0F')
+    # Start auth + main script
+    logging.info("Initial codebase by:")
+    printy(r"""
+    [c>] _____       _                            _   @
+    [c>]|  __ \     | |                          | |  @
+    [c>]| |  | | ___| |_ ___ _ __ __ _  ___ _ __ | |_ @
+    [c>]| |  | |/ _ \ __/ _ \ '__/ _` |/ _ \ '_ \| __|@
+    [c>]| |__| |  __/ ||  __/ | | (_| |  __/ | | | |_ @
+    [c>]|_____/ \___|\__\___|_|  \__, |\___|_| |_|\__|@
+    [c>]                          __/ |               @
+    [c>]                         |___/                @
+    """, "{k}")
+    logging.info("Re-written by:")
+    printy(r"""
+    [c>]    __ __              __              __                __                  __  @
+    [c>]   / //_/__  __ _____ / /__  __ _____ / /__ ___   _____ / /_   __  __ _____ / /__@
+    [c>]  / ,<  / / / // ___// // / / // ___// //_// _ \ / ___// __ \ / / / // ___// //_/@
+    [c>] / /| |/ /_/ // /   / // /_/ // /__ / ,<  /  __// /__ / / / // /_/ // /__ / ,<   @
+    [c>]/_/ |_|\__, //_/   /_/ \__,_/ \___//_/|_| \___/ \___//_/ /_/ \__,_/ \___//_/|_|  @
+    [c>]      /____/                                                                     @
+    """, "{k}")
+    os.system('color 0F')
+
+    script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+    if not setup_logging(
+            console_log_output="stdout",
+            console_log_level="debug" if VERBOSE else "warning",
+            console_log_color=True,
+            logfile_file=script_name + ".log",
+            logfile_log_level="debug",
+            logfile_log_color=False,
+            log_line_template="%(color_on)s[%(created)d] [%(threadName)s] %(levelname)-8s || %(message)s%(color_off)s"
+        ):
+        print("Failed to set up logger, continue with caution!")
+        if (auto.alert("Failed to set up logger, continue with caution!\n", buttons=['Proceed', 'Cancel']) == "Cancel"):
+            return 1
+    else:
+        print("Logger setup success")
+
+    logging.info(f"Welcome! \nPlease feel free to ask questions or contribute at https://github.com/Kyrluckechuck/tft-bot")
+    auto.alert("Press OK when you're in a TFT lobby!\n")
+    logging.info("Bot started, queuing up!")
+
+    keyboard.add_hotkey('alt+p', lambda: toggle_pause())
+
+    global starttimer
+    starttimer = time.time()
+    tft_bot_loop()
+
+
+if (__name__ == "__main__"):
+    sys.exit(main())

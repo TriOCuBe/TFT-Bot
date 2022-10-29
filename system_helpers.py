@@ -2,6 +2,7 @@ import win32gui
 import win32process
 import win32com.client
 
+import logging
 import psutil
 
 def set_active_window(window_id):
@@ -18,7 +19,7 @@ def bring_window_to_forefront(window_title, path_to_verify=None):
         _, pid = win32process.GetWindowThreadProcessId(hwnd)
         path = psutil.Process(pid).exe()
         if path != path_to_verify:
-            print(f"Failed to find process to bring to forefront:\n\t{path} != {path_to_verify}")
+            logging.debug(f"Failed to find process to bring to forefront:\n\t{path} != {path_to_verify}")
             return
     set_active_window(hwnd)
 

@@ -1,4 +1,5 @@
 import time
+import logging
 import pyautogui as auto
 import python_imagesearch.imagesearch as imagesearch
 
@@ -25,17 +26,20 @@ def click_right(delay=.1):
 
 def click_to(path, precision=0.8, delay=.1):
     if onscreen(path, precision):
-        auto.moveTo(imagesearch.imagesearch(path))
-        click_left(delay)
+        try:
+            auto.moveTo(imagesearch.imagesearch(path))
+            click_left(delay)
+        except Exception:
+            pass
     else:
-        print(f"Could not find '{path}', skipping")
+        logging.debug(f"Could not find '{path}', skipping")
 
 def click_to_multiple(images, conditional_func=None, delay=None):
     for image in images:
         try:
             click_to(image)
         except Exception:
-            print(f"Failed to click {image}")
+            logging.debug(f"Failed to click {image}")
         if generic_helpers.is_var_number(delay):
             time.sleep(delay)
         if generic_helpers.is_var_function(conditional_func) and conditional_func():
@@ -43,7 +47,10 @@ def click_to_multiple(images, conditional_func=None, delay=None):
     return False
 
 def search_to(path):
-    pos = imagesearch.imagesearch(path)
-    if onscreen(path):
-        auto.moveTo(pos)
-        return pos
+    try:
+        pos = imagesearch.imagesearch(path)
+        if onscreen(path):
+            auto.moveTo(pos)
+            return pos
+    except Exception:
+        return None

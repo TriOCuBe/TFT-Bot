@@ -17,10 +17,6 @@ from logging_helper import setup_logging
 from screen_helpers import onscreen, onscreen_multiple_any, onscreen_region_numLoop
 from click_helpers import click_right, click_to, click_to_multiple
 
-pkg_resources.require("PyAutoGUI==0.9.50")
-pkg_resources.require("opencv-python==4.6.0.66")
-pkg_resources.require("python-imagesearch==1.2.2")
-
 
 auto.FAILSAFE = False
 gamecount = -1

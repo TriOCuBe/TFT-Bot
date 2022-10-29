@@ -17,7 +17,6 @@ Some features I hope to implement at some point:
 - Ability to work on any monitor and/or in Windowed mode (make clicking relative to window location), which would help in not needing to change your actual monitors resolution
 - Update LoL game & client executable "constants" to be detectable
   - I implemented this in a lazy way for now since it was quick, and reliable so long as you don't have a non-default install location for LoL
-- Update logging system
 
 ## Info / Why I forked it
 I've fairly heavily forked this from what it originally was, but if you'd like to see the original, I'm not claiming to have made this from scratch:

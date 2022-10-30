@@ -29,8 +29,8 @@ def click_to(path, precision=0.8, delay=.1):
         try:
             auto.moveTo(imagesearch.imagesearch(path))
             click_left(delay)
-        except Exception:
-            pass
+        except Exception as err:
+            logging.debug(f"Failed to click to {err}")
     else:
         logging.debug(f"Could not find '{path}', skipping")
 

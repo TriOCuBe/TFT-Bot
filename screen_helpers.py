@@ -1,5 +1,6 @@
 import time
 import python_imagesearch.imagesearch as imagesearch
+import logging
 
 def onscreen(path, precision=0.8):
     try:
@@ -11,10 +12,14 @@ def onscreen(path, precision=0.8):
 def onscreen_multiple_any(paths, precision=0.8):
     try:
         for path in paths:
-            if (imagesearch.imagesearch(path, precision)[0] != -1):
+            is_onscreen = imagesearch.imagesearch(path, precision)[0]
+            # logging.debug(f"is_onscreen: {is_onscreen != -1}") #Advanced debugging not even normally needed
+            if (is_onscreen != -1):
                 return True
-    finally:
-        return False
+    except Exception as err:
+        logging.debug(f"multiple_onscreen_any error: {err}")
+
+    return False
 
 def onscreen_region(path, x1, y1, x2, y2, precision=0.8):
     try:

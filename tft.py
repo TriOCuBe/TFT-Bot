@@ -109,6 +109,7 @@ def queue():
 
 
 def loading_match():
+    logging.info("Match Loading!")
     while not onscreen(CONSTANTS['game']['round']['1-1']) and not onscreen(CONSTANTS['game']['gamelogic']['timer_1']):
         time.sleep(1)
 

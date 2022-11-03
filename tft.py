@@ -11,7 +11,7 @@ import pyautogui as auto
 from printy import printy
 from datetime import datetime
 
-from constants import CONSTANTS, find_match_images, exit_now_images
+from constants import CONSTANTS, find_match_images, exit_now_images, skip_waiting_for_stats_images
 import system_helpers
 from logging_helper import setup_logging
 from screen_helpers import onscreen, onscreen_multiple_any, onscreen_region_numLoop
@@ -155,6 +155,8 @@ def exit_now_conditional():
 
 
 def check_if_game_complete():
+    if not league_already_running() and not attempt_reconnect_to_existing_game():
+        return True
     if onscreen(CONSTANTS['client']['death']):
         logging.info("Death detected")
         click_to(CONSTANTS['client']['death'])
@@ -164,7 +166,7 @@ def check_if_game_complete():
         exit_now_bool = click_to_multiple(exit_now_images, conditional_func=exit_now_conditional, delay=1.5)
         logging.debug(f"Exit now clicking success: {exit_now_bool}")
         time.sleep(5)
-    return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play'])
+    return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play']) or onscreen_multiple_any(skip_waiting_for_stats_images)
 
 
 def attempt_reconnect_to_existing_game():
@@ -172,6 +174,7 @@ def attempt_reconnect_to_existing_game():
         logging.info("Reconnecting!")
         time.sleep(0.5)
         click_to(CONSTANTS['client']['reconnect'])
+        return True
     return False
 
 
@@ -249,6 +252,7 @@ def main_game_loop():
 def end_match():
     # added a main loop for the end match function to ensure you make it to the find match button.
     while not onscreen_multiple_any(find_match_images):
+        bring_league_client_to_forefront()
         while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
             logging.info("Dismissing mission")
             #screenshot if you have an "ok" button
@@ -260,9 +264,9 @@ def end_match():
             logging.info("Screenshot of mission saved")
             click_to(CONSTANTS['client']['post_game']['missions_ok'])
             time.sleep(3)
-        if onscreen(CONSTANTS['client']['post_game']['skip_waiting_for_stats']):
+        if onscreen_multiple_any(skip_waiting_for_stats_images):
             logging.info("Skipping waiting for stats")
-            click_to(CONSTANTS['client']['post_game']['skip_waiting_for_stats'])
+            click_to_multiple(skip_waiting_for_stats_images)
             time.sleep(10)
         if onscreen(CONSTANTS['client']['post_game']['play_again']):
             logging.info("Attempting to play again")

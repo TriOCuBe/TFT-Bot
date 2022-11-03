@@ -6,6 +6,11 @@ CONSTANTS = {
             "game": "C:\Riot Games\League of Legends\Game\League of Legends.exe",
         },
     },
+    "processes": {
+        "client": "LeagueClient.exe",
+        "client_ux": "LeagueClientUx.exe",
+        "game": "League of Legends.exe"
+    },
     "tft_logo": {
         "base": "./captures/tft_logo.png",
         "overshadowed": "./captures/tft_logo_overshadowed.png",
@@ -36,6 +41,9 @@ CONSTANTS = {
             "play_again": "./captures/buttons/play_again.png",
             "missions_ok": "./captures/buttons/missions_ok.png",
         },
+        "launcher_play": "./captures/buttons/launcher_play.png",
+        "session_expired": "./captures/buttons/session_expired.png",
+        "message_ok": "./captures/buttons/message_ok.png"
     },
     "game": {
         "loading": "./captures/loading.png",

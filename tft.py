@@ -2,6 +2,7 @@ import time
 import random
 import keyboard
 import os
+import subprocess
 import sys
 import logging
 
@@ -32,10 +33,37 @@ def bring_league_client_to_forefront():
     except Exception:
         logging.warning("Failed to bring League to forefront, this should be non-fatal so let's continue")
 
-
-def league_already_running():
+def league_game_already_running():
     return system_helpers.find_in_processes(CONSTANTS['executables']['league']['game'])
 
+def league_client_running():
+    return system_helpers.find_in_processes(CONSTANTS['executables']['league']['client']) and system_helpers.find_in_processes(CONSTANTS['executables']['league']['client_ux'])
+
+def parse_task_kill_text(result: subprocess.CompletedProcess[str]):
+    if 'not found.' in result.stderr:
+        logging.debug(F"{result.args[-1]} was not running.")
+    elif 'has been terminated.' in result.stdout:
+        logging.debug(F"{result.args[-1]} has been terminated.")
+    else:
+        logging.warning(F"An unknown exception ocurred attempting to end {result.args[-1]}")
+        logging.debug(result)
+
+def restart_league_client():
+    logging.debug("Killing League Client!")
+    result = subprocess.run(["taskkill", "/f", "/im", CONSTANTS['processes']['client']], capture_output=True, text=True)
+    parse_task_kill_text(result)
+    result = subprocess.run(["taskkill", "/f", "/im", CONSTANTS['processes']['client_ux']], capture_output=True, text=True)
+    parse_task_kill_text(result)
+    time.sleep(3)
+    subprocess.run(CONSTANTS['executables']['league']['client'])
+    time.sleep(5)
+
+def restart_league_if_not_running():
+    if not league_client_running():
+        logging.debug("League client not detected, restarting!")
+        restart_league_client()
+        return True
+    return False
 
 def toggle_pause():
     global pauselogic
@@ -73,7 +101,6 @@ def find_match():
                 logging.info("Was not in queue for 60 seconds, aborting")
                 break
 
-
 # Start between match logic
 def queue():
     # Queue search loop
@@ -81,13 +108,15 @@ def queue():
         if pauselogic:
             time.sleep(5)
         else:
+            if restart_league_if_not_running():
+                continue
             # Not already in queue
             bring_league_client_to_forefront()
             if not is_in_queue():
                 if is_in_tft_lobby():
                     logging.info("TFT lobby detected, finding match")
                     find_match()
-                elif league_already_running():
+                elif league_game_already_running():
                     logging.info("Already in game!")
                     break
                 # Post-match screen
@@ -95,14 +124,14 @@ def queue():
                     match_complete()
                 else:
                     logging.warning("TFT lobby not detected!")
-                    time.sleep(5)
+                    restart_league_if_not_running()
 
             #
 
             if onscreen(CONSTANTS['game']['loading']):
                 logging.info("Loading!")
                 break
-            elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_already_running():
+            elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_game_already_running():
                 logging.info("Already in game :O!")
                 break
     loading_match()
@@ -151,16 +180,21 @@ def buy(iterations):
 
 
 def exit_now_conditional():
-    return not league_already_running()
-
+    return not league_game_already_running()
 
 def check_if_game_complete():
-    if not league_already_running() and not attempt_reconnect_to_existing_game():
+    if not league_game_already_running() and not attempt_reconnect_to_existing_game():
         return True
     if onscreen(CONSTANTS['client']['death']):
         logging.info("Death detected")
         click_to(CONSTANTS['client']['death'])
         time.sleep(5)
+    if onscreen(CONSTANTS['client']['session_expired']):
+        logging.info("Session expired!")
+        click_to(CONSTANTS['client']['message_ok'])
+        time.sleep(5)
+        restart_league_client()
+        return True
     if onscreen_multiple_any(exit_now_images):
         logging.info("End of game detected")
         exit_now_bool = click_to_multiple(exit_now_images, conditional_func=exit_now_conditional, delay=1.5)

@@ -28,7 +28,11 @@ CONSTANTS = {
         "death": "./captures/death.png",
         "reconnect": "./captures/buttons/reconnect.png",
         "post_game": {
-            "skip_waiting_for_stats": "./captures/buttons/skip_waiting_for_stats.png",
+            "skip_waiting_for_stats": {
+                "original": "./captures/buttons/skip_waiting_for_stats.png",
+                "base": "./captures/buttons/skip_waiting_for_stats_base.png",
+                "highlighted": "./captures/buttons/skip_waiting_for_stats_highlighted.png"
+            },
             "play_again": "./captures/buttons/play_again.png",
             "missions_ok": "./captures/buttons/missions_ok.png",
         },
@@ -100,4 +104,10 @@ find_match_images = [
 exit_now_images = [
     CONSTANTS['game']['exit_now']['base'],
     CONSTANTS['game']['exit_now']['highlighted'],
+]
+
+skip_waiting_for_stats_images = [
+    CONSTANTS['client']['post_game']['skip_waiting_for_stats']['original'],
+    CONSTANTS['client']['post_game']['skip_waiting_for_stats']['base'],
+    CONSTANTS['client']['post_game']['skip_waiting_for_stats']['highlighted']
 ]

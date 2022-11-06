@@ -8,7 +8,6 @@ def onscreen(path, precision=0.8):
     except Exception:
         return False
 
-
 def onscreen_multiple_any(paths, precision=0.8):
     try:
         for path in paths:
@@ -23,7 +22,8 @@ def onscreen_multiple_any(paths, precision=0.8):
 
 def onscreen_region(path, x1, y1, x2, y2, precision=0.8):
     try:
-        return imagesearch.imagesearcharea(path, x1, y1, x2, y2, precision)[0] != -1
+        pos = imagesearch.imagesearcharea(path, x1, y1, x2, y2, precision)
+        return pos if pos[0] != -1 else False
     except Exception:
         return False
 
@@ -46,5 +46,33 @@ def imagesearch_region_numLoop(image, timesample, maxSamples, x1, y1, x2, y2, pr
             if count > maxSamples:
                 break
         return pos
+    except Exception:
+        return None
+
+def find_image(path, precision=0.8):
+    try:
+        pos = imagesearch.imagesearch(path, precision)
+        return pos if pos[0] != -1 else None
+    except Exception:
+        return None
+
+def find_image_multiple_any(paths, precision=0.8):
+    try:
+        for path in paths:
+            pos = imagesearch.imagesearch(path, precision)
+            # logging.debug(f"is_onscreen: {pos[0] != -1}") #Advanced debugging not even normally needed
+            if (pos[0] != -1):
+                return pos
+            else:
+                return None
+    except Exception as err:
+        logging.debug(f"multiple_onscreen_any error: {err}")
+
+    return None
+
+def find_image_in_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
+    try:
+        pos = imagesearch_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision)
+        return pos if pos[0] != -1 else None
     except Exception:
         return None

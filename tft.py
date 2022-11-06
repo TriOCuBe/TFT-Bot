@@ -325,7 +325,7 @@ def end_match():
 def match_complete():
     print_timer()
     logging.info("Match complete! Cleaning up and restarting")
-    time.sleep(3)
+    time.sleep(1)
     end_match()
 
 

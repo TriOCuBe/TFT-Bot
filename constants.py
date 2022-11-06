@@ -47,8 +47,14 @@ CONSTANTS = {
             "missions_ok": "./captures/buttons/missions_ok.png",
         },
         "launcher_play": "./captures/buttons/launcher_play.png",
-        "session_expired": "./captures/buttons/session_expired.png",
-        "message_ok": "./captures/buttons/message_ok.png"
+        "messages": {
+            "session_expired": "./captures/buttons/session_expired.png",
+            "failed_to_reconnect": "./captures/buttons/failed_to_reconnect.png",
+            "buttons": {
+                "message_ok": "./captures/buttons/message_ok.png",
+                "message_exit": "./captures/buttons/message_exit.png",
+            }
+        }
     },
     "game": {
         "loading": "./captures/loading.png",

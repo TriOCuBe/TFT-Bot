@@ -85,7 +85,7 @@ def is_in_tft_lobby():
 
 def find_match():
     counter = 0
-    while is_in_tft_lobby():
+    while is_in_tft_lobby() and not check_if_client_error():
         bring_league_client_to_forefront()
         find_match_click_success = click_to_middle_multiple(find_match_images, conditional_func=is_in_queue, delay=0.2)
         logging.debug(f"Clicking find match success: {find_match_click_success}")
@@ -187,19 +187,33 @@ def buy(iterations):
 def exit_now_conditional():
     return not league_game_already_running()
 
+def check_if_client_error():
+    if onscreen(CONSTANTS['client']['messages']['session_expired']):
+        logging.info("Session expired!")
+        click_to_middle(CONSTANTS['client']['messages']['buttons']['message_ok'])
+        time.sleep(5)
+        restart_league_client()
+        return True
+    if onscreen(CONSTANTS['client']['messages']['failed_to_reconnect']):
+        logging.info("Failed to reconnect!")
+        click_to_middle(CONSTANTS['client']['messages']['buttons']['message_exit'])
+        time.sleep(3)
+        while not system_helpers.have_internet():
+            logging.info("Internet is not up, will retry in 60 seconds")
+            time.sleep(60)
+        restart_league_client()
+        return True
+    return False
+
 def check_if_game_complete():
     if not league_game_already_running() and not attempt_reconnect_to_existing_game():
+        return True
+    if check_if_client_error():
         return True
     if onscreen(CONSTANTS['client']['death']):
         logging.info("Death detected")
         click_to_middle(CONSTANTS['client']['death'])
         time.sleep(5)
-    if onscreen(CONSTANTS['client']['session_expired']):
-        logging.info("Session expired!")
-        click_to_middle(CONSTANTS['client']['message_ok'])
-        time.sleep(5)
-        restart_league_client()
-        return True
     if onscreen_multiple_any(exit_now_images):
         logging.info("End of game detected")
         exit_now_bool = click_to_middle_multiple(exit_now_images, conditional_func=exit_now_conditional, delay=1.5)
@@ -292,6 +306,8 @@ def end_match():
     # added a main loop for the end match function to ensure you make it to the find match button.
     while not onscreen_multiple_any(find_match_images):
         bring_league_client_to_forefront()
+        if check_if_client_error():
+            return
         while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
             logging.info("Dismissing mission")
             #screenshot if you have an "ok" button

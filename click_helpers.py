@@ -1,5 +1,6 @@
 import time
 import logging
+import random
 import pyautogui as auto
 import python_imagesearch.imagesearch as imagesearch
 
@@ -56,15 +57,16 @@ def search_to(path):
     except Exception:
         return None
 
-def click_to_middle(path, precision=0.8, delay=0.2, offset="half", action="left"):
+def click_to_middle(path, precision=0.8, move_duration=random.uniform(0.1, 1.0), delay=0.2, offset="half", action="left"):
     pos = find_image(path, precision)
     if pos:
         try:
-            click_image_rand(path, pos, action, delay, offset=offset)
+            return click_image_rand(path, pos, action, move_duration=move_duration, delay=delay, offset=offset)
         except Exception as err:
             logging.debug(f"M|Failed to click to {err}")
     else:
         logging.debug(f"M|Could not find '{path}', skipping")
+    return False
 
 def click_to_middle_multiple(images, conditional_func=None, delay=None, action="left"):
     for image in images:

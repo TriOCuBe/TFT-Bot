@@ -166,17 +166,22 @@ def shared_draft_pathing():
     auto.moveTo(1200, 460)
     click_right()
 
+wanted_traits = [
+    CONSTANTS['game']['trait']['bruiser'],
+    CONSTANTS['game']['trait']['mage'],
+    CONSTANTS['game']['trait']['jade']
+]
 
 def buy(iterations):
     for i in range(iterations):
-        if check_if_gold_at_least(1):
-            click_to_middle(CONSTANTS['game']['trait']['bruiser'])
-            time.sleep(0.5)
-            click_to_middle(CONSTANTS['game']['trait']['mage'])
-            time.sleep(0.5)
-            click_to_middle(CONSTANTS['game']['trait']['jade'])
-            time.sleep(0.5)
-        time.sleep(0.5)
+        if not check_if_gold_at_least(1):
+            return
+        for i in wanted_traits:
+            if onscreen(i):
+                click_to_middle(i)
+                time.sleep(0.5)
+            else:
+                return
 
 
 def exit_now_conditional():
@@ -261,13 +266,13 @@ def main_game_loop():
             # If round > 2, attempt re-rolls
             if check_if_gold_at_least(4) and onscreen(CONSTANTS['game']['gamelogic']['xp_buy']):
                 click_to_middle(CONSTANTS['game']['gamelogic']['xp_buy'])
-                time.sleep(1)
+                time.sleep(0.2)
                 continue
             if not onscreen(CONSTANTS['game']['round']['1-'], 0.9) and not onscreen(CONSTANTS['game']['round']['2-'], 0.9):
                 if check_if_gold_at_least(2) and onscreen(CONSTANTS['game']['gamelogic']['reroll']):
                     click_to_middle(CONSTANTS['game']['gamelogic']['reroll'])
 
-            time.sleep(1)
+            time.sleep(0.5)
 
         if check_if_post_game():
             match_complete()

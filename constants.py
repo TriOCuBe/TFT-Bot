@@ -17,6 +17,11 @@ CONSTANTS = {
     },
     "client": {
         "screenshot_location": "./screenshots/",
+        "tabs": {
+            "tft": {
+                "unselected": "./captures/buttons/tab_tft_unselected.png"
+            }
+        },
         "pre_match": {
             "quick_play": "./captures/buttons/quick_play.png",
             "find_match": {

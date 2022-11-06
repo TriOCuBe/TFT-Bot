@@ -16,7 +16,7 @@ from constants import CONSTANTS, find_match_images, exit_now_images, skip_waitin
 import system_helpers
 from logging_helper import setup_logging
 from screen_helpers import onscreen, onscreen_multiple_any, onscreen_region_numLoop
-from click_helpers import click_right, click_to, click_to_multiple
+from click_helpers import click_right, click_to_middle_multiple, click_to_middle, click_to_middle_multiple
 
 
 auto.FAILSAFE = False
@@ -87,11 +87,11 @@ def find_match():
     counter = 0
     while is_in_tft_lobby():
         bring_league_client_to_forefront()
-        find_match_click_success = click_to_multiple(find_match_images, conditional_func=is_in_queue, delay=0.2)
+        find_match_click_success = click_to_middle_multiple(find_match_images, conditional_func=is_in_queue, delay=0.2)
         logging.debug(f"Clicking find match success: {find_match_click_success}")
         time.sleep(1)
         while not onscreen(CONSTANTS['game']['loading']) and not onscreen(CONSTANTS['game']['round']['1-1']) and is_in_queue():
-            click_to(CONSTANTS['client']['in_queue']['accept'])
+            click_to_middle(CONSTANTS['client']['in_queue']['accept'])
             time.sleep(1)
 
             if not is_in_queue():
@@ -170,11 +170,11 @@ def shared_draft_pathing():
 def buy(iterations):
     for i in range(iterations):
         if check_if_gold_at_least(1):
-            click_to(CONSTANTS['game']['trait']['bruiser'])
+            click_to_middle(CONSTANTS['game']['trait']['bruiser'])
             time.sleep(0.5)
-            click_to(CONSTANTS['game']['trait']['mage'])
+            click_to_middle(CONSTANTS['game']['trait']['mage'])
             time.sleep(0.5)
-            click_to(CONSTANTS['game']['trait']['jade'])
+            click_to_middle(CONSTANTS['game']['trait']['jade'])
             time.sleep(0.5)
         time.sleep(0.5)
 
@@ -187,17 +187,17 @@ def check_if_game_complete():
         return True
     if onscreen(CONSTANTS['client']['death']):
         logging.info("Death detected")
-        click_to(CONSTANTS['client']['death'])
+        click_to_middle(CONSTANTS['client']['death'])
         time.sleep(5)
     if onscreen(CONSTANTS['client']['session_expired']):
         logging.info("Session expired!")
-        click_to(CONSTANTS['client']['message_ok'])
+        click_to_middle(CONSTANTS['client']['message_ok'])
         time.sleep(5)
         restart_league_client()
         return True
     if onscreen_multiple_any(exit_now_images):
         logging.info("End of game detected")
-        exit_now_bool = click_to_multiple(exit_now_images, conditional_func=exit_now_conditional, delay=1.5)
+        exit_now_bool = click_to_middle_multiple(exit_now_images, conditional_func=exit_now_conditional, delay=1.5)
         logging.debug(f"Exit now clicking success: {exit_now_bool}")
         time.sleep(5)
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play']) or onscreen_multiple_any(skip_waiting_for_stats_images)
@@ -207,7 +207,7 @@ def attempt_reconnect_to_existing_game():
     if onscreen(CONSTANTS['client']['reconnect']):
         logging.info("Reconnecting!")
         time.sleep(0.5)
-        click_to(CONSTANTS['client']['reconnect'])
+        click_to_middle(CONSTANTS['client']['reconnect'])
         return True
     return False
 
@@ -248,7 +248,7 @@ def main_game_loop():
             # Handle recurring round logic
             # Treasure dragon, dont reroll just take it
             if onscreen(CONSTANTS['game']['gamelogic']['take_all']):
-                click_to(CONSTANTS['game']['gamelogic']['take_all'])
+                click_to_middle(CONSTANTS['game']['gamelogic']['take_all'])
                 time.sleep(1)
                 continue
             # Free champ round
@@ -260,12 +260,12 @@ def main_game_loop():
                 buy(3)
             # If round > 2, attempt re-rolls
             if check_if_gold_at_least(4) and onscreen(CONSTANTS['game']['gamelogic']['xp_buy']):
-                click_to(CONSTANTS['game']['gamelogic']['xp_buy'])
+                click_to_middle(CONSTANTS['game']['gamelogic']['xp_buy'])
                 time.sleep(1)
                 continue
             if not onscreen(CONSTANTS['game']['round']['1-'], 0.9) and not onscreen(CONSTANTS['game']['round']['2-'], 0.9):
                 if check_if_gold_at_least(2) and onscreen(CONSTANTS['game']['gamelogic']['reroll']):
-                    click_to(CONSTANTS['game']['gamelogic']['reroll'])
+                    click_to_middle(CONSTANTS['game']['gamelogic']['reroll'])
 
             time.sleep(1)
 
@@ -296,21 +296,25 @@ def end_match():
             myScreenshot.save(rf'{CONSTANTS["client"]["screenshot_location"]}/{current_time}.png')
             time.sleep(2)
             logging.info("Screenshot of mission saved")
-            click_to(CONSTANTS['client']['post_game']['missions_ok'])
+            click_to_middle(CONSTANTS['client']['post_game']['missions_ok'])
             time.sleep(3)
         if onscreen_multiple_any(skip_waiting_for_stats_images):
             logging.info("Skipping waiting for stats")
-            click_to_multiple(skip_waiting_for_stats_images)
+            click_to_middle_multiple(skip_waiting_for_stats_images)
             time.sleep(10)
         if onscreen(CONSTANTS['client']['post_game']['play_again']):
             logging.info("Attempting to play again")
             bring_league_client_to_forefront()
-            click_to(CONSTANTS['client']['post_game']['play_again'], delay=0.5)
+            click_to_middle(CONSTANTS['client']['post_game']['play_again'], delay=0.5)
             time.sleep(3)
         if onscreen(CONSTANTS['client']['pre_match']['quick_play']):
             logging.info("Attempting to quick play")
-            click_to(CONSTANTS['client']['pre_match']['quick_play'])
+            click_to_middle(CONSTANTS['client']['pre_match']['quick_play'])
             time.sleep(10)
+        if not onscreen_multiple_any(find_match_images) and onscreen(CONSTANTS['client']['tabs']['tft']['unselected'], precision=0.9):
+            logging.info("Detected that TFT tab is not selected, attempting ot select")
+            click_to_middle(CONSTANTS['client']['tabs']['tft']['unselected'])
+            time.sleep(3)
 
 
 def match_complete():
@@ -326,18 +330,18 @@ def surrender():
     logging.info(f'Waiting {surrenderwait} seconds ({surrenderwait / 60 } minutes) to surrender')
     time.sleep(surrenderwait)
     logging.info("Starting surrender")
-    click_to(CONSTANTS['game']['settings'])
+    click_to_middle(CONSTANTS['game']['settings'])
 
     while not onscreen(CONSTANTS['game']['surrender']['surrender_1']):
         # just in case it gets interrupted or misses
-        click_to(CONSTANTS['game']['settings'])
+        click_to_middle(CONSTANTS['game']['settings'])
         time.sleep(1)
         counter = counter + 1
         if (counter > 20):
             break
     counter = 0
     while not onscreen(CONSTANTS['game']['surrender']['surrender_2']):
-        click_to(CONSTANTS['game']['surrender']['surrender_1'])
+        click_to_middle(CONSTANTS['game']['surrender']['surrender_1'])
         # added a check here for the rare case that the game ended before the surrender finished.
         if check_if_post_game():
             return
@@ -346,7 +350,7 @@ def surrender():
             break
 
     time.sleep(1)
-    click_to(CONSTANTS['game']['surrender']['surrender_2'])
+    click_to_middle(CONSTANTS['game']['surrender']['surrender_2'])
     time.sleep(10)
     end_match()
     time.sleep(5)

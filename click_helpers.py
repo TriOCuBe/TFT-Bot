@@ -8,25 +8,25 @@ from screen_helpers import onscreen, find_image
 from better_image_click import click_image_rand
 import generic_helpers
 
-def click_key(key, delay=.1):
+def click_key(key, delay=.1) -> None:
     auto.keyDown(key)
     time.sleep(delay)
     auto.keyUp(key)
 
 
-def click_left(delay=.1):
+def click_left(delay=.1) -> None:
     auto.mouseDown()
     time.sleep(delay)
     auto.mouseUp()
 
 
-def click_right(delay=.1):
+def click_right(delay=.1) -> None:
     auto.mouseDown(button='right')
     time.sleep(delay)
     auto.mouseUp(button='right')
 
 
-def click_to(path, precision=0.8, delay=.1):
+def click_to(path, precision=0.8, delay=.1) -> None:
     if onscreen(path, precision):
         try:
             auto.moveTo(imagesearch.imagesearch(path))
@@ -36,7 +36,7 @@ def click_to(path, precision=0.8, delay=.1):
     else:
         logging.debug(f"Could not find '{path}', skipping")
 
-def click_to_multiple(images, conditional_func=None, delay=None):
+def click_to_multiple(images, conditional_func=None, delay=None) -> bool:
     for image in images:
         try:
             click_to(image)
@@ -48,7 +48,7 @@ def click_to_multiple(images, conditional_func=None, delay=None):
             return True
     return False
 
-def search_to(path):
+def search_to(path) -> (None | list[int] | tuple[int, int]):
     try:
         pos = imagesearch.imagesearch(path)
         if onscreen(path):
@@ -57,7 +57,7 @@ def search_to(path):
     except Exception:
         return None
 
-def click_to_middle(path, precision=0.8, move_duration=random.uniform(0.1, 1.0), delay=0.2, offset="half", action="left"):
+def click_to_middle(path, precision=0.8, move_duration=random.uniform(0.1, 1.0), delay=0.2, offset="half", action="left") -> bool:
     pos = find_image(path, precision)
     if pos:
         try:
@@ -68,7 +68,7 @@ def click_to_middle(path, precision=0.8, move_duration=random.uniform(0.1, 1.0),
         logging.debug(f"M|Could not find '{path}', skipping")
     return False
 
-def click_to_middle_multiple(images, conditional_func=None, delay=None, action="left"):
+def click_to_middle_multiple(images, conditional_func=None, delay=None, action="left") -> bool:
     for image in images:
         try:
             click_to_middle(image, action=action)

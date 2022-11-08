@@ -31,7 +31,13 @@ def bring_league_client_to_forefront():
     try:
         system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['client_ux'])
     except Exception:
-        logging.warning("Failed to bring League to forefront, this should be non-fatal so let's continue")
+        logging.warning("Failed to bring League client to forefront, this should be non-fatal so let's continue")
+
+def bring_league_game_to_forefront():
+    try:
+        system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['game'])
+    except Exception:
+        logging.warning("Failed to bring League game to forefront, this should be non-fatal so let's continue")
 
 def league_game_already_running():
     return system_helpers.find_in_processes(CONSTANTS['executables']['league']['game'])
@@ -101,6 +107,20 @@ def find_match():
                 logging.info("Was not in queue for 60 seconds, aborting")
                 break
 
+        counter = counter + 1
+        if (counter > 60):
+            logging.info("An exception occurred while finding match")
+            break
+
+def wait_for_league_running():
+    counter = 0
+    while not league_game_already_running():
+        counter = counter + 1
+        time.sleep(0.5)
+        if counter > 60:
+            break
+    return league_game_already_running()
+
 # Start between match logic
 def queue():
     # Queue search loop
@@ -108,6 +128,7 @@ def queue():
         if pauselogic:
             time.sleep(5)
         else:
+            game_launched = False
             if restart_league_if_not_running():
                 continue
             # Not already in queue
@@ -116,19 +137,23 @@ def queue():
                 if is_in_tft_lobby():
                     logging.info("TFT lobby detected, finding match")
                     find_match()
+                    game_launched = True
                 elif league_game_already_running():
                     logging.info("Already in game!")
+                    game_launched = True
                     break
                 # Post-match screen
                 elif check_if_post_game():
                     match_complete()
                 else:
                     logging.warning("TFT lobby not detected!")
-                    restart_league_if_not_running()
+                    restart_league_client()
+                    continue
 
-            #
+            if game_launched:
+                wait_for_league_running()
 
-            if onscreen(CONSTANTS['game']['loading']):
+            if league_game_already_running() and onscreen(CONSTANTS['game']['loading']):
                 logging.info("Loading!")
                 break
             elif onscreen(CONSTANTS['game']['gamelogic']['timer_1']) or league_game_already_running():
@@ -138,9 +163,18 @@ def queue():
 
 
 def loading_match():
+    counter = 0
     logging.info("Match Loading!")
+    bring_league_game_to_forefront()
+
     while not onscreen(CONSTANTS['game']['round']['1-1']) and not onscreen(CONSTANTS['game']['gamelogic']['timer_1']):
-        time.sleep(1)
+        time.sleep(0.5)
+        # In case the client isn't already running, try waiting for it
+        wait_for_league_running()
+        bring_league_game_to_forefront()
+        if counter > 60:
+            logging.warn("Did not detect game start, continuing anyways 😬")
+        counter = counter + 1
 
     logging.info("Match starting!")
     start_match()

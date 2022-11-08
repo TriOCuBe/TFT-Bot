@@ -6,7 +6,7 @@ import logging
 import psutil
 import http.client as httplib
 
-def set_active_window(window_id):
+def set_active_window(window_id) -> None:
     # Try to account for every scenario
     shell = win32com.client.Dispatch("WScript.Shell")
     shell.SendKeys('%')
@@ -14,7 +14,7 @@ def set_active_window(window_id):
     win32gui.SetForegroundWindow(window_id)
     win32gui.SetActiveWindow(window_id)
 
-def bring_window_to_forefront(window_title, path_to_verify=None):
+def bring_window_to_forefront(window_title, path_to_verify=None) -> None:
     try:
         hwnd = win32gui.FindWindowEx(0,0,0, window_title)
         if (path_to_verify is not None):
@@ -27,7 +27,7 @@ def bring_window_to_forefront(window_title, path_to_verify=None):
     except Exception as err:
         logging.debug(f"Failed to click to {err}")
 
-def find_in_processes(executable_path):
+def find_in_processes(executable_path) -> bool:
     for proc in psutil.process_iter():
         try:
             if (proc.exe() == executable_path):

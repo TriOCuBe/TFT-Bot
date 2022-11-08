@@ -51,9 +51,9 @@ class LogFormatter(logging.Formatter):
 		return super(LogFormatter, self).format(record, *args, **kwargs)
 
 # Enable ANSI terminal mode for Command Prompt on Microsoft Windows
-def try_windows_enable_ansi_terminal_mode():
+def try_windows_enable_ansi_terminal_mode() -> bool:
     if (sys.platform != "win32"):
-        return None
+        return False
     try:
         kernel32 = ctypes.windll.kernel32
         result = kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
@@ -63,7 +63,7 @@ def try_windows_enable_ansi_terminal_mode():
         return False
 
 # Setup logging
-def setup_logging(console_log_output, console_log_level, console_log_color, logfile_file, logfile_log_level, logfile_log_color, log_line_template):
+def setup_logging(console_log_output, console_log_level, console_log_color, logfile_file, logfile_log_level, logfile_log_color, log_line_template) -> bool:
 	try_windows_enable_ansi_terminal_mode()
 	# Create logger
 	# For simplicity, we use the root logger, i.e. call 'logging.getLogger()'

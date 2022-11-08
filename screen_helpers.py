@@ -2,13 +2,13 @@ import time
 import python_imagesearch.imagesearch as imagesearch
 import logging
 
-def onscreen(path, precision=0.8):
+def onscreen(path, precision=0.8) -> bool:
     try:
         return imagesearch.imagesearch(path, precision)[0] != -1
     except Exception:
         return False
 
-def onscreen_multiple_any(paths, precision=0.8):
+def onscreen_multiple_any(paths, precision=0.8) -> bool:
     try:
         for path in paths:
             is_onscreen = imagesearch.imagesearch(path, precision)[0]
@@ -20,21 +20,21 @@ def onscreen_multiple_any(paths, precision=0.8):
 
     return False
 
-def onscreen_region(path, x1, y1, x2, y2, precision=0.8):
+def onscreen_region(path, x1, y1, x2, y2, precision=0.8) -> (bool | list[int] | tuple[int, int]):
     try:
         pos = imagesearch.imagesearcharea(path, x1, y1, x2, y2, precision)
         return pos if pos[0] != -1 else False
     except Exception:
         return False
 
-def onscreen_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
+def onscreen_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision=0.8) -> (bool | list[int] | tuple[int, int]):
     try:
         return imagesearch_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision)[0] != -1
     except Exception:
         return False
 
 # Via https://github.com/drov0/python-imagesearch/blob/master/python_imagesearch/imagesearch.py
-def imagesearch_region_numLoop(image, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
+def imagesearch_region_numLoop(image, timesample, maxSamples, x1, y1, x2, y2, precision=0.8) -> (None | list[int] | tuple[int, int]):
     try:
         pos = imagesearch.imagesearcharea(image, x1, y1, x2, y2, precision)
         count = 0
@@ -49,14 +49,14 @@ def imagesearch_region_numLoop(image, timesample, maxSamples, x1, y1, x2, y2, pr
     except Exception:
         return None
 
-def find_image(path, precision=0.8):
+def find_image(path, precision=0.8) -> (None | list[int] | tuple[int, int]):
     try:
         pos = imagesearch.imagesearch(path, precision)
         return pos if pos[0] != -1 else None
     except Exception:
         return None
 
-def find_image_multiple_any(paths, precision=0.8):
+def find_image_multiple_any(paths, precision=0.8) -> (None | list[int] | tuple[int, int]):
     try:
         for path in paths:
             pos = imagesearch.imagesearch(path, precision)
@@ -70,7 +70,7 @@ def find_image_multiple_any(paths, precision=0.8):
 
     return None
 
-def find_image_in_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision=0.8):
+def find_image_in_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision=0.8) -> (None | list[int] | tuple[int, int]):
     try:
         pos = imagesearch_region_numLoop(path, timesample, maxSamples, x1, y1, x2, y2, precision)
         return pos if pos[0] != -1 else None

@@ -27,25 +27,25 @@ FF_EARLY = False
 VERBOSE = False
 
 
-def bring_league_client_to_forefront():
+def bring_league_client_to_forefront() -> None:
     try:
         system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['client_ux'])
     except Exception:
         logging.warning("Failed to bring League client to forefront, this should be non-fatal so let's continue")
 
-def bring_league_game_to_forefront():
+def bring_league_game_to_forefront() -> None:
     try:
         system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS['executables']['league']['game'])
     except Exception:
         logging.warning("Failed to bring League game to forefront, this should be non-fatal so let's continue")
 
-def league_game_already_running():
+def league_game_already_running() -> bool:
     return system_helpers.find_in_processes(CONSTANTS['executables']['league']['game'])
 
-def league_client_running():
+def league_client_running() -> bool:
     return system_helpers.find_in_processes(CONSTANTS['executables']['league']['client']) and system_helpers.find_in_processes(CONSTANTS['executables']['league']['client_ux'])
 
-def parse_task_kill_text(result: subprocess.CompletedProcess[str]):
+def parse_task_kill_text(result: subprocess.CompletedProcess[str]) -> None:
     if 'not found.' in result.stderr:
         logging.debug(F"{result.args[-1]} was not running.")
     elif 'has been terminated.' in result.stdout:
@@ -54,7 +54,7 @@ def parse_task_kill_text(result: subprocess.CompletedProcess[str]):
         logging.warning(F"An unknown exception ocurred attempting to end {result.args[-1]}")
         logging.debug(result)
 
-def restart_league_client():
+def restart_league_client() -> None:
     logging.debug("Killing League Client!")
     result = subprocess.run(["taskkill", "/f", "/im", CONSTANTS['processes']['client']], capture_output=True, text=True)
     parse_task_kill_text(result)
@@ -64,14 +64,14 @@ def restart_league_client():
     subprocess.run(CONSTANTS['executables']['league']['client'])
     time.sleep(5)
 
-def restart_league_if_not_running():
+def restart_league_if_not_running() -> bool:
     if not league_client_running():
         logging.debug("League client not detected, restarting!")
         restart_league_client()
         return True
     return False
 
-def toggle_pause():
+def toggle_pause() -> None:
     global pauselogic
     logging.debug(f'alt+p pressed, toggling pause from {pauselogic} to {not pauselogic}')
     pauselogic = not pauselogic
@@ -81,15 +81,15 @@ def toggle_pause():
         logging.info("Bot playing again!")
 
 
-def is_in_queue():
+def is_in_queue() -> bool:
     return onscreen(CONSTANTS['client']['in_queue']['base']) or onscreen(CONSTANTS['client']['in_queue']['overshadowed'])
 
 
-def is_in_tft_lobby():
+def is_in_tft_lobby() -> bool:
     return onscreen(CONSTANTS['tft_logo']['base']) or onscreen(CONSTANTS['tft_logo']['overshadowed'])
 
 
-def find_match():
+def find_match() -> None:
     counter = 0
     while is_in_tft_lobby() and not check_if_client_error():
         bring_league_client_to_forefront()
@@ -112,7 +112,7 @@ def find_match():
             logging.info("An exception occurred while finding match")
             break
 
-def wait_for_league_running():
+def wait_for_league_running() -> bool:
     counter = 0
     while not league_game_already_running():
         counter = counter + 1
@@ -122,7 +122,7 @@ def wait_for_league_running():
     return league_game_already_running()
 
 # Start between match logic
-def queue():
+def queue() -> None:
     # Queue search loop
     while True:
         if pauselogic:
@@ -162,7 +162,7 @@ def queue():
     loading_match()
 
 
-def loading_match():
+def loading_match() -> None:
     counter = 0
     logging.info("Match Loading!")
     bring_league_game_to_forefront()
@@ -180,14 +180,14 @@ def loading_match():
     start_match()
 
 
-def start_match():
+def start_match() -> None:
     while onscreen(CONSTANTS['game']['round']['1-1']):
         shared_draft_pathing()
     logging.info("In the match now!")
     main_game_loop()
 
 
-def shared_draft_pathing():
+def shared_draft_pathing() -> None:
     auto.moveTo(946, 315)
     click_right()
     time.sleep(3)
@@ -206,7 +206,7 @@ wanted_traits = [
     CONSTANTS['game']['trait']['jade']
 ]
 
-def buy(iterations):
+def buy(iterations) -> None:
     for i in range(iterations):
         if not check_if_gold_at_least(1):
             return
@@ -217,11 +217,7 @@ def buy(iterations):
             else:
                 return
 
-
-def exit_now_conditional():
-    return not league_game_already_running()
-
-def check_if_client_error():
+def check_if_client_error() -> bool:
     if onscreen(CONSTANTS['client']['messages']['session_expired']):
         logging.info("Session expired!")
         click_to_middle(CONSTANTS['client']['messages']['buttons']['message_ok'])
@@ -239,7 +235,10 @@ def check_if_client_error():
         return True
     return False
 
-def check_if_game_complete():
+def exit_now_conditional() -> bool:
+    return not league_game_already_running()
+
+def check_if_game_complete() -> bool:
     if not league_game_already_running() and not attempt_reconnect_to_existing_game():
         return True
     if check_if_client_error():
@@ -256,7 +255,7 @@ def check_if_game_complete():
     return onscreen(CONSTANTS['client']['post_game']['play_again']) or onscreen(CONSTANTS['client']['pre_match']['quick_play']) or onscreen_multiple_any(skip_waiting_for_stats_images)
 
 
-def attempt_reconnect_to_existing_game():
+def attempt_reconnect_to_existing_game() -> bool:
     if onscreen(CONSTANTS['client']['reconnect']):
         logging.info("Reconnecting!")
         time.sleep(0.5)
@@ -265,13 +264,13 @@ def attempt_reconnect_to_existing_game():
     return False
 
 
-def check_if_post_game():  # checks to see if game was interrupted
+def check_if_post_game() -> bool:  # checks to see if game was interrupted
     if check_if_game_complete():
         return True
     return attempt_reconnect_to_existing_game()
 
 
-def check_if_gold_at_least(num):
+def check_if_gold_at_least(num) -> bool:
     logging.debug(f"Looking for at least {num} gold")
     for i in range(num + 1):
         # logging.info(f"Checking for {i} gold")
@@ -291,7 +290,7 @@ def check_if_gold_at_least(num):
     return True
 
 
-def main_game_loop():
+def main_game_loop() -> None:
     global FF_EARLY
     exit = False
     while exit == False:
@@ -336,7 +335,7 @@ def main_game_loop():
                     break
 
 
-def end_match():
+def end_match() -> None:
     # added a main loop for the end match function to ensure you make it to the find match button.
     while not onscreen_multiple_any(find_match_images):
         bring_league_client_to_forefront()
@@ -372,14 +371,14 @@ def end_match():
             time.sleep(3)
 
 
-def match_complete():
+def match_complete() -> None:
     print_timer()
     logging.info("Match complete! Cleaning up and restarting")
     time.sleep(1)
     end_match()
 
 
-def surrender():
+def surrender() -> None:
     counter = 0
     surrenderwait = random.randint(100, 150)
     logging.info(f'Waiting {surrenderwait} seconds ({surrenderwait / 60 } minutes) to surrender')
@@ -414,7 +413,7 @@ def surrender():
     match_complete()
 
 
-def print_timer():
+def print_timer() -> None:
     global endtimer, gamecount
     endtimer = time.time()
     gamecount += 1
@@ -435,7 +434,7 @@ def print_timer():
 # End main process
 
 
-def tft_bot_loop():
+def tft_bot_loop() -> None:
     while True:
         try:
             queue()

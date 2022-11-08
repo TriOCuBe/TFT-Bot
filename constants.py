@@ -48,8 +48,9 @@ CONSTANTS = {
         },
         "launcher_play": "./captures/buttons/launcher_play.png",
         "messages": {
-            "session_expired": "./captures/buttons/session_expired.png",
-            "failed_to_reconnect": "./captures/buttons/failed_to_reconnect.png",
+            "session_expired": "./captures/messages/session_expired.png",
+            "failed_to_reconnect": "./captures/messages/failed_to_reconnect.png",
+            "login_servers_down": "./captures/messages/login_servers_down.png",
             "buttons": {
                 "message_ok": "./captures/buttons/message_ok.png",
                 "message_exit": "./captures/buttons/message_exit.png",

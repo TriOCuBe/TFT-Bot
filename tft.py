@@ -217,20 +217,36 @@ def buy(iterations) -> None:
             else:
                 return
 
+def click_ok_message() -> None:
+    click_to_middle(CONSTANTS['client']['messages']['buttons']['message_ok'])
+
+def click_exit_message() -> None:
+    click_to_middle(CONSTANTS['client']['messages']['buttons']['message_exit'])
+
+def wait_for_internet() -> None:
+    while not system_helpers.have_internet():
+        logging.info("Internet is not up, will retry in 60 seconds")
+        time.sleep(60)
+
 def check_if_client_error() -> bool:
     if onscreen(CONSTANTS['client']['messages']['session_expired']):
         logging.info("Session expired!")
-        click_to_middle(CONSTANTS['client']['messages']['buttons']['message_ok'])
+        click_ok_message()
         time.sleep(5)
         restart_league_client()
         return True
     if onscreen(CONSTANTS['client']['messages']['failed_to_reconnect']):
         logging.info("Failed to reconnect!")
-        click_to_middle(CONSTANTS['client']['messages']['buttons']['message_exit'])
-        time.sleep(3)
-        while not system_helpers.have_internet():
-            logging.info("Internet is not up, will retry in 60 seconds")
-            time.sleep(60)
+        click_exit_message()
+        time.sleep(5)
+        wait_for_internet()
+        restart_league_client()
+        return True
+    if onscreen(CONSTANTS['client']['messages']['login_servers_down']):
+        logging.info("Login servers down!")
+        click_exit_message()
+        time.sleep(5)
+        wait_for_internet()
         restart_league_client()
         return True
     return False
@@ -339,7 +355,7 @@ def end_match() -> None:
     # added a main loop for the end match function to ensure you make it to the find match button.
     while not onscreen_multiple_any(find_match_images):
         bring_league_client_to_forefront()
-        if check_if_client_error():
+        if check_if_client_error() or not league_client_running():
             return
         while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
             logging.info("Dismissing mission")

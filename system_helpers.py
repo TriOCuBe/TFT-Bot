@@ -2,6 +2,7 @@ import win32gui
 import win32process
 import win32com.client
 
+import os
 import logging
 import psutil
 import http.client as httplib
@@ -48,3 +49,19 @@ def have_internet(ip_to_ping="1.1.1.1") -> bool:
         return False
     finally:
         conn.close()
+
+# Via https://gist.github.com/sthonnard/31106e47eab8d6f3329ef530717e8079
+def disable_quickedit():
+    # Disable QuickEdit mode on Windows terminal. QuickEdit pauses application execution if the user selects/highlights/clicks within the terminal
+    if not os.name == 'posix':
+        try:
+            import msvcrt
+            import ctypes
+            kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+            device = r'\\.\CONIN$'
+            with open(device, 'r') as con:
+                hCon = msvcrt.get_osfhandle(con.fileno())
+                kernel32.SetConsoleMode(hCon, 0x0080)
+        except Exception as e:
+            logging.warn(f'Cannot disable QuickEdit mode! : {str(e)}')
+            logging.warn('As a consequence, execution might be automatically paused, careful where you click!')

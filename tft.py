@@ -484,6 +484,7 @@ def main():
     else:
         logging.info("FF Early Not Specified - Will play out games for their duration")
 
+    system_helpers.disable_quickedit()
     os.system('color 0F')
     # Start auth + main script
     logging.info("Initial codebase by:")

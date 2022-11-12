@@ -84,4 +84,6 @@ def resource_path(relative_path):
     except Exception:
         base_path = os.path.abspath(".")
 
+    if relative_path.startswith(base_path):
+        return relative_path
     return os.path.join(base_path, relative_path)

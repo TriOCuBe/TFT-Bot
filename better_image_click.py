@@ -9,7 +9,7 @@ def click_image_rand(image, pos, action, move_duration, offset="half", delay=0.1
     if img is None:
         logging.debug(f'Image file not found: {image}')
         return False
-    height, width = img.shape
+    height, width, _channel = img.shape
     offset_to_use = min(height, width) / 2
     if offset != "half":
         offset_to_use = offset

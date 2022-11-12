@@ -1,9 +1,9 @@
 CONSTANTS = {
     "executables": {
         "league": {
-            "client": "C:\Riot Games\League of Legends\LeagueClient.exe",
-            "client_ux": "C:\Riot Games\League of Legends\LeagueClientUx.exe",
-            "game": "C:\Riot Games\League of Legends\Game\League of Legends.exe",
+            "client": r"C:\Riot Games\League of Legends\LeagueClient.exe",
+            "client_ux": r"C:\Riot Games\League of Legends\LeagueClientUx.exe",
+            "game": r"C:\Riot Games\League of Legends\Game\League of Legends.exe",
         },
     },
     "processes": {

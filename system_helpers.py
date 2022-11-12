@@ -1,13 +1,18 @@
+import sys
+import os
+import logging
+import http.client as httplib
+import psutil
+
 import win32gui
 import win32process
 import win32com.client
 
-import sys
-import os
-import logging
-import psutil
-import http.client as httplib
-
+try:
+    import msvcrt
+    import ctypes
+finally:
+    pass
 
 def set_active_window(window_id) -> None:
     # Try to account for every scenario
@@ -21,7 +26,7 @@ def set_active_window(window_id) -> None:
 def bring_window_to_forefront(window_title, path_to_verify=None) -> None:
     try:
         hwnd = win32gui.FindWindowEx(0, 0, 0, window_title)
-        if (path_to_verify is not None):
+        if path_to_verify is not None:
             _, pid = win32process.GetWindowThreadProcessId(hwnd)
             path = psutil.Process(pid).exe()
             if path != path_to_verify:
@@ -35,7 +40,7 @@ def bring_window_to_forefront(window_title, path_to_verify=None) -> None:
 def find_in_processes(executable_path) -> bool:
     for proc in psutil.process_iter():
         try:
-            if (proc.exe() == executable_path):
+            if proc.exe() == executable_path:
                 return True
         except Exception:
             # Nothing, we don't care
@@ -63,21 +68,19 @@ def disable_quickedit():
     # execution if the user selects/highlights/clicks within the terminal
     if not os.name == 'posix':
         try:
-            import msvcrt
-            import ctypes
             kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
             device = r'\\.\CONIN$'
-            with open(device, 'r') as con:
-                hCon = msvcrt.get_osfhandle(con.fileno())
-                kernel32.SetConsoleMode(hCon, 0x0080)
-        except Exception as e:
-            logging.warn(f'Cannot disable QuickEdit mode! : {str(e)}')
-            logging.warn('As a consequence, execution might be automatically paused, careful where you click!')
+            with open(device, 'r') as con: # pylint: disable=unspecified-encoding
+                file_handle = msvcrt.get_osfhandle(con.fileno())
+                kernel32.SetConsoleMode(file_handle, 0x0080)
+        except Exception as err:
+            logging.warning(f'Cannot disable QuickEdit mode! : {str(err)}')
+            logging.warning('As a consequence, execution might be automatically paused, careful where you click!')
 
 
 def resource_path(relative_path):
     try:
-        base_path = sys._MEIPASS
+        base_path = sys._MEIPASS # pylint: disable=no-member,protected-access
     except Exception:
         base_path = os.path.abspath(".")
 

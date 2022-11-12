@@ -1,19 +1,19 @@
-import cv2
-import pyautogui as auto
-import random
 import logging
 import time
+import random
+import pyautogui as auto
+import cv2
 
 def click_image_rand(image, pos, action, move_duration, offset="half", delay=0.1) -> bool:
     img = cv2.imread(image)
     if img is None:
-        logging.debug('Image file not found: {}'.format(image))
+        logging.debug(f'Image file not found: {image}')
         return False
-    height, width, channels = img.shape
+    height, width = img.shape
     offset_to_use = min(height, width) / 2
     if offset != "half":
         offset_to_use = offset
-    auto.moveTo(pos[0] + r(width / 2, offset_to_use), pos[1] + r(height / 2, offset_to_use), move_duration)
+    auto.moveTo(pos[0] + rand_func(width / 2, offset_to_use), pos[1] + rand_func(height / 2, offset_to_use), move_duration)
     click_action(delay=delay, button=action)
     return True
 
@@ -22,5 +22,5 @@ def click_action(delay=.1, button="left") -> None:
     time.sleep(delay)
     auto.mouseUp(button=button)
 
-def r(num, rand) -> float:
+def rand_func(num, rand) -> float:
     return num + rand * random.random()

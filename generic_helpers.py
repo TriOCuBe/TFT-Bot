@@ -1,6 +1,6 @@
 def is_var_number(var) -> bool:
     try:
-        return type(var) == int or type(var) == float
+        return type(var) == int or type(var) == float #pylint: disable=unidiomatic-typecheck
     except Exception:
         pass
     return False

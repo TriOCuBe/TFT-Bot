@@ -44,7 +44,7 @@ On that note, if anyone has any suggestions / features they would like to see, p
 
 # Installation:
 
-* Install Python 3.8.3 from [here](https://www.python.org/downloads/), or the Windows Store
+* Install Python 3.10 from [here](https://www.python.org/downloads/), or the Windows Store
 * Navigate to your install directory using `cd` and run `pip install -r requirements.txt` in Command Prompt
 * Navigate to your install directory using `cd` and run `py tft.py` in Command Prompt
 * Follow the instructions in your terminal window! Get into a TFT lobby, have the created window visible on your screen, and press 'OK' to start the bot!

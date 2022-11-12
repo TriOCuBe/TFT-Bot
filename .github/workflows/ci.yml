@@ -14,18 +14,7 @@ jobs:
         python-version: '3.10'
     - run: pip install -r requirements.txt
     - run: python installer.py
-    # - name: release
-    #   uses: actions/create-release@v1
-    #   id: create_release
-    #   with:
-    #     draft: false
-    #     prerelease: false
-    #     release_name: ${{ steps.version.outputs.version }}
-    #     tag_name: ${{ github.ref }}
-    #     body_path: CHANGELOG.md
-    #   env:
-    #     GITHUB_TOKEN: ${{ github.token }}
-    
+
     - name: Display structure of downloaded files
       run: ls -R
     - uses: xresloader/upload-to-github-release@main
@@ -33,8 +22,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         file: "dist/TFT Bot.exe"
-        # release_id: ${{ steps.create_release.outputs.id }}
-        # branches: "main;dev"
+        branches: "main;dev"
         verbose: true
         prerelease: true
-        draft: true
+        draft: false

@@ -6,6 +6,7 @@ import python_imagesearch.imagesearch as imagesearch
 
 from screen_helpers import onscreen, find_image
 from better_image_click import click_image_rand
+from system_helpers import resource_path
 import generic_helpers
 
 def click_key(key, delay=.1) -> None:
@@ -27,6 +28,7 @@ def click_right(delay=.1) -> None:
 
 
 def click_to(path, precision=0.8, delay=.1) -> None:
+    path = resource_path(path)
     if onscreen(path, precision):
         try:
             auto.moveTo(imagesearch.imagesearch(path))
@@ -38,6 +40,7 @@ def click_to(path, precision=0.8, delay=.1) -> None:
 
 def click_to_multiple(images, conditional_func=None, delay=None) -> bool:
     for image in images:
+        image = resource_path(image)
         try:
             click_to(image)
         except Exception:
@@ -50,6 +53,7 @@ def click_to_multiple(images, conditional_func=None, delay=None) -> bool:
 
 def search_to(path) -> (None | list[int] | tuple[int, int]):
     try:
+        path = resource_path(path)
         pos = imagesearch.imagesearch(path)
         if onscreen(path):
             auto.moveTo(pos)
@@ -58,6 +62,7 @@ def search_to(path) -> (None | list[int] | tuple[int, int]):
         return None
 
 def click_to_middle(path, precision=0.8, move_duration=random.uniform(0.1, 1.0), delay=0.2, offset="half", action="left") -> bool:
+    path = resource_path(path)
     pos = find_image(path, precision)
     if pos:
         try:
@@ -70,6 +75,7 @@ def click_to_middle(path, precision=0.8, move_duration=random.uniform(0.1, 1.0),
 
 def click_to_middle_multiple(images, conditional_func=None, delay=None, action="left") -> bool:
     for image in images:
+        image = resource_path(image)
         try:
             click_to_middle(image, action=action)
         except Exception:

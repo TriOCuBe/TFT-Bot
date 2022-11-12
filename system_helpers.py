@@ -2,6 +2,7 @@ import win32gui
 import win32process
 import win32com.client
 
+import sys
 import os
 import logging
 import psutil
@@ -65,3 +66,11 @@ def disable_quickedit():
         except Exception as e:
             logging.warn(f'Cannot disable QuickEdit mode! : {str(e)}')
             logging.warn('As a consequence, execution might be automatically paused, careful where you click!')
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)

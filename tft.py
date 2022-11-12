@@ -470,9 +470,6 @@ def main():
 
     FF_EARLY = parsed_args.ffearly
     VERBOSE = parsed_args.verbose
-    logging_handlers = [logging.StreamHandler()]
-    if VERBOSE:
-        logging_handlers.append(logging.FileHandler("debug.log"))
 
     if VERBOSE:
         logging.info("Will explain everything and be very verbose")
@@ -512,12 +509,12 @@ def main():
     script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
     if not setup_logging(
             console_log_output="stdout",
-            console_log_level="debug" if VERBOSE else "warning",
+            console_log_level="debug" if VERBOSE else "info",
             console_log_color=True,
             logfile_file=script_name + ".log",
             logfile_log_level="debug",
             logfile_log_color=False,
-            log_line_template="%(color_on)s[%(created)d] [%(threadName)s] %(levelname)-8s || %(message)s%(color_off)s"
+            log_line_template="%(color_on)s[%(asctime)s] [%(threadName)s] %(levelname)-8s || %(message)s%(color_off)s"
         ):
         print("Failed to set up logger, continue with caution!")
         if (auto.alert("Failed to set up logger, continue with caution!\n", buttons=['Proceed', 'Cancel']) == "Cancel"):

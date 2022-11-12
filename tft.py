@@ -368,6 +368,10 @@ def end_match() -> None:
             logging.info("Screenshot of mission saved")
             click_to_middle(CONSTANTS['client']['post_game']['missions_ok'])
             time.sleep(3)
+        if onscreen(CONSTANTS['client']['key_fragment']):
+            logging.info("Dismissing key fragment")
+            click_to_middle(CONSTANTS['client']['key_fragment'])
+            time.sleep(0.5)
         if onscreen_multiple_any(skip_waiting_for_stats_images):
             logging.info("Skipping waiting for stats")
             click_to_middle_multiple(skip_waiting_for_stats_images)

@@ -37,6 +37,7 @@ CONSTANTS = {
         },
         "death": "captures/death.png",
         "reconnect": "captures/buttons/reconnect.png",
+        "key_fragment": "captures/buttons/key_fragment.png",
         "post_game": {
             "skip_waiting_for_stats": {
                 "original": "captures/buttons/skip_waiting_for_stats.png",

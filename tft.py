@@ -512,7 +512,7 @@ def main():
     script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
     if not setup_logging(
             console_log_output="stdout",
-            console_log_level="debug" if VERBOSE else "warning",
+            console_log_level="debug" if VERBOSE else "info",
             console_log_color=True,
             logfile_file=script_name + ".log",
             logfile_log_level="debug",

@@ -16,7 +16,7 @@ CONSTANTS = {
         "overshadowed": "captures/tft_logo_overshadowed.png",
     },
     "client": {
-        "screenshot_location": "screenshots/",
+        "screenshot_location": "./screenshots/",
         "tabs": {
             "tft": {
                 "unselected": "captures/buttons/tab_tft_unselected.png"
@@ -37,7 +37,10 @@ CONSTANTS = {
         },
         "death": "captures/death.png",
         "reconnect": "captures/buttons/reconnect.png",
-        "key_fragment": "captures/buttons/key_fragment.png",
+        "key_fragment": {
+            "one": "captures/buttons/key_fragment.png",
+            "two": "captures/buttons/key_fragment2.png",
+        },
         "post_game": {
             "skip_waiting_for_stats": {
                 "original": "captures/buttons/skip_waiting_for_stats.png",
@@ -130,5 +133,10 @@ exit_now_images = [
 skip_waiting_for_stats_images = [
     CONSTANTS['client']['post_game']['skip_waiting_for_stats']['original'],
     CONSTANTS['client']['post_game']['skip_waiting_for_stats']['base'],
-    CONSTANTS['client']['post_game']['skip_waiting_for_stats']['highlighted']
+    CONSTANTS['client']['post_game']['skip_waiting_for_stats']['highlighted'],
+]
+
+key_fragment_images = [
+    CONSTANTS['client']['key_fragment']['one'],
+    CONSTANTS['client']['key_fragment']['two'],
 ]

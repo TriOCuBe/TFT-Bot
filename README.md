@@ -13,6 +13,11 @@ Some features of this bot:
   - If >= 1, attempt 3 champ purchases
     - After that, if >= 2, re-roll
 
+TODO (near future):
+- Update `README.md` to mention exectuables as the preferred way for users to use this
+ - This is pending further testing & verification
+- Add ability to load from config file of some sort so that verbose can be enabled without running via CLI
+
 Some features I hope to implement at some point:
 - Ability to work on any monitor and/or in Windowed mode (make clicking relative to window location), which would help in not needing to change your actual monitors resolution
 - Update LoL game & client executable "constants" to be detectable

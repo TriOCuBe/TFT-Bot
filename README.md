@@ -13,6 +13,11 @@ Some features of this bot:
   - If >= 1, attempt 3 champ purchases
     - After that, if >= 2, re-roll
 
+TODO (near future):
+- Update `README.md` to mention exectuables as the preferred way for users to use this
+ - This is pending further testing & verification
+- Add ability to load from config file of some sort so that verbose can be enabled without running via CLI
+
 Some features I hope to implement at some point:
 - Ability to work on any monitor and/or in Windowed mode (make clicking relative to window location), which would help in not needing to change your actual monitors resolution
 - Update LoL game & client executable "constants" to be detectable
@@ -44,7 +49,7 @@ On that note, if anyone has any suggestions / features they would like to see, p
 
 # Installation:
 
-* Install Python 3.8.3 from [here](https://www.python.org/downloads/), or the Windows Store
+* Install Python 3.10 from [here](https://www.python.org/downloads/), or the Windows Store
 * Navigate to your install directory using `cd` and run `pip install -r requirements.txt` in Command Prompt
 * Navigate to your install directory using `cd` and run `py tft.py` in Command Prompt
 * Follow the instructions in your terminal window! Get into a TFT lobby, have the created window visible on your screen, and press 'OK' to start the bot!

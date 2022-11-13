@@ -1,0 +1,26 @@
+name: Main CI
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: [windows-latest]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - run: pip install -r requirements.txt
+    - run: python installer.py
+
+    - name: Display structure of downloaded files
+      run: ls -R
+    - uses: xresloader/upload-to-github-release@main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "dist/TFT Bot.exe"
+        branches: "main;dev"
+        verbose: true
+        prerelease: true
+        draft: false

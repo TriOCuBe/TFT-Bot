@@ -17,7 +17,7 @@ def onscreen_multiple_any(paths, precision=0.8) -> bool:
         for path in paths:
             path = resource_path(path)
             is_onscreen = imagesearch.imagesearch(path, precision)[0]
-            # logging.debug(f"is_onscreen: {is_onscreen != -1}") #Advanced debugging not even normally needed
+            logging.debug(f"is_onscreen: {is_onscreen != -1}") #Advanced debugging not even normally needed
             if is_onscreen != -1:
                 return True
     except Exception as err:

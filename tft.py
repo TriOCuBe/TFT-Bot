@@ -10,7 +10,8 @@ from printy import printy
 import pyautogui as auto
 import keyboard
 
-from constants import CONSTANTS, find_match_images, exit_now_images, skip_waiting_for_stats_images
+from constants import CONSTANTS, find_match_images, exit_now_images, skip_waiting_for_stats_images, key_fragment_images
+
 import system_helpers
 from logging_helper import setup_logging
 from screen_helpers import onscreen, onscreen_multiple_any, onscreen_region_numLoop
@@ -93,6 +94,7 @@ def find_match() -> None:
     counter = 0
     while is_in_tft_lobby() and not check_if_client_error():
         bring_league_client_to_forefront()
+        dismiss_interruptions()
         find_match_click_success = click_to_middle_multiple(find_match_images, conditional_func=is_in_queue, delay=0.2)
         logging.debug(f"Clicking find match success: {find_match_click_success}")
         time.sleep(1)
@@ -133,6 +135,7 @@ def queue() -> None:
                 continue
             # Not already in queue
             bring_league_client_to_forefront()
+            dismiss_interruptions()
             if not is_in_queue():
                 if is_in_tft_lobby():
                     logging.info("TFT lobby detected, finding match")
@@ -357,21 +360,7 @@ def end_match() -> None:
         bring_league_client_to_forefront()
         if check_if_client_error() or not league_client_running():
             return
-        while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
-            logging.info("Dismissing mission")
-            #screenshot if you have an "ok" button
-            localtime = time.localtime()    # added for printing time
-            current_time = time.strftime("%H%M%S", localtime) #for the changing file name
-            my_screenshot = auto.screenshot()
-            my_screenshot.save(rf'{CONSTANTS["client"]["screenshot_location"]}/{current_time}.png')
-            time.sleep(2)
-            logging.info("Screenshot of mission saved")
-            click_to_middle(CONSTANTS['client']['post_game']['missions_ok'])
-            time.sleep(3)
-        if onscreen(CONSTANTS['client']['key_fragment']):
-            logging.info("Dismissing key fragment")
-            click_to_middle(CONSTANTS['client']['key_fragment'])
-            time.sleep(0.5)
+        dismiss_interruptions()
         if onscreen_multiple_any(skip_waiting_for_stats_images):
             logging.info("Skipping waiting for stats")
             click_to_middle_multiple(skip_waiting_for_stats_images)
@@ -389,6 +378,25 @@ def end_match() -> None:
             logging.info("Detected that TFT tab is not selected, attempting ot select")
             click_to_middle(CONSTANTS['client']['tabs']['tft']['unselected'])
             time.sleep(3)
+
+def dismiss_interruptions() -> None:
+    if onscreen_multiple_any(key_fragment_images, 0.7):
+        logging.info("Dismissing key fragment")
+        click_to_middle_multiple(key_fragment_images, 0.7)
+        time.sleep(0.5)
+    else:
+        logging.info("No key fragment to dismiss")
+    while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
+        logging.info("Dismissing mission")
+        #screenshot if you have an "ok" button
+        localtime = time.localtime()    # added for printing time
+        current_time = time.strftime("%H%M%S", localtime) #for the changing file name
+        my_screenshot = auto.screenshot()
+        my_screenshot.save(rf'{CONSTANTS["client"]["screenshot_location"]}/{current_time}.png')
+        time.sleep(2)
+        logging.info("Screenshot of mission saved")
+        click_to_middle(CONSTANTS['client']['post_game']['missions_ok'])
+        time.sleep(3)
 
 
 def match_complete() -> None:

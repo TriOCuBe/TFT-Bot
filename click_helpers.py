@@ -73,11 +73,11 @@ def click_to_middle(path, precision=0.8, move_duration=random.uniform(0.1, 1.0),
         logging.debug(f"M|Could not find '{path}', skipping")
     return False
 
-def click_to_middle_multiple(images, conditional_func=None, delay=None, action="left") -> bool:
+def click_to_middle_multiple(images, precision=0.8, conditional_func=None, delay=None, action="left") -> bool:
     for image in images:
         image = resource_path(image)
         try:
-            click_to_middle(image, action=action)
+            click_to_middle(image, precision=precision, action=action)
         except Exception:
             logging.debug(f"M|Failed to click {image}")
         if generic_helpers.is_var_number(delay):

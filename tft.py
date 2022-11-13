@@ -384,8 +384,6 @@ def dismiss_interruptions() -> None:
         logging.info("Dismissing key fragment")
         click_to_middle_multiple(key_fragment_images, 0.7)
         time.sleep(0.5)
-    else:
-        logging.info("No key fragment to dismiss")
     while onscreen(CONSTANTS['client']['post_game']['missions_ok']):
         logging.info("Dismissing mission")
         #screenshot if you have an "ok" button

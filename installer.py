@@ -1,4 +1,7 @@
+"""Bot executable creation script."""
 import PyInstaller.__main__
+
+import constants
 
 PyInstaller.__main__.run([
     'tft.py',
@@ -12,5 +15,7 @@ PyInstaller.__main__.run([
     '--console',
     '--win-private-assemblies',
     '--win-no-prefer-redirects',
-    '--clean'
+    '--clean',
+    '--runtime-tmpdir',
+    constants.CONSTANTS['storage']['appdata']
 ])

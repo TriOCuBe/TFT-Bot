@@ -8,9 +8,9 @@ CONSTANTS = {
     },
     "executables": {
         "league": {
-            "client": r"C:\Riot Games\League of Legends\LeagueClient.exe",
-            "client_ux": r"C:\Riot Games\League of Legends\LeagueClientUx.exe",
-            "game": r"C:\Riot Games\League of Legends\Game\League of Legends.exe",
+            "client": r"\LeagueClient.exe",
+            "client_ux": r"\LeagueClientUx.exe",
+            "game": r"\Game\League of Legends.exe",
         },
     },
     "processes": {
@@ -26,7 +26,8 @@ CONSTANTS = {
         "screenshot_location": f"{os.getcwd()}/screenshots",
         "tabs": {
             "tft": {
-                "unselected": "captures/buttons/tab_tft_unselected.png"
+                "unselected": "captures/buttons/tab_tft_unselected.png",
+                "selected": "captures/buttons/tab_tft_selected.png"
             }
         },
         "pre_match": {
@@ -35,6 +36,9 @@ CONSTANTS = {
                 "base": "captures/buttons/find_match.png",
                 "highlighted": "captures/buttons/find_match_highlighted.png",
                 "original": "captures/buttons/find_match_original.png",
+            },
+            "lobby": {
+                "normal": "captures/tft_lobby_normal.png",
             }
         },
         "in_queue": {

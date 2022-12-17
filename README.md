@@ -17,6 +17,12 @@ Some features of this bot:
 - Can load settings from a config file (if you want to customize how it starts up)
 - Automatically detects your League install location from the Windows registry, allowing non-default installs to still benefit from this script
 
+How stable is this you might ask?
+I recorded this screenshot after a couple days if it running straight, and the battlepass XP matches 😜
+
+![image](https://user-images.githubusercontent.com/7606153/208268290-8956bfb0-62d4-4d2f-9dd9-0c17c4c1a20e.png)
+
+
 
 # Usage / Settings
 

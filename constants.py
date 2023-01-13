@@ -44,7 +44,10 @@ CONSTANTS = {
         "in_queue": {
             "base": "captures/buttons/in_queue.png",
             "overshadowed": "captures/buttons/in_queue_overshadowed.png",
-            "accept": "captures/buttons/accept.png",
+            "accept": {
+                "zoomed": "captures/buttons/accept_zoomed.png",
+                "expanded": "captures/buttons/accept_expanded.png",
+            }
         },
         "death": "captures/death.png",
         "reconnect": "captures/buttons/reconnect.png",
@@ -144,6 +147,11 @@ CONSTANTS = {
         },
     },
 }
+
+accept_match_images = [
+    CONSTANTS["client"]["in_queue"]["accept"]["expanded"],
+    CONSTANTS["client"]["in_queue"]["accept"]["zoomed"],
+]
 
 find_match_images = [
     CONSTANTS["client"]["pre_match"]["find_match"]["base"],

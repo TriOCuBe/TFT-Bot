@@ -438,10 +438,14 @@ def check_if_game_complete() -> bool:
         click_to_middle(CONSTANTS["client"]["death"])
         time.sleep(3)
     if onscreen_multiple_any(exit_now_images):
-        logging.info("End of game detected")
+        logging.info("End of game detected (exit now)")
         exit_now_bool = click_to_middle_multiple(exit_now_images, conditional_func=exit_now_conditional, delay=1.5)
         logging.debug(f"Exit now clicking success: {exit_now_bool}")
         time.sleep(4)
+    if onscreen(CONSTANTS["client"]["continue"]):
+        logging.info("End of game detected (continue)")
+        click_to_middle(CONSTANTS["client"]["continue"])
+        time.sleep(3)
     return (
         onscreen(CONSTANTS["client"]["post_game"]["play_again"])
         or onscreen(CONSTANTS["client"]["pre_match"]["quick_play"])

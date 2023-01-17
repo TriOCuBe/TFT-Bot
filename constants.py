@@ -50,6 +50,7 @@ CONSTANTS = {
                 "expanded": "captures/buttons/accept_expanded.png",
             }
         },
+        "continue": "captures/buttons/continue.png",
         "death": "captures/death.png",
         "reconnect": "captures/buttons/reconnect.png",
         "key_fragment": {
@@ -82,6 +83,7 @@ CONSTANTS = {
         "exit_now": {
             "base": "captures/buttons/exit_now_base.png",
             "highlighted": "captures/buttons/exit_now_highlighted.png",
+            "original": "captures/buttons/exit_now_original.png",
         },
         "settings": "captures/buttons/settings.png",
         "surrender": {
@@ -162,12 +164,13 @@ find_match_images = [
 exit_now_images = [
     CONSTANTS["game"]["exit_now"]["base"],
     CONSTANTS["game"]["exit_now"]["highlighted"],
+    CONSTANTS["game"]["exit_now"]["original"],
 ]
 
 skip_waiting_for_stats_images = [
-    CONSTANTS["client"]["post_game"]["skip_waiting_for_stats"]["original"],
     CONSTANTS["client"]["post_game"]["skip_waiting_for_stats"]["base"],
     CONSTANTS["client"]["post_game"]["skip_waiting_for_stats"]["highlighted"],
+    CONSTANTS["client"]["post_game"]["skip_waiting_for_stats"]["original"],
 ]
 
 key_fragment_images = [

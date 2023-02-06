@@ -27,8 +27,9 @@ CONSTANTS = {
                 "unselected": {
                     "1": "captures/buttons/tab_tft_unselected_1.png",
                     "2": "captures/buttons/tab_tft_unselected_2.png",
+                    "3": "captures/buttons/tab_tft_unselected_3.png",
+                    "4": "captures/buttons/tab_tft_unselected_highlighted.png",
                 },
-                "selected": "captures/buttons/tab_tft_selected.png",
                 "subtab_home": "captures/buttons/tft_subtab_home.png"
             }
         },
@@ -68,7 +69,10 @@ CONSTANTS = {
         },
         "launcher_play": "captures/buttons/launcher_play.png",
         "messages": {
-            "give_feedback": "captures/messages/give_feedback.png",
+            "give_feedback": {
+                "full": "captures/messages/give_feedback.png",
+                "smaller": "captures/messages/give_feedback_smaller.png",
+            },
             "session_expired": "captures/messages/session_expired.png",
             "failed_to_reconnect": "captures/messages/failed_to_reconnect.png",
             "login_servers_down": "captures/messages/login_servers_down.png",
@@ -189,4 +193,11 @@ wanted_traits = [
 unselected_tft_tabs = [
     CONSTANTS["client"]["tabs"]["tft"]["unselected"]["1"],
     CONSTANTS["client"]["tabs"]["tft"]["unselected"]["2"],
+    CONSTANTS["client"]["tabs"]["tft"]["unselected"]["3"],
+    CONSTANTS["client"]["tabs"]["tft"]["unselected"]["4"],
+]
+
+give_feedback = [
+    CONSTANTS["client"]["messages"]["give_feedback"]["full"],
+    CONSTANTS["client"]["messages"]["give_feedback"]["smaller"],
 ]

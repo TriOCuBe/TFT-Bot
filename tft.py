@@ -23,6 +23,7 @@ from constants import exit_now_images
 from constants import find_match_images
 from constants import give_feedback
 from constants import key_fragment_images
+from constants import message_exit_buttons
 from constants import skip_waiting_for_stats_images
 from constants import unselected_tft_tabs
 from constants import wanted_traits
@@ -55,7 +56,7 @@ def bring_league_client_to_forefront() -> None:
 def bring_league_game_to_forefront() -> None:
     """Brings the league game to the forefront."""
     try:
-        system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS["executables"]["league"]["game"])
+        system_helpers.bring_window_to_forefront("League of Legends (TM) Client", CONSTANTS["executables"]["league"]["game"])
     except Exception:
         logger.warning("Failed to bring League game to forefront, this should be non-fatal so let's continue")
 
@@ -296,7 +297,16 @@ def loading_match() -> None:
     logger.info("Match Loading!")
     bring_league_game_to_forefront()
 
-    while not onscreen(CONSTANTS["game"]["round"]["1-1"]) and not onscreen(CONSTANTS["game"]["gamelogic"]["timer_1"]):
+    while (
+        not onscreen(CONSTANTS["game"]["loading"]) and
+        not onscreen(CONSTANTS["game"]["gamelogic"]["timer_1"]) and
+        not onscreen(CONSTANTS["game"]["round"]["1-"]) and
+        not onscreen(CONSTANTS["game"]["round"]["2-"]) and
+        not onscreen(CONSTANTS["game"]["round"]["3-"]) and
+        not onscreen(CONSTANTS["game"]["round"]["4-"]) and
+        not onscreen(CONSTANTS["game"]["round"]["5-"]) and
+        not onscreen(CONSTANTS["game"]["round"]["6-"])
+    ):
         time.sleep(0.5)
         # In case the client isn't already running, try waiting for it
         wait_for_league_running()
@@ -358,7 +368,7 @@ def click_ok_message() -> None:
 
 def click_exit_message() -> None:
     """Click the message Exit button"""
-    click_to_middle(CONSTANTS["client"]["messages"]["buttons"]["message_exit"])
+    click_to_middle_multiple(message_exit_buttons)
 
 
 def wait_for_internet() -> None:
@@ -375,26 +385,24 @@ def check_if_client_error() -> bool:
     Returns:
         bool: True if a client error message was detected.
     """
-    if onscreen(CONSTANTS["client"]["messages"]["session_expired"]):
-        logger.info("Session expired!")
-        click_ok_message()
-        time.sleep(5)
-        restart_league_client()
-        return True
+    if onscreen(CONSTANTS["client"]["messages"]["down_for_maintenance"]):
+        logger.info("League down for maintenance, delaying restart for 5 minutes!")
+        return acknowledge_error_and_restart_league(delay=300)
     if onscreen(CONSTANTS["client"]["messages"]["failed_to_reconnect"]):
         logger.info("Failed to reconnect!")
-        click_exit_message()
-        time.sleep(5)
-        wait_for_internet()
-        restart_league_client()
-        return True
+        return acknowledge_error_and_restart_league(internet_pause=True)
     if onscreen(CONSTANTS["client"]["messages"]["login_servers_down"]):
         logger.info("Login servers down!")
-        click_exit_message()
-        time.sleep(5)
-        wait_for_internet()
-        restart_league_client()
-        return True
+        return acknowledge_error_and_restart_league(internet_pause=True)
+    if onscreen(CONSTANTS["client"]["messages"]["session_expired"]):
+        logger.info("Session expired!")
+        return acknowledge_error_and_restart_league()
+    if onscreen(CONSTANTS["client"]["messages"]["unexpected_error_with_session"]):
+        logger.info("Unexpected error with session!")
+        return acknowledge_error_and_restart_league()
+    if onscreen(CONSTANTS["client"]["messages"]["unexpected_login_error"]):
+        logger.info("Unexpected login error!")
+        return acknowledge_error_and_restart_league()
     if onscreen(CONSTANTS["client"]["messages"]["players_are_not_ready"]):
         logger.info("Player not ready detected, waiting to see if it stays")
         time.sleep(5)
@@ -404,6 +412,18 @@ def check_if_client_error() -> bool:
             return True
         logger.info("Player not ready dismissed, continuing on")
     return False
+
+
+def acknowledge_error_and_restart_league(delay: int = 5, internet_pause: bool = False) -> bool:
+    """Acknowledge error message with ok or error button and restart league client
+    """
+    click_exit_message()
+    click_ok_message()
+    time.sleep(delay)
+    if internet_pause:
+        wait_for_internet()
+    restart_league_client()
+    return True
 
 
 def check_if_client_popup() -> bool:

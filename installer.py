@@ -1,7 +1,7 @@
 """Bot executable creation script."""
 import PyInstaller.__main__
 
-import constants
+from tft_bot import constants
 
 PyInstaller.__main__.run(
     [
@@ -9,6 +9,8 @@ PyInstaller.__main__.run(
         "--onefile",
         "--add-data",
         "captures;captures",
+        "--add-data",
+        "tft_bot/resources;tft_bot/resources",
         "-n",
         "TFT Bot",
         "-i",

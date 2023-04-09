@@ -22,7 +22,6 @@ from tft_bot.constants import exit_now_images
 from tft_bot.constants import find_match_images
 from tft_bot.constants import league_processes
 from tft_bot.constants import message_exit_buttons
-from tft_bot.constants import wanted_traits
 from tft_bot.helpers import system_helpers
 from tft_bot.helpers.click_helpers import click_left
 from tft_bot.helpers.click_helpers import click_right
@@ -310,11 +309,11 @@ def buy(iterations: int) -> None:
     for _ in range(iterations):
         if not check_if_gold_at_least(1):
             return
-        for trait in wanted_traits:
-            if onscreen(trait):
-                click_to_middle(trait)
+        for trait in config.get_wanted_traits():
+            if onscreen(CONSTANTS["game"]["trait"][trait]):
+                click_to_middle(CONSTANTS["game"]["trait"][trait])
                 time.sleep(0.5)
-            else:
+            elif config.purchase_traits_in_prioritized_order():
                 return
 
 
@@ -692,11 +691,12 @@ def print_timer() -> None:
     global GAME_COUNT
     GAME_COUNT += 1
 
-    logger.info("-------------------------------------")
+    logger.info("-----------------------------------------")
     logger.info("Game End")
     logger.info(f"Time since start: {delta_seconds // 3600}h {(delta_seconds // 60) % 60}m {delta_seconds % 60}s")
     logger.info(f"Games played: {str(GAME_COUNT)}")
-    logger.info("-------------------------------------")
+    logger.info(f"Win rate (at most last 20 games): {LCU_INTEGRATION.get_win_rate(GAME_COUNT)}%")
+    logger.info("-----------------------------------------")
 
 
 def tft_bot_loop() -> None:

@@ -219,6 +219,12 @@ def queue() -> None:  # pylint: disable=too-many-branches
         if not PLAY_NEXT_GAME:
             evaluate_next_game_logic()
 
+        if LCU_INTEGRATION.session_expired():
+            logger.warning("Our login session expired, restarting the client")
+            restart_league_client()
+            time.sleep(5)
+            continue
+
         if LCU_INTEGRATION.in_game():
             logger.info("A game is running, switching to game logic")
             break
@@ -255,9 +261,10 @@ def queue() -> None:  # pylint: disable=too-many-branches
 
 def loading_match() -> None:
     """Attempt to wait for the match to load, bringing the League game to the forefront/focus.
-    After some time, if the game has not been detected as starting, it moves on anyways.
+    After some time, if the game has not been detected as starting, it moves on anyway.
     """
-    if not GAME_CLIENT_INTEGRATION.wait_for_game_window():
+    logger.info("Waiting for the game window (~30s timeout)")
+    if not GAME_CLIENT_INTEGRATION.wait_for_game_window(lcu_integration=LCU_INTEGRATION):
         if LCU_INTEGRATION.in_game():
             logger.warning("We are in a game, but the game window is not opening. Restarting client...")
             restart_league_client()
@@ -893,4 +900,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        logger.info("Received wish to exit by CTRL+C, exiting immediately.")
+        sys.exit(0)

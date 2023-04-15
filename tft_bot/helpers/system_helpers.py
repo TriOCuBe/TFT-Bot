@@ -115,6 +115,11 @@ def disable_quickedit() -> None:
 def resource_path(relative_path: str) -> str:
     """Convert the given relative path to the expanded temp directory path.
 
+    NOTES
+    Change the local application context to ensure assets are asked for relative to the main asset folder.
+    This is related to an issue with https://github.com/Kyrluckechuck/TFT-Bot/issues/129
+    This can likely be done in a cleaner maner but is being left as-is since it's a viable fix.
+
     Args:
         relative_path (str): The relative path to expand.
 
@@ -126,9 +131,9 @@ def resource_path(relative_path: str) -> str:
     except Exception:
         base_path = os.path.abspath(".")
 
-    if relative_path.startswith(base_path):
-        return relative_path
-    return os.path.join(base_path, relative_path)
+    os.chdir(base_path)
+
+    return relative_path
 
 
 def expand_environment_variables(var: str) -> str:

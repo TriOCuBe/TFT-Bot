@@ -23,13 +23,14 @@ from tft_bot.constants import find_match_images
 from tft_bot.constants import league_processes
 from tft_bot.constants import message_exit_buttons
 from tft_bot.helpers import system_helpers
-from tft_bot.helpers.click_helpers import click_left
-from tft_bot.helpers.click_helpers import click_right
-from tft_bot.helpers.click_helpers import click_to_middle
-from tft_bot.helpers.click_helpers import click_to_middle_multiple
-from tft_bot.helpers.screen_helpers import onscreen
-from tft_bot.helpers.screen_helpers import onscreen_multiple_any
-from tft_bot.helpers.screen_helpers import onscreen_region_num_loop
+from tft_bot.helpers.click_helpers import click_to
+from tft_bot.helpers.click_helpers import click_to_image
+from tft_bot.helpers.screen_helpers import BoundingBox
+from tft_bot.helpers.screen_helpers import calculate_window_click_offset
+from tft_bot.helpers.screen_helpers import check_league_game_size
+from tft_bot.helpers.screen_helpers import get_on_screen_in_client
+from tft_bot.helpers.screen_helpers import get_on_screen_in_game
+from tft_bot.helpers.screen_helpers import get_on_screen_multiple_any
 from tft_bot.league_api import league_api_integration
 
 auto.FAILSAFE = False
@@ -42,22 +43,20 @@ LCU_INTEGRATION = league_api_integration.LCUIntegration()
 GAME_CLIENT_INTEGRATION = league_api_integration.GameClientIntegration()
 
 
+@logger.catch
 def bring_league_client_to_forefront() -> None:
     """Brings the league client to the forefront."""
-    try:
-        system_helpers.bring_window_to_forefront("League of Legends", CONSTANTS["executables"]["league"]["client_ux"])
-    except Exception:
-        logger.warning("Failed to bring League client to forefront, this should be non-fatal so let's continue")
+    system_helpers.bring_window_to_forefront(
+        CONSTANTS["window_titles"]["client"], CONSTANTS["executables"]["league"]["client_ux"]
+    )
 
 
+@logger.catch
 def bring_league_game_to_forefront() -> None:
     """Brings the league game to the forefront."""
-    try:
-        system_helpers.bring_window_to_forefront(
-            "League of Legends (TM) Client", CONSTANTS["executables"]["league"]["game"]
-        )
-    except Exception:
-        logger.warning("Failed to bring League game to forefront, this should be non-fatal so let's continue")
+    system_helpers.bring_window_to_forefront(
+        CONSTANTS["window_titles"]["game"], CONSTANTS["executables"]["league"]["game"]
+    )
 
 
 def league_game_already_running() -> bool:
@@ -267,12 +266,13 @@ def loading_match() -> None:
 
     logger.info("Match loaded, starting initial draft pathfinding")
     bring_league_game_to_forefront()
+    check_league_game_size()
     start_match()
 
 
 def start_match() -> None:
     """Do initial first round pathing to pick the first champ."""
-    while onscreen(CONSTANTS["game"]["round"]["1-1"]):
+    while get_on_screen_in_game(CONSTANTS["game"]["round"]["1-1"]):
         shared_draft_pathing()
     logger.info("Initial draft complete, continuing with game")
     main_game_loop()
@@ -280,17 +280,23 @@ def start_match() -> None:
 
 def shared_draft_pathing() -> None:
     """Navigate counter-clockwise in a diamond to help ensure a champ is picked up."""
-    auto.moveTo(946, 315)
-    click_right()
+    top = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=946, position_y=315)
+    left = calculate_window_click_offset(
+        window_title=CONSTANTS["window_titles"]["game"], position_x=700, position_y=450
+    )
+    bottom = calculate_window_click_offset(
+        window_title=CONSTANTS["window_titles"]["game"], position_x=950, position_y=675
+    )
+    right = calculate_window_click_offset(
+        window_title=CONSTANTS["window_titles"]["game"], position_x=1200, position_y=460
+    )
+    click_to(position_x=top.position_x, position_y=top.position_y, action="right")
     time.sleep(2)
-    auto.moveTo(700, 450)
-    click_right()
+    click_to(position_x=left.position_x, position_y=left.position_y, action="right")
     time.sleep(2)
-    auto.moveTo(950, 675)
-    click_right()
+    click_to(position_x=bottom.position_x, position_y=bottom.position_y, action="right")
     time.sleep(2)
-    auto.moveTo(1200, 460)
-    click_right()
+    click_to(position_x=right.position_x, position_y=right.position_y, action="right")
 
 
 def buy(iterations: int) -> None:
@@ -304,8 +310,7 @@ def buy(iterations: int) -> None:
         if not check_if_gold_at_least(1):
             return
         for trait in config.get_wanted_traits():
-            if onscreen(CONSTANTS["game"]["trait"][trait]):
-                click_to_middle(CONSTANTS["game"]["trait"][trait])
+            if click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["trait"][trait])):
                 time.sleep(0.5)
             elif config.purchase_traits_in_prioritized_order():
                 return
@@ -313,12 +318,15 @@ def buy(iterations: int) -> None:
 
 def click_ok_message() -> None:
     """Click the message OK button"""
-    click_to_middle(CONSTANTS["client"]["messages"]["buttons"]["message_ok"])
+    click_to_image(
+        image_search_result=get_on_screen_in_client(CONSTANTS["client"]["messages"]["buttons"]["message_ok"])
+    )
 
 
 def click_exit_message() -> None:
     """Click the message Exit button"""
-    click_to_middle_multiple(message_exit_buttons)
+    for button in message_exit_buttons:
+        click_to_image(image_search_result=get_on_screen_in_client(button))
 
 
 def wait_for_internet() -> None:
@@ -335,28 +343,28 @@ def check_if_client_error() -> bool:  # pylint: disable=too-many-return-statemen
     Returns:
         bool: True if a client error message was detected.
     """
-    if onscreen(CONSTANTS["client"]["messages"]["down_for_maintenance"]):
+    if get_on_screen_in_client(CONSTANTS["client"]["messages"]["down_for_maintenance"]):
         logger.info("League down for maintenance, delaying restart for 5 minutes!")
         return acknowledge_error_and_restart_league(delay=300)
-    if onscreen(CONSTANTS["client"]["messages"]["failed_to_reconnect"]):
+    if get_on_screen_in_client(CONSTANTS["client"]["messages"]["failed_to_reconnect"]):
         logger.info("Failed to reconnect!")
         return acknowledge_error_and_restart_league(internet_pause=True)
-    if onscreen(CONSTANTS["client"]["messages"]["login_servers_down"]):
+    if get_on_screen_in_client(CONSTANTS["client"]["messages"]["login_servers_down"]):
         logger.info("Login servers down!")
         return acknowledge_error_and_restart_league(internet_pause=True)
-    if onscreen(CONSTANTS["client"]["messages"]["session_expired"]):
+    if get_on_screen_in_client(CONSTANTS["client"]["messages"]["session_expired"]):
         logger.info("Session expired!")
         return acknowledge_error_and_restart_league()
-    if onscreen(CONSTANTS["client"]["messages"]["unexpected_error_with_session"]):
+    if get_on_screen_in_client(CONSTANTS["client"]["messages"]["unexpected_error_with_session"]):
         logger.info("Unexpected error with session!")
         return acknowledge_error_and_restart_league()
-    if onscreen(CONSTANTS["client"]["messages"]["unexpected_login_error"]):
+    if get_on_screen_in_client(CONSTANTS["client"]["messages"]["unexpected_login_error"]):
         logger.info("Unexpected login error!")
         return acknowledge_error_and_restart_league()
-    if onscreen(CONSTANTS["client"]["messages"]["players_are_not_ready"]):
+    if get_on_screen_in_client(CONSTANTS["client"]["messages"]["players_are_not_ready"]):
         logger.info("Player not ready detected, waiting to see if it stays")
         time.sleep(5)
-        if onscreen(CONSTANTS["client"]["messages"]["players_are_not_ready"]):
+        if get_on_screen_in_client(CONSTANTS["client"]["messages"]["players_are_not_ready"]):
             logger.error("Player not ready did not dismiss, restarting client!")
             restart_league_client()
             return True
@@ -393,14 +401,15 @@ def check_screen_for_exit_button() -> bool:
         True if any known exit buttons were found, False if not.
 
     """
-    if onscreen_multiple_any(exit_now_images):
-        logger.info("End of game detected (exit now)")
-        exit_now_bool = click_to_middle_multiple(exit_now_images, conditional_func=exit_now_conditional, delay=1.5)
-        logger.debug(f"Exit now clicking success: {exit_now_bool}")
-        time.sleep(5)
-        return True
+    for image in exit_now_images:
+        if click_to_image(image_search_result=get_on_screen_in_game(image)):
+            logger.info("End of game detected, exiting")
+            break
+    else:
+        return False
 
-    return False
+    time.sleep(5)
+    return True
 
 
 def check_if_game_complete(wait_for_exit_buttons: bool = False) -> bool:
@@ -461,9 +470,9 @@ def attempt_reconnect_to_existing_game() -> bool:
     Returns:
         bool: True if a reconnect is attempted, False otherwise.
     """
-    if onscreen(CONSTANTS["client"]["reconnect"]):
+    if LCU_INTEGRATION.should_reconnect():
+        LCU_INTEGRATION.reconnect()
         logger.info("Reconnecting!")
-        click_to_middle(CONSTANTS["client"]["reconnect"])
         return True
     return False
 
@@ -492,11 +501,11 @@ def check_gold(num: int) -> bool:
 
     """
     try:
-        if onscreen_region_num_loop(CONSTANTS["game"]["gold"][f"{num}"], 0.05, 5, 780, 850, 970, 920, 0.9):
+        if get_on_screen_in_game(CONSTANTS["game"]["gold"][f"{num}"], 0.9, BoundingBox(780, 850, 970, 920)):
             logger.debug(f"Found {num} gold")
             return True
-    except Exception:
-        logger.debug(f"Exception finding {num} gold, we possibly don't have the value as a file")
+    except Exception as exc:
+        logger.opt(exception=exc).debug(f"Exception finding {num} gold, we possibly don't have the value as a file")
         # We don't have this gold as a file
         return True
     return False
@@ -532,26 +541,26 @@ def determine_minimum_round() -> int:
         The major round as an integer.
 
     """
-    if onscreen(CONSTANTS["game"]["round"]["krugs_inactive"], 0.9) or onscreen(
+    if get_on_screen_in_game(CONSTANTS["game"]["round"]["krugs_inactive"], 0.9) or get_on_screen_in_game(
         CONSTANTS["game"]["round"]["krugs_active"], 0.9
     ):
         return 2
 
-    if onscreen(CONSTANTS["game"]["round"]["wolves_inactive"], 0.9) or onscreen(
+    if get_on_screen_in_game(CONSTANTS["game"]["round"]["wolves_inactive"], 0.9) or get_on_screen_in_game(
         CONSTANTS["game"]["round"]["wolves_active"], 0.9
     ):
         return 3
 
-    if onscreen(CONSTANTS["game"]["round"]["threat_inactive"], 0.9) or onscreen(
+    if get_on_screen_in_game(CONSTANTS["game"]["round"]["threat_inactive"], 0.9) or get_on_screen_in_game(
         CONSTANTS["game"]["round"]["threat_active"], 0.9
     ):
         return 4
 
-    if onscreen(CONSTANTS["game"]["round"]["1-"]):
+    if get_on_screen_in_game(CONSTANTS["game"]["round"]["1-"]):
         return 1
 
     for i in range(1, 7):
-        if onscreen(CONSTANTS["game"]["round"][f"{i}-"]):
+        if get_on_screen_in_game(CONSTANTS["game"]["round"][f"{i}-"]):
             return i
 
     logger.debug("Could not determine minimum round, returning 0.")
@@ -576,15 +585,17 @@ def main_game_loop() -> None:  # pylint: disable=too-many-branches
 
         minimum_round = determine_minimum_round()
         # Free champ round
-        if minimum_round > 1 and onscreen(CONSTANTS["game"]["round"]["draft_active"], 0.95):
+        if minimum_round > 1 and get_on_screen_in_game(CONSTANTS["game"]["round"]["draft_active"], 0.95):
             logger.info("Active draft detected, pathing to carousel")
             shared_draft_pathing()
             continue
 
-        if onscreen(CONSTANTS["game"]["gamelogic"]["choose_an_augment"], 0.95):
+        if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["choose_an_augment"], 0.95):
             logger.info("Detected augment offer, selecting one")
-            auto.moveTo(960, 540)
-            click_left()
+            augment_offset = calculate_window_click_offset(
+                window_title=CONSTANTS["window_titles"]["game"], position_x=960, position_y=540
+            )
+            click_to(position_x=augment_offset.position_x, position_y=augment_offset.position_y)
             time.sleep(0.5)
             continue
 
@@ -599,13 +610,13 @@ def main_game_loop() -> None:  # pylint: disable=too-many-branches
 
         # If round > 2, buy champs, level and re-roll
         buy(3)
-        if check_if_gold_at_least(4) and onscreen(CONSTANTS["game"]["gamelogic"]["xp_buy"]):
-            click_to_middle(CONSTANTS["game"]["gamelogic"]["xp_buy"])
-            time.sleep(0.2)
+        if check_if_gold_at_least(4):
+            click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["xp_buy"]))
+            time.sleep(0.5)
 
-        if check_if_gold_at_least(5) and onscreen(CONSTANTS["game"]["gamelogic"]["reroll"]):
-            click_to_middle(CONSTANTS["game"]["gamelogic"]["reroll"])
-            time.sleep(0.2)
+        if check_if_gold_at_least(5):
+            click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["reroll"]))
+            time.sleep(0.5)
             continue
 
         time.sleep(0.5)
@@ -629,7 +640,7 @@ def end_match() -> None:
             continue
         break
 
-    if not onscreen_multiple_any(find_match_images):
+    if not get_on_screen_multiple_any(window_title=CONSTANTS["window_titles"]["client"], paths=find_match_images):
         bring_league_client_to_forefront()
         if check_if_client_error() or not league_client_running():
             return
@@ -674,13 +685,12 @@ def surrender() -> None:
     #  in the settings doesn't work. This is a temporary work-around.
     #  We need to use PyDirectInput since the league client does not
     #  always recognize the input of the method pyautogui uses.
-    while not onscreen(CONSTANTS["game"]["surrender"]["surrender_2"]):
+    while not click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["surrender"]["surrender_2"])):
         time.sleep(2)
         bring_league_game_to_forefront()
         pydirectinput.write(["enter", "/", "f", "f", "enter"], interval=0.1)
         time.sleep(1)
 
-    click_to_middle(CONSTANTS["game"]["surrender"]["surrender_2"])
     time.sleep(10)
     end_match()
     logger.info("Surrender complete")
@@ -818,7 +828,6 @@ def main():
     # Logs at level DEBUG, so it's always verbose.
     # retention=10 to only keep the 10 most recent files.
     logger.add(storage_path + "\\tft-bot-debug-{time}.log", level="DEBUG", retention=10)
-
     system_helpers.disable_quickedit()
     # Start auth + main script
     logger.info(

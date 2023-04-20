@@ -26,6 +26,15 @@ wanted_traits:
 # to buy all traits.
 purchase_traits_in_prioritized_order: true
 
+# Settings for the bots decisions made for purchasing units, leveling and rolling.
+economy:
+  # The mode itself to be used. ocr_* modes require Tesseract-OCR to be installed.
+  # "default" constantly spends all gold, cycling equally between purchasing, leveling, and rolling.
+  # "ocr_standard" tries to keep your gold at around 50, otherwise behaves like default.
+  mode: "default"
+  # Override the automatic detection of tesseract. Should not be needed, but is supported.
+  override_tesseract_location: ""
+
 # Configure the various timeouts the bot uses throughout it's looping logic.
 # Adjust these to account for differences in internet/hardware speed.
 # All of these are measured in seconds.
@@ -59,4 +68,4 @@ timeouts:
 override_install_location: ''
 
 # Version of the YAML. Changing this manually can potentially break the bot, so don't!
-version: 4
+version: 5

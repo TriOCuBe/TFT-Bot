@@ -13,7 +13,6 @@ import keyboard
 from loguru import logger
 import psutil
 import pyautogui as auto
-import pydirectinput
 import requests
 from requests import HTTPError
 
@@ -26,6 +25,7 @@ from tft_bot.economy.base import EconomyMode
 from tft_bot.helpers import system_helpers
 from tft_bot.helpers.click_helpers import click_to
 from tft_bot.helpers.click_helpers import click_to_image
+from tft_bot.helpers.click_helpers import move_to
 from tft_bot.helpers.screen_helpers import calculate_window_click_offset
 from tft_bot.helpers.screen_helpers import check_league_game_size
 from tft_bot.helpers.screen_helpers import get_board_positions
@@ -260,7 +260,7 @@ def loading_match() -> None:
             restart_league_client()
         return
 
-    game_start_timeout = config.get_timeout(config.Timeout.GAME_START, 120)
+    game_start_timeout = config.get_timeout(config.Timeout.GAME_START, 300)
     logger.info(f"Match loading, waiting for game to start (~{game_start_timeout}s timeout)")
     for _ in range(game_start_timeout):
         if GAME_CLIENT_INTEGRATION.game_loaded():
@@ -277,9 +277,17 @@ def loading_match() -> None:
 
 def start_match() -> None:
     """Do initial first round pathing to pick the first champ."""
-    while get_on_screen_in_game(CONSTANTS["game"]["round"]["1-1"]):
-        shared_draft_pathing()
-    logger.info("Initial draft complete, continuing with game")
+    time.sleep(5)
+    if get_on_screen_in_game(CONSTANTS["game"]["round"]["1-1"]):
+        vote_option_offset = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=34, position_y=435
+        )
+        move_to(position_x=vote_option_offset.position_x, position_y=vote_option_offset.position_y)
+        time.sleep(1)
+        click_to(position_x=vote_option_offset.position_x + 300, position_y=vote_option_offset.position_y + 125)
+        time.sleep(25)
+
+    logger.info("Initial vote complete, continuing with game")
     main_game_loop(economy_mode=config.get_economy_mode(system_helpers=system_helpers))
 
 
@@ -491,7 +499,9 @@ def determine_minimum_round() -> int:
     ):
         return 4
 
-    if get_on_screen_in_game(CONSTANTS["game"]["round"]["elder_dragon_inactive"], 0.9):
+    if get_on_screen_in_game(CONSTANTS["game"]["round"]["elder_dragon_inactive"], 0.9) or get_on_screen_in_game(
+        CONSTANTS["game"]["round"]["elder_dragon_active"], 0.9
+    ):
         return 5
 
     for i in range(1, 7):
@@ -589,34 +599,43 @@ def surrender() -> None:
     )
     logger.info(f"Waiting {random_seconds} seconds before surrendering...")
     time.sleep(random_seconds)
+
+    if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["choose_an_augment"], 0.95):
+        logger.info("Detected augment offer, selecting one before surrendering")
+        augment_offset = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=960, position_y=540
+        )
+        click_to(position_x=augment_offset.position_x, position_y=augment_offset.position_y)
+        time.sleep(3)
+
     logger.info("Starting surrender")
-    # click_to_middle(CONSTANTS["game"]["settings"])
-    #
-    # counter = 0
-    # while not onscreen(CONSTANTS["game"]["surrender"]["surrender_1"]):
-    #     # just in case it gets interrupted or misses
-    #     click_to_middle(CONSTANTS["game"]["settings"])
-    #     time.sleep(1)
-    #     counter = counter + 1
-    #     if counter > 20:
-    #         break
-    # while not onscreen(CONSTANTS["game"]["surrender"]["surrender_2"]):
-    #     click_to_middle(CONSTANTS["game"]["surrender"]["surrender_1"])
-    #     # added a check here for the rare case that the game ended before the surrender finished.
-    #     if check_if_post_game():
-    #         return
-    #     counter = counter + 1
-    #     if counter > 20:
-    #         break
-    # FIXME There's a bug in TFT right now where the surrender button  # pylint: disable=fixme
-    #  in the settings doesn't work. This is a temporary work-around.
-    #  We need to use PyDirectInput since the league client does not
-    #  always recognize the input of the method pyautogui uses.
-    while not click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["surrender"]["surrender_2"])):
-        time.sleep(2)
-        bring_league_game_to_forefront()
-        pydirectinput.write(["enter", "/", "f", "f", "enter"], interval=0.1)
+    click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["settings"]))
+
+    for _ in range(20):
+        if get_on_screen_in_game(CONSTANTS["game"]["surrender"]["surrender_1"]):
+            break
+
+        click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["settings"]))
         time.sleep(1)
+    else:
+        logger.warning("Could not find settings button to click on to surrender.")
+        return
+
+    for _ in range(20):
+        if get_on_screen_in_game(CONSTANTS["game"]["surrender"]["surrender_2"]):
+            break
+
+        click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["surrender"]["surrender_1"]))
+        time.sleep(1)
+    else:
+        logger.warning("Could not find surrender button to click on.")
+        return
+
+    # added a check here for the rare case that the game ended before the surrender finished.
+    if check_if_post_game():
+        return
+
+    click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["surrender"]["surrender_2"]))
 
     time.sleep(10)
     end_match()

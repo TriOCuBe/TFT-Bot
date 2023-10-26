@@ -284,7 +284,7 @@ def start_match() -> None:
         )
         move_to(position_x=vote_option_offset.position_x, position_y=vote_option_offset.position_y)
         time.sleep(1)
-        click_to(position_x=vote_option_offset.position_x + 300, position_y=vote_option_offset.position_y + 125)
+        click_to(position_x=vote_option_offset.position_x + 290, position_y=vote_option_offset.position_y + 115)
         time.sleep(25)
 
     logger.info("Initial vote complete, continuing with game")
@@ -534,7 +534,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
 
         minimum_round = determine_minimum_round()
         # Free champ round
-        if minimum_round > 1 and get_on_screen_in_game(CONSTANTS["game"]["round"]["draft_active"], 0.9):
+        if minimum_round > 1 and get_on_screen_in_game(CONSTANTS["game"]["round"]["draft_active"], 0.95):
             logger.info("Active draft detected, pathing to carousel")
             shared_draft_pathing()
             continue

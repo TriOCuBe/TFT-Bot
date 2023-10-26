@@ -96,16 +96,16 @@ class EconomyMode:
         """
         Runs a circle (square) around the map, trying to collect items on the way.
         """
-        checkpoint1 = calculate_window_click_offsetcalculate_window_click_offset(
+        checkpoint1 = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=730
         )
-        checkpoint2 = calculate_window_click_offsetcalculate_window_click_offset(
+        checkpoint2 = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=730
         )
-        checkpoint3 = calculate_window_click_offsetcalculate_window_click_offset(
+        checkpoint3 = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300
         )
-        checkpoint4 = calculate_window_click_offsetcalculate_window_click_offset(
+        checkpoint4 = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=300
         )
         logger.info("Running around, trying to collect items")

@@ -41,6 +41,7 @@ class DefaultEconomyMode(EconomyMode):
 
         if timer >= 10:
             self.collect_items()
+            timer = 0
         else:
             timer += 1
         time.sleep(0.5)

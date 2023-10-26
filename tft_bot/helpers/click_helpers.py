@@ -1,8 +1,7 @@
 """A collection of click helpers."""
 import random
 import time
-
-import pyautogui as auto
+import keyboard
 from pyHM import mouse
 
 from tft_bot.helpers.screen_helpers import ImageSearchResult
@@ -16,9 +15,9 @@ def click(delay=0.1, button="left") -> None:
         button (str, optional): Button of the mouse to activate : "left" "right" "middle",
             see pyautogui.click documentation for more info. Defaults to "left".
     """
-    auto.mouseDown(button=button)
+    mouse.down(button=button)
     time.sleep(delay)
-    auto.mouseUp(button=button)
+    mouse.up(button=button)
     # if button == "left":
     #     mouse.click()
     # else:
@@ -57,7 +56,7 @@ def click_to(
     """
     # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
     move_to(position_x, position_y)
-    mouse_button(delay=delay, button=action)
+    click(delay=delay, button=action)
     # if action == "left":
     #     mouse.click(position_x, position_y)
     # else:

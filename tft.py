@@ -512,49 +512,23 @@ def determine_minimum_round() -> int:
     return 0
 
 
-def is_item_round() -> bool:
-    """
-    Checks if the current round is an item round
+# def is_item_round() -> bool:
+#     """
+#     Checks if the current round is an item round
 
-    Returns:
-        True or False
-    """
+#     Returns:
+#         True or False
+#     """
 
-    if  get_on_screen_in_game(
-        CONSTANTS["game"]["round"]["krugs_active"], 0.9) or get_on_screen_in_game(
-        CONSTANTS["game"]["round"]["wolves_active"], 0.9) or get_on_screen_in_game(
-        CONSTANTS["game"]["round"]["birds_active"], 0.9) or get_on_screen_in_game(
-        CONSTANTS["game"]["round"]["elder_dragon_active"], 0.9):
+#     if  get_on_screen_in_game(
+#         CONSTANTS["game"]["round"]["krugs_active"], 0.9) or get_on_screen_in_game(
+#         CONSTANTS["game"]["round"]["wolves_active"], 0.9) or get_on_screen_in_game(
+#         CONSTANTS["game"]["round"]["birds_active"], 0.9) or get_on_screen_in_game(
+#         CONSTANTS["game"]["round"]["elder_dragon_active"], 0.9):
 
-        return True
+#         return True
     
-    return False
-
-
-def collect_items() -> None:
-    """
-    Runs a circle around the map, trying to collect items on the way.
-    """
-    checkpoint1 = calculate_window_click_offsetcalculate_window_click_offset(
-        window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=730
-    )
-    checkpoint2 = calculate_window_click_offsetcalculate_window_click_offset(
-        window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=730
-    )
-    checkpoint3 = calculate_window_click_offsetcalculate_window_click_offset(
-        window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300
-    )
-    checkpoint4 = calculate_window_click_offsetcalculate_window_click_offset(
-        window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=300
-    )
-    logger.info("Last round was PVE, running around to collect items")
-
-    checkpoint_list = [checkpoint1, checkpoint2, checkpoint3, checkpoint4]
-    for i in range(2):
-        random.shuffle(checkpoint_list)
-        for point in checkpoint_list:
-            click_to(position_x=point.x, position_y=point.y, action="right")
-            time.sleep(2.5)
+#     return False
 
 
 def main_game_loop(economy_mode: EconomyMode) -> None:
@@ -571,15 +545,6 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
         if PAUSE_LOGIC:
             time.sleep(5)
             continue
-        
-        if is_item_round():
-            collect_timer = True
-        else:
-            collect_timer = False
-        
-        if not is_item_round() and collect_timer:
-            collect_items()
-            collect_timer = False
 
         post_game = check_if_post_game()
         if post_game:

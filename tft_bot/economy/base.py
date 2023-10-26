@@ -91,3 +91,28 @@ class EconomyMode:
             click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["xp_buy"]))
         else:
             press('F')  # hotkey for xp
+
+    def collect_items(self) -> None:
+        """
+        Runs a circle (square) around the map, trying to collect items on the way.
+        """
+        checkpoint1 = calculate_window_click_offsetcalculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=730
+        )
+        checkpoint2 = calculate_window_click_offsetcalculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=730
+        )
+        checkpoint3 = calculate_window_click_offsetcalculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300
+        )
+        checkpoint4 = calculate_window_click_offsetcalculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=300
+        )
+        logger.info("Running around, trying to collect items")
+
+        checkpoint_list = [checkpoint1, checkpoint2, checkpoint3, checkpoint4]
+        # for i in range(2):
+        random.shuffle(checkpoint_list)
+        for point in checkpoint_list:
+            click_to(position_x=point.x, position_y=point.y, action="right")
+            time.sleep(2.5)

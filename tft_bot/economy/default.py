@@ -33,3 +33,14 @@ class DefaultEconomyMode(EconomyMode):
 
         if random.randint(0, 2) == 1:
             self.sell_units(amount=random.randint(1,2))
+            time.sleep(0.5)
+    
+        global timer
+        if timer is undefined:
+            timer = 0
+
+        if timer >= 10:
+            self.collect_items()
+        else:
+            timer += 1
+        time.sleep(0.5)

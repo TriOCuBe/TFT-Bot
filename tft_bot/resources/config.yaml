@@ -44,7 +44,7 @@ timeouts:
   league_client: 300
   # Time we wait for us to successfully connect to the league client.
   client_connect: 60
-  # Time we wait for the client to tell us that it's done loadin.
+  # Time we wait for the client to tell us that it's done loading.
   client_availability: 120
   # Time we wait between a match being marked as started and the game showing up.
   game_window: 30

@@ -3,21 +3,26 @@ import random
 import time
 
 import pyautogui as auto
+from pyHM import mouse
 
 from tft_bot.helpers.screen_helpers import ImageSearchResult
 
 
-def mouse_button(delay=0.1, button="left") -> None:
+def click(delay=0.1, button="left") -> None:
+    #   delay (float, optional): The delay between button down & up. Defaults to .1.
     """A click helper to simulate clicking the specified button.
 
     Args:
-        delay (float, optional): The delay between button down & up. Defaults to .1.
         button (str, optional): Button of the mouse to activate : "left" "right" "middle",
             see pyautogui.click documentation for more info. Defaults to "left".
     """
-    auto.mouseDown(button=button)
-    time.sleep(delay)
-    auto.mouseUp(button=button)
+    # auto.mouseDown(button=button)
+    # time.sleep(delay)
+    # auto.mouseUp(button=button)
+    if button == "left":
+        mouse.click()
+    else:
+        mouse.right_click()
 
 
 def move_to(
@@ -31,7 +36,8 @@ def move_to(
         position_x: The x coordinate to move to
         position_y: The y coordinate to move to
     """
-    auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
+    # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
+    mouse.move(position_x + random.randint(-2,2), position_y + random.randint(-2,2))
 
 
 def click_to(
@@ -49,8 +55,12 @@ def click_to(
         delay (float, optional): The delay between mouse down & up. Defaults to 0.2.
         action (str, optional): The mouse button to perform. Defaults to "left".
     """
-    auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
-    mouse_button(delay=delay, button=action)
+    # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
+    # mouse_button(delay=delay, button=action)
+    if action == "left":
+        mouse.click(position_x, position_y)
+    else:
+        mouse.right_click(position_x, position_y)
 
 
 def click_to_image(
@@ -84,3 +94,28 @@ def click_to_image(
         action=action,
     )
     return True
+
+
+def hold_and_move_to(position_x: int, position_y: int, action: str = "left"):
+    """
+    Holds down a mouse button and moves the cursor to coordinates, then stops holding.
+
+    Args:
+        position_x: The x coordinate to move to.
+        position_y: The y coordinate to move to.
+        action: The mouse button to perform. Defaults to "left".
+    """
+    mouse.down(button=action)
+    time.sleep(random.randint(10)/100)
+    move_to(position_x, position_y)
+    time.sleep(random.randint(10)/100)
+    mouse.up(button=action)
+
+def press(key: str) -> None:
+    """
+    Presses a key.
+
+    Args:
+        key: The key to press.
+    """
+    keyboard.press(key)

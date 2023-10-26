@@ -284,7 +284,7 @@ def start_match() -> None:
         )
         move_to(position_x=vote_option_offset.position_x, position_y=vote_option_offset.position_y)
         time.sleep(1)
-        click_to(position_x=vote_option_offset.position_x + 290, position_y=vote_option_offset.position_y + 115)
+        click_to(position_x=vote_option_offset.position_x + 290, position_y=vote_option_offset.position_y + 122)
         time.sleep(25)
 
     logger.info("Initial vote complete, continuing with game")
@@ -512,6 +512,51 @@ def determine_minimum_round() -> int:
     return 0
 
 
+def is_item_round() -> bool:
+    """
+    Checks if the current round is an item round
+
+    Returns:
+        True or False
+    """
+
+    if  get_on_screen_in_game(
+        CONSTANTS["game"]["round"]["krugs_active"], 0.9) or get_on_screen_in_game(
+        CONSTANTS["game"]["round"]["wolves_active"], 0.9) or get_on_screen_in_game(
+        CONSTANTS["game"]["round"]["bird_active"], 0.9) or get_on_screen_in_game(
+        CONSTANTS["game"]["round"]["elder_dragon_active"], 0.9):
+
+        return True
+    
+    return False
+
+
+def collect_items() -> None:
+    """
+    Runs a circle around the map, trying to collect items on the way.
+    """
+    checkpoint1 = calculate_window_click_offsetcalculate_window_click_offset(
+        window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=730
+    )
+    checkpoint2 = calculate_window_click_offsetcalculate_window_click_offset(
+        window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=730
+    )
+    checkpoint3 = calculate_window_click_offsetcalculate_window_click_offset(
+        window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300
+    )
+    checkpoint4 = calculate_window_click_offsetcalculate_window_click_offset(
+        window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=300
+    )
+    logger.info("Last round was PVE, running around to collect items")
+
+    checkpoint_list = [checkpoint1, checkpoint2, checkpoint3, checkpoint4]
+    for i in range(2):
+        random.shuffle(checkpoint_list)
+        for point in checkpoint_list:
+            click_to(position_x=point.x, position_y=point.y, action="right")
+            time.sleep(2.5)
+
+
 def main_game_loop(economy_mode: EconomyMode) -> None:
     """
     The main in-game loop.
@@ -527,6 +572,12 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             time.sleep(5)
             continue
 
+        if is_item_round():
+            collect_timer = True
+        elif collect_timer:
+            collect_items()
+            collect_timer = False
+
         post_game = check_if_post_game()
         if post_game:
             match_complete()
@@ -539,7 +590,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             shared_draft_pathing()
             continue
 
-        if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["choose_an_augment"], 0.95):
+        if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["choose_an_augment"], 0.9):
             logger.info("Detected augment offer, selecting one")
             augment_offset = calculate_window_click_offset(
                 window_title=CONSTANTS["window_titles"]["game"], position_x=960, position_y=540
@@ -549,6 +600,9 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
 
             logger.debug(f"Board positions: {get_board_positions()}")
             continue
+
+        if minimum_round >= 3:
+            sell_random()
 
         economy_mode.loop_decision(minimum_round=minimum_round)
 

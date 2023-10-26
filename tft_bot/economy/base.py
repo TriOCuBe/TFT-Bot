@@ -2,9 +2,10 @@
 Module holding the base economy mode blueprint class.
 """
 import time
+import random
 
 from tft_bot.constants import CONSTANTS
-from tft_bot.helpers.click_helpers import click_to_image
+from tft_bot.helpers.click_helpers import click_to_image, move_to, hold_and_move_to, press
 from tft_bot.helpers.screen_helpers import get_on_screen_in_game
 
 
@@ -46,14 +47,47 @@ class EconomyMode:
                 elif self.prioritized_order:
                     return
 
+    def sell_units(self, amount: int) -> None:
+        # y=780, x=400 + 130 * 8 (total 9)
+        """
+        Attempts to sell a random unit on the bench.
+
+        Args:
+            amount: The amount of units to sell.
+        """
+
+        points = []
+        for i in range(9):
+            point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=400 + (130 * i), position_y=780)
+            points.append(point)
+
+        for _ in range(amount):
+            # this block removes used points, so the same slot can't be picked multiple times
+            index = random.randint(len(points))
+            point = points[index]
+            points.remove(point)
+
+            move_to(position_x=point.x, position_y=point.y)
+            if random.randint(0, 1) == 1:
+                sell_offset = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=960, position_y=980)
+                hold_and_move_to(sell_offset.x, sell_offset.y)
+            else:
+                press('E')  # hotkey for sell
+
     def roll(self) -> None:
         """
         Utility method to roll (refresh) the shop once.
         """
-        click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["reroll"]))
+        if random.randint(0, 1) == 1:
+            click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["reroll"]))
+        else:
+            press('D')  # hotkey for roll
 
     def purchase_xp(self) -> None:
         """
         Utility method to purchase xp once.
         """
-        click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["xp_buy"]))
+        if random.randint(0, 1) == 1:
+            click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["xp_buy"]))
+        else:
+            press('F')  # hotkey for xp

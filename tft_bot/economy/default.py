@@ -2,6 +2,7 @@
 Module holding the default economy mode.
 """
 import time
+import random
 
 from tft import GAME_CLIENT_INTEGRATION
 
@@ -29,3 +30,6 @@ class DefaultEconomyMode(EconomyMode):
         if screen_helpers.gold_at_least(5):
             self.roll()
             time.sleep(0.5)
+
+        if random.randint(0, 2) == 1:
+            self.sell_units(amount=random.randint(1,2))

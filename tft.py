@@ -523,7 +523,7 @@ def is_item_round() -> bool:
     if  get_on_screen_in_game(
         CONSTANTS["game"]["round"]["krugs_active"], 0.9) or get_on_screen_in_game(
         CONSTANTS["game"]["round"]["wolves_active"], 0.9) or get_on_screen_in_game(
-        CONSTANTS["game"]["round"]["bird_active"], 0.9) or get_on_screen_in_game(
+        CONSTANTS["game"]["round"]["birds_active"], 0.9) or get_on_screen_in_game(
         CONSTANTS["game"]["round"]["elder_dragon_active"], 0.9):
 
         return True
@@ -571,10 +571,13 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
         if PAUSE_LOGIC:
             time.sleep(5)
             continue
-
+        
         if is_item_round():
             collect_timer = True
-        elif collect_timer:
+        else:
+            collect_timer = False
+        
+        if not is_item_round() and collect_timer:
             collect_items()
             collect_timer = False
 
@@ -600,9 +603,6 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
 
             logger.debug(f"Board positions: {get_board_positions()}")
             continue
-
-        if minimum_round >= 3:
-            sell_random()
 
         economy_mode.loop_decision(minimum_round=minimum_round)
 

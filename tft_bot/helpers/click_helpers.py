@@ -16,13 +16,13 @@ def click(delay=0.1, button="left") -> None:
         button (str, optional): Button of the mouse to activate : "left" "right" "middle",
             see pyautogui.click documentation for more info. Defaults to "left".
     """
-    # auto.mouseDown(button=button)
-    # time.sleep(delay)
-    # auto.mouseUp(button=button)
-    if button == "left":
-        mouse.click()
-    else:
-        mouse.right_click()
+    auto.mouseDown(button=button)
+    time.sleep(delay)
+    auto.mouseUp(button=button)
+    # if button == "left":
+    #     mouse.click()
+    # else:
+    #     mouse.right_click()
 
 
 def move_to(
@@ -56,11 +56,12 @@ def click_to(
         action (str, optional): The mouse button to perform. Defaults to "left".
     """
     # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
-    # mouse_button(delay=delay, button=action)
-    if action == "left":
-        mouse.click(position_x, position_y)
-    else:
-        mouse.right_click(position_x, position_y)
+    move_to(position_x, position_y)
+    mouse_button(delay=delay, button=action)
+    # if action == "left":
+    #     mouse.click(position_x, position_y)
+    # else:
+    #     mouse.right_click(position_x, position_y)
 
 
 def click_to_image(

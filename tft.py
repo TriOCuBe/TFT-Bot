@@ -534,7 +534,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
 
         minimum_round = determine_minimum_round()
         # Free champ round
-        if minimum_round > 1 and get_on_screen_in_game(CONSTANTS["game"]["round"]["draft_active"], 0.95):
+        if minimum_round > 1 and get_on_screen_in_game(CONSTANTS["game"]["round"]["draft_active"], 0.9):
             logger.info("Active draft detected, pathing to carousel")
             shared_draft_pathing()
             continue

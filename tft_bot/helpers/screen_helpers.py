@@ -87,7 +87,7 @@ def get_window_bounding_box(window_title: str) -> BoundingBox | None:
     return BoundingBox(*win32gui.GetWindowRect(league_game_window_handle))
 
 
-def check_league_game_size() -> None:
+def check_league_game_size(returnValues=False) -> None:
     """
     Check the league game size and print an error if it is not what we need it to be.
     """
@@ -98,13 +98,16 @@ def check_league_game_size() -> None:
     if league_game_bounding_box.get_width() != 1920 or league_game_bounding_box.get_height() != 1080:
         logger.error(
             f"Your game's size is {league_game_bounding_box.get_width()} x {league_game_bounding_box.get_height()} "
-            f"instead of 1920 x 1080! This WILL cause issues!"
+            f"instead of 1920 x 1080! Unless your size is 1600x900, this WILL cause issues!"
         )
+        if returnValues:
+            return dimensions = (league_game_bounding_box.get_width(), league_game_bounding_box.get_height())
 
 
 def calculate_window_click_offset(window_title: str, position_x: int, position_y: int) -> Coordinates | None:
     """
     Calculate absolute screen coordinates based off relative pixel position in a specific window.
+    If window size is not 1920x1080, manipulate given x and y values
 
     Args:
         window_title: The title of the window to click in.
@@ -117,6 +120,12 @@ def calculate_window_click_offset(window_title: str, position_x: int, position_y
     window_bounding_box = get_window_bounding_box(window_title=window_title)
     if not window_bounding_box:
         return None
+    
+    if window_title == "League of Legends (TM) Client":
+        if window_bounding_box.get_width() != 1920:
+            position_x = window_bounding_box.get_with() / position_x
+        if window_bounding_box.get_height() != 1080:
+            position_y = window_bounding_box.get_height() / position_y
 
     return Coordinates(
         position_x=window_bounding_box.min_x + position_x, position_y=window_bounding_box.min_y + position_y

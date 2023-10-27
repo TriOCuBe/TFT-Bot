@@ -58,7 +58,7 @@ class EconomyMode:
 
         points = []
         for i in range(9):
-            point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=400 + (130 * i), position_y=780)
+            point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=410 + (120 * i), position_y=780)
             points.append(point)
 
         for _ in range(amount):
@@ -69,7 +69,9 @@ class EconomyMode:
 
             move_to(position_x=point.position_x, position_y=point.position_y)
             if random.randint(0, 1) == 1:
-                sell_offset = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=960, position_y=980)
+                sell_offset = calculate_window_click_offset(
+                    window_title=CONSTANTS["window_titles"]["game"], position_x=random.randint(850, 1000), position_y=980
+                )
                 hold_and_move_to(sell_offset.position_x, sell_offset.position_y)
             else:
                 press('E')  # hotkey for sell

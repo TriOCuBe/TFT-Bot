@@ -37,7 +37,7 @@ def move_to(
         position_y: The y coordinate to move to
     """
     # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
-    mouse.move(position_x + random.randint(-2,2), position_y + random.randint(-2,2))
+    mouse.move(position_x + random.randint(0,2), position_y + random.randint(0,2))
 
 
 def click_to(

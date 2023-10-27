@@ -36,10 +36,12 @@ class DefaultEconomyMode(EconomyMode):
             time.sleep(0.5)
     
         global timer
-        if timer is undefined:
+        try:
+            timer
+        except NameError:
             timer = 0
 
-        if timer >= 10:
+        if timer >= 20:
             self.collect_items()
             timer = 0
         else:

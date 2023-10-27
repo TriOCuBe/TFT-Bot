@@ -5,7 +5,7 @@ import time
 import random
 
 from tft_bot.constants import CONSTANTS
-from tft_bot.helpers.click_helpers import click_to_image, move_to, hold_and_move_to, press
+from tft_bot.helpers.click_helpers import click_to, click_to_image, move_to, hold_and_move_to, press
 from tft_bot.helpers.screen_helpers import get_on_screen_in_game, calculate_window_click_offset
 
 
@@ -63,7 +63,7 @@ class EconomyMode:
 
         for _ in range(amount):
             # this block removes used points, so the same slot can't be picked multiple times
-            index = random.randint(len(points))
+            index = random.randint(0, len(points))
             point = points[index]
             points.remove(point)
 
@@ -92,27 +92,41 @@ class EconomyMode:
         else:
             press('F')  # hotkey for xp
 
-    def collect_items(self) -> None:
-        """
-        Runs a circle (square) around the map, trying to collect items on the way.
-        """
-        checkpoint1 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=650
-        )
-        checkpoint2 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=650
-        )
-        checkpoint3 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300
-        )
-        checkpoint4 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=300
-        )
-        logger.info("Running around, trying to collect items")
+    # unused
+    # def collect_items(self) -> None:
+    #     """
+    #     Runs a circle (square) around the map, trying to collect items on the way.
+    #     """
+    #     checkpoint1 = calculate_window_click_offset(
+    #         window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=650
+    #     )
+    #     checkpoint2 = calculate_window_click_offset(
+    #         window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=650
+    #     )
+    #     checkpoint3 = calculate_window_click_offset(
+    #         window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300
+    #     )
+    #     checkpoint4 = calculate_window_click_offset(
+    #         window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=300
+    #     )
+    #     logger.info("Running around, trying to collect items")
 
-        checkpoint_list = [checkpoint1, checkpoint2, checkpoint3, checkpoint4]
-        # for i in range(2):
-        random.shuffle(checkpoint_list)
-        for point in checkpoint_list:
-            click_to(position_x=point.x, position_y=point.y, action="right")
-            time.sleep(2.5)
+    #     checkpoint_list = [checkpoint1, checkpoint2, checkpoint3, checkpoint4]
+    #     # for i in range(2):
+    #     random.shuffle(checkpoint_list)
+    #     for point in checkpoint_list:
+    #         click_to(position_x=point.x, position_y=point.y, action="right")
+    #         time.sleep(2.5)
+
+    def walk_random(self) -> None:
+        """
+        Walks to a random point on the field.
+        """
+        goal_offset = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], 
+            position_x=random.randint(500, 1400), 
+            position_y=random.randint(300, 650)
+        )
+        logger.debug(f"Walking to random point ({goal_offset.x}, {goal_offset.y}) on field")
+
+        click_to(position_x=goal_offset.x, position_y=goal_offset.y, action="right")

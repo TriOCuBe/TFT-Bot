@@ -569,6 +569,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             logger.debug(f"Board positions: {get_board_positions()}")
             continue
 
+        global timer
         economy_mode.loop_decision(minimum_round=minimum_round)
 
         if minimum_round >= 3 and config.forfeit_early():

@@ -16,7 +16,7 @@ class DefaultEconomyMode(EconomyMode):
     """
 
     def loop_decision(self, minimum_round: int):
-        if random.randint(0,2) == 2:
+        if random.randint(0,1) == 1:
             self.walk_random()
             time.sleep(0.5)
 
@@ -24,12 +24,18 @@ class DefaultEconomyMode(EconomyMode):
             self.purchase_units(amount=3)
             time.sleep(0.5)
 
-        if minimum_round < 3:
+        if minimum_round < 2:
             return
 
         if screen_helpers.gold_at_least(4) and GAME_CLIENT_INTEGRATION.get_level() < 8:
             self.purchase_xp()
             time.sleep(0.5)
+            if minimum_round > 3:
+                self.purchase_xp()
+                time.sleep(0.5)
+            if minimum_round > 4:
+                self.purchase_xp()
+                time.sleep(0.5)
 
         if screen_helpers.gold_at_least(5):
             self.roll()

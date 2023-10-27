@@ -107,9 +107,9 @@ def hold_and_move_to(position_x: int, position_y: int, action: str = "left"):
         action: The mouse button to perform. Defaults to "left".
     """
     mouse.down(button=action)
-    time.sleep(0.1, (random.randint(10)/100) + 0.1)
+    time.sleep(random.randint(1, 5)/10)
     move_to(position_x, position_y)
-    time.sleep(0.1, (random.randint(10)/100) + 0.1)
+    time.sleep(random.randint(1, 5)/10)
     mouse.up(button=action)
 
 def press(key: str) -> None:

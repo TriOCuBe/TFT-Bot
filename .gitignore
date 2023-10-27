@@ -136,3 +136,4 @@ dmypy.json
 screenshots/
 output/
 bot_settings.ini
+tft_bot/resources/config.yaml

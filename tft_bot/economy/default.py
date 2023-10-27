@@ -16,6 +16,10 @@ class DefaultEconomyMode(EconomyMode):
     """
 
     def loop_decision(self, minimum_round: int):
+        if random.randint(0,2) == 2:
+            self.walk_random()
+            time.sleep(0.5)
+
         if screen_helpers.gold_at_least(3):
             self.purchase_units(amount=3)
             time.sleep(0.5)
@@ -31,19 +35,6 @@ class DefaultEconomyMode(EconomyMode):
             self.roll()
             time.sleep(0.5)
 
-        if random.randint(0, 2) == 1:
+        if random.randint(0, 1) == 1:
             self.sell_units(amount=random.randint(1,2))
             time.sleep(0.5)
-    
-        global timer
-        try:
-            timer
-        except NameError:
-            timer = 0
-
-        if timer >= 20:
-            self.collect_items()
-            timer = 0
-        else:
-            timer += 1
-        time.sleep(0.5)

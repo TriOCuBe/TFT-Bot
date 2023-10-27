@@ -63,7 +63,7 @@ class EconomyMode:
 
         for _ in range(amount):
             # this block removes used points, so the same slot can't be picked multiple times
-            index = random.randint(0, len(points))
+            index = random.randint(0, len(points)-1)
             point = points[index]
             points.remove(point)
 

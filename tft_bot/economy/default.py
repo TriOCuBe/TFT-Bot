@@ -30,10 +30,10 @@ class DefaultEconomyMode(EconomyMode):
         if screen_helpers.gold_at_least(4) and GAME_CLIENT_INTEGRATION.get_level() < 8:
             self.purchase_xp()
             time.sleep(0.5)
-            # if minimum_round > 3:
-            #     self.purchase_xp()
-            #     time.sleep(0.5)
-            if minimum_round > 4:
+            if minimum_round >= 4:
+                self.purchase_xp()
+                time.sleep(0.5)
+            if minimum_round >= 5:
                 self.purchase_xp()
                 time.sleep(0.5)
 

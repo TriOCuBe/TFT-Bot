@@ -8,10 +8,11 @@ from tft_bot.helpers.screen_helpers import ImageSearchResult
 
 
 def click(delay=0.1, button="left") -> None:
-    #   delay (float, optional): The delay between button down & up. Defaults to .1.
+   
     """A click helper to simulate clicking the specified button.
 
     Args:
+        delay (float, optional): The delay between button down & up. Defaults to .1.
         button (str, optional): Button of the mouse to activate : "left" "right" "middle",
             see pyautogui.click documentation for more info. Defaults to "left".
     """

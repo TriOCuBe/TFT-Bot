@@ -6,7 +6,7 @@ import random
 
 from tft_bot.constants import CONSTANTS
 from tft_bot.helpers.click_helpers import click_to_image, move_to, hold_and_move_to, press
-from tft_bot.helpers.screen_helpers import get_on_screen_in_game
+from tft_bot.helpers.screen_helpers import get_on_screen_in_game, calculate_window_click_offset
 
 
 class EconomyMode:
@@ -97,10 +97,10 @@ class EconomyMode:
         Runs a circle (square) around the map, trying to collect items on the way.
         """
         checkpoint1 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=730
+            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=650
         )
         checkpoint2 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=730
+            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=650
         )
         checkpoint3 = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300

@@ -37,10 +37,13 @@ class DefaultEconomyMode(EconomyMode):
                 self.purchase_xp()
                 time.sleep(0.5)
 
+        if minimum_round < 3:
+            return
+            
         if screen_helpers.gold_at_least(5):
             self.roll()
             time.sleep(0.5)
 
-        if random.randint(0, 1) == 1:
+        if random.randint(0, 3) == 1:
             self.sell_units(amount=random.randint(1,2))
             time.sleep(0.5)

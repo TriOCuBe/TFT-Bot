@@ -59,7 +59,7 @@ class EconomyMode:
         points = []
         for i in range(9):
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=410 + (120 * i), position_y=780)
-            points.append(point)
+            points.append({"x": point.position_x, "y": point.position_y})
 
         for _ in range(amount):
             # this block removes used points, so the same slot can't be picked multiple times
@@ -67,7 +67,7 @@ class EconomyMode:
             point = points[index]
             points.remove(point)
 
-            move_to(position_x=point.position_x, position_y=point.position_y)
+            move_to(position_x=point["x"], position_y=point["y"])
             if random.randint(0, 1) == 1:
                 sell_offset = calculate_window_click_offset(
                     window_title=CONSTANTS["window_titles"]["game"], position_x=random.randint(850, 1000), position_y=980

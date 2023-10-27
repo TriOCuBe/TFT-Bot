@@ -124,7 +124,7 @@ class EconomyMode:
         """
         goal_offset = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], 
-            position_x=random.randint(500, 1400), 
+            position_x=random.randint(500, 1200), 
             position_y=random.randint(300, 650)
         )
 

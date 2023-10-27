@@ -67,10 +67,10 @@ class EconomyMode:
             point = points[index]
             points.remove(point)
 
-            move_to(position_x=point.x, position_y=point.y)
+            move_to(position_x=point.position_x, position_y=point.position_y)
             if random.randint(0, 1) == 1:
                 sell_offset = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=960, position_y=980)
-                hold_and_move_to(sell_offset.x, sell_offset.y)
+                hold_and_move_to(sell_offset.position_x, sell_offset.position_y)
             else:
                 press('E')  # hotkey for sell
 
@@ -127,6 +127,5 @@ class EconomyMode:
             position_x=random.randint(500, 1400), 
             position_y=random.randint(300, 650)
         )
-        logger.debug(f"Walking to random point ({goal_offset.x}, {goal_offset.y}) on field")
 
-        click_to(position_x=goal_offset.x, position_y=goal_offset.y, action="right")
+        click_to(position_x=goal_offset.position_x, position_y=goal_offset.position_y, action="right")

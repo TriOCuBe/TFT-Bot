@@ -566,7 +566,8 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             click_to(position_x=augment_offset.position_x, position_y=augment_offset.position_y)
             time.sleep(3)
 
-            logger.debug(f"Board positions: {get_board_positions()}")
+            # commented out since i dont know why this is done, and perfomance boost
+            # logger.debug(f"Board positions: {get_board_positions()}")
             continue
 
         global timer

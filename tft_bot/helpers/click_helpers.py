@@ -37,8 +37,8 @@ def move_to(
         position_y: The y coordinate to move to
     """
     # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
-    # position_x = position_x + random.randint(0, 2)
-    # position_y = position_y + random.randint(0, 2)
+    position_x = position_x + random.randint(0, 2)
+    position_y = position_y + random.randint(0, 2)
     mouse.move(position_x, position_y)
 
 

@@ -4,6 +4,7 @@ Module holding the default economy mode.
 import time
 import random
 
+from loguru import logger
 from tft import GAME_CLIENT_INTEGRATION
 
 from ..helpers import screen_helpers
@@ -49,6 +50,8 @@ class DefaultEconomyMode(EconomyMode):
 
         if event:
             event = False
+
+            logger.info("Executing one time event at start of round 4")
 
             self.sell_units(amount=5)
             time.sleep(0.5)

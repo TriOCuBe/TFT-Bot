@@ -108,7 +108,7 @@ def check_league_game_size() -> None:
 def calculate_window_click_offset(window_title: str, position_x: int, position_y: int) -> Coordinates | None:
     """
     Calculate absolute screen coordinates based off relative pixel position in a specific window.
-    If window size is not 1920x1080, manipulate given x and y values
+    For game and client: If window size is not 1920x1080 or 1280x720 respectively, manipulate given x and y values
 
     Args:
         window_title: The title of the window to click in.

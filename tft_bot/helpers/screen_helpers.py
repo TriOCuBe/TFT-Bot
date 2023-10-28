@@ -9,6 +9,7 @@ from pytesseract import pytesseract
 import win32gui
 
 from tft_bot.constants import CONSTANTS
+from tft_bot.helpers.click_helpers import move_to
 
 
 @dataclass
@@ -209,10 +210,16 @@ def get_on_screen(
         return None
 
     if offsets:
-        window_bounding_box.min_x += offsets.min_x
-        window_bounding_box.min_y += offsets.min_y
-        window_bounding_box.max_x += offsets.max_x
-        window_bounding_box.max_y += offsets.max_y
+        width = league_bounding_box.get_width()
+        height = league_bounding_box.get_height()
+
+        resize_x = width / 1920
+        resize_y = height / 1080
+
+        window_bounding_box.min_x += offsets.min_x * resize_x
+        window_bounding_box.min_y += offsets.min_y * resize_y
+        window_bounding_box.max_x += offsets.max_x * resize_x
+        window_bounding_box.max_y += offsets.max_y * resize_y
 
     with mss.mss() as screenshot_taker:
         screenshot = screenshot_taker.grab(window_bounding_box.to_tuple())
@@ -268,11 +275,17 @@ def get_gold_with_ocr() -> int:
     if not league_bounding_box:
         return 0
 
+    width = league_bounding_box.get_width()
+    height = league_bounding_box.get_height()
+
+    resize_x = width / 1920
+    resize_y = height / 1080
+
     gold_bounding_box = (
-        league_bounding_box.min_x + 867,
-        league_bounding_box.min_y + 881,
-        league_bounding_box.min_x + 924,
-        league_bounding_box.min_y + 909,
+        league_bounding_box.min_x + (867 * resize_x),
+        league_bounding_box.min_y + (881 * resize_y),
+        league_bounding_box.min_x + (924 * resize_x),
+        league_bounding_box.min_y + (909 * resize_y),
     )
     with mss.mss() as screenshot_taker:
         screenshot = screenshot_taker.grab(gold_bounding_box)
@@ -293,7 +306,7 @@ def get_gold_with_opencv(num: int) -> bool:
         True if we found the amount of gold. False if not.
     """
     try:
-        if get_on_screen_in_game(CONSTANTS["game"]["gold"][f"{num}"], 0.9, BoundingBox(780, 850, 970, 920)):
+        if get_on_screen_in_game(CONSTANTS["game"]["gold"][f"{num}"], 0.9, BoundingBox(780 * (10/12), 850 * (10/12), 970 * (10/12), 920*  (10/12))):
             logger.debug(f"Found {num} gold")
             return True
     except Exception as exc:
@@ -375,3 +388,60 @@ def get_board_positions() -> list[Coordinates]:
         positions.append(Coordinates(position_x=position_x, position_y=potential_unit_y_positions.min()))
 
     return positions
+
+
+# essentially copied from https://github.com/jfd02/TFT-OCR-BOT/blob/main/arena_functions.py#L118
+def get_items() -> list:
+    """
+    Checks every position for items and looks if there is one present.
+
+    Returns:
+        List of dictionaries, with "coordinates" and "item_name".
+    """
+    item_positions = [(273, 753), (348, 737), (289, 692), (356, 676), (307, 631), (323, 586), (407, 679), (379, 632), (396, 582), (457, 628)]
+
+    league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
+    if not league_bounding_box:
+        return 0
+
+    width = league_bounding_box.get_width()
+    height = league_bounding_box.get_height()
+
+    resize_x = width / 1920
+    resize_y = height / 1080
+
+    item_box = (
+        league_bounding_box.min_x + (867 * resize_x),
+        league_bounding_box.min_y + (881 * resize_y),
+        league_bounding_box.min_x + (924 * resize_x),
+        league_bounding_box.min_y + (909 * resize_y),
+    )
+    with mss.mss() as screenshot_taker:
+        screenshot = screenshot_taker.grab(gold_bounding_box)
+
+    item_list = []
+    for pos in item_positions:
+        offset = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=pos[0], position_y=pos[1]
+        )
+        move_to(position_x=offset.position_x, position_y=offset.position_y)
+        
+        item_box = (
+            offset.position_x + 100,
+            offset.position_y + 40,
+            offset.position_x + 240,
+            offset.position_y + 70,
+        )
+
+        with mss.mss() as screenshot_taker:
+            screenshot = screenshot_taker.grab(item_box)
+
+        pixels = numpy.array(screenshot)
+        gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
+        item_name = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
+
+        item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": item_name})
+
+    return item_list
+
+        

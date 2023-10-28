@@ -512,25 +512,6 @@ def determine_minimum_round() -> int:
     return 0
 
 
-# def is_item_round() -> bool:
-#     """
-#     Checks if the current round is an item round
-
-#     Returns:
-#         True or False
-#     """
-
-#     if  get_on_screen_in_game(
-#         CONSTANTS["game"]["round"]["krugs_active"], 0.9) or get_on_screen_in_game(
-#         CONSTANTS["game"]["round"]["wolves_active"], 0.9) or get_on_screen_in_game(
-#         CONSTANTS["game"]["round"]["birds_active"], 0.9) or get_on_screen_in_game(
-#         CONSTANTS["game"]["round"]["elder_dragon_active"], 0.9):
-
-#         return True
-    
-#     return False
-
-
 def main_game_loop(economy_mode: EconomyMode) -> None:
     """
     The main in-game loop.
@@ -541,6 +522,8 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
     Skips 5-second increments if a pause logic request is made,
     repeating until toggled or an event triggers an early exit.
     """
+    global sell_and_move_event
+    sell_and_move_event = False
     while True:
         if PAUSE_LOGIC:
             time.sleep(5)

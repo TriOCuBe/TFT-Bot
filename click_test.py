@@ -28,6 +28,7 @@ import time
 #     click_to(960 * (10/12), 540 * (10/12))
 #     print("found augment, clicking to middle")
 
-for _ in range(50):
-    move_to(randint(100, 1500) + randint(0, 2), randint(100, 800) + randint(0, 2))
+for _ in range(1):
+    # mouse.move(randint(0, 1600) + randint(0, 2), randint(0, 900) + randint(0, 2))
+    mouse.move(3000, 400)
     time.sleep(0.1)

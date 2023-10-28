@@ -119,13 +119,21 @@ def calculate_window_click_offset(window_title: str, position_x: int, position_y
     if not window_bounding_box:
         return None
     
-    if window_title == "League Of Legends (TM) Client":
-        if window_bounding_box.get_width() != 1920:
-            resize_x = window_bounding_box.get_width() / 1920
-            position_x = int(position_x * resize_x)
-        if window_bounding_box.get_height() != 1080:
-            resize_y = window_bounding_box.get_height() / 1080
-            position_y = int(position_y * resize_y)
+    if window_title == CONSTANTS["window_titles"]["game"]:
+        resize = True
+        original_x = 1920
+        original_y = 1080
+    elif window_title == CONSTANTS["window_titles"]["client"]:
+        resize = True
+        original_x = 1280
+        original_y = 720
+
+    if resize:
+        resize_x = window_bounding_box.get_width() / original_x
+        resize_y = window_bounding_box.get_height() / original_y
+        position_x = int(position_x * resize_x)
+        position_y = int(position_y * resize_y)
+
 
     return Coordinates(
         position_x=window_bounding_box.min_x + position_x, position_y=window_bounding_box.min_y + position_y

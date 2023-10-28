@@ -9,7 +9,6 @@ from pytesseract import pytesseract
 import win32gui
 
 from tft_bot.constants import CONSTANTS
-from tft_bot.helpers.click_helpers import move_to
 
 
 @dataclass
@@ -282,10 +281,10 @@ def get_gold_with_ocr() -> int:
     resize_y = height / 1080
 
     gold_bounding_box = (
-        league_bounding_box.min_x + (867 * resize_x),
-        league_bounding_box.min_y + (881 * resize_y),
-        league_bounding_box.min_x + (924 * resize_x),
-        league_bounding_box.min_y + (909 * resize_y),
+        int(league_bounding_box.min_x + (867 * resize_x)),
+        int(league_bounding_box.min_y + (881 * resize_y)),
+        int(league_bounding_box.min_x + (924 * resize_x)),
+        int(league_bounding_box.min_y + (909 * resize_y)),
     )
     with mss.mss() as screenshot_taker:
         screenshot = screenshot_taker.grab(gold_bounding_box)
@@ -306,7 +305,7 @@ def get_gold_with_opencv(num: int) -> bool:
         True if we found the amount of gold. False if not.
     """
     try:
-        if get_on_screen_in_game(CONSTANTS["game"]["gold"][f"{num}"], 0.9, BoundingBox(780 * (10/12), 850 * (10/12), 970 * (10/12), 920*  (10/12))):
+        if get_on_screen_in_game(CONSTANTS["game"]["gold"][f"{num}"], 0.9, BoundingBox(int(780 * (10/12)), int(850 * (10/12)), int(970 * (10/12)), int(920*  (10/12)))):
             logger.debug(f"Found {num} gold")
             return True
     except Exception as exc:
@@ -373,10 +372,10 @@ def get_board_positions() -> list[Coordinates]:
     for contour in contours:
         position_x, position_y, width, height = cv2.boundingRect(contour)
 
-        if position_y < 275 or position_y > 672:
+        if position_y < int(275 * (10/12)) or position_y > int(672 * (10/12)):
             continue
 
-        if width < 55 or width > 80 or height < 5 or height > 20:
+        if width < int(55 * (10/12)) or width > int(80 * (10/12)) or height < int(5 * (10/12)) or height > int(20 * (10/12)):
             continue
 
         position_x = int(position_x + (width / 2))
@@ -398,6 +397,8 @@ def get_items() -> list:
     Returns:
         List of dictionaries, with "coordinates" and "item_name".
     """
+    from tft_bot.helpers.click_helpers import move_to
+    
     item_positions = [(273, 753), (348, 737), (289, 692), (356, 676), (307, 631), (323, 586), (407, 679), (379, 632), (396, 582), (457, 628)]
 
     league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
@@ -440,6 +441,7 @@ def get_items() -> list:
         gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
         item_name = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
 
+        # if CONSTANTS["game"]["items"]["full_items"].includes(item_name) or CONSTANTS["game"]["items"]["components"].includes(item_name):
         item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": item_name})
 
     return item_list

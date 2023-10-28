@@ -28,6 +28,6 @@ import time
 #     click_to(960 * (10/12), 540 * (10/12))
 #     print("found augment, clicking to middle")
 
-for _ in range(10):
-    move_to(747, 828)
+for _ in range(50):
+    move_to(randint(100, 1500) + randint(0, 2), randint(100, 800) + randint(0, 2))
     time.sleep(0.1)

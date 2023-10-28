@@ -94,11 +94,14 @@ def check_league_game_size() -> None:
     league_game_bounding_box = get_window_bounding_box(window_title="League of Legends (TM) Client")
     if not league_game_bounding_box:
         return
+        
+    width = league_game_bounding_box.get_width()
+    height = league_game_bounding_box.get_height()
 
-    if league_game_bounding_box.get_width() != 1920 or league_game_bounding_box.get_height() != 1080:
+    if width != 1920 or width != 1600 or height != 1080 or height != 900:
         logger.error(
-            f"Your game's size is {league_game_bounding_box.get_width()} x {league_game_bounding_box.get_height()} "
-            f"instead of 1920 x 1080! Unless your size is 1600x900, this WILL cause issues!"
+            f"Your game's size is {width} x {height} "
+            f"instead of 1920 x 1080 or 1600 x 900! This WILL cause issues!"
         )
 
 

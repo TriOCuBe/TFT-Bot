@@ -558,7 +558,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             shared_draft_pathing()
             continue
 
-        if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["choose_an_augment"], 0.9):
+        if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["choose_an_augment"], 0.85):
             logger.info("Detected augment offer, selecting one")
             augment_offset = calculate_window_click_offset(
                 window_title=CONSTANTS["window_titles"]["game"], position_x=960, position_y=540

@@ -525,6 +525,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
     repeating until toggled or an event triggers an early exit.
     """
     event = True
+    counter = 0
     while True:
         if PAUSE_LOGIC:
             time.sleep(5)
@@ -553,6 +554,13 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             # commented out since i dont know why this is done, and perfomance boost
             # logger.debug(f"Board positions: {get_board_positions()}")
             continue
+
+        if minimum_round > 3 and not event:
+            counter += 1
+        
+        if counter >= 8:
+            counter = 0
+            event = True
 
         event = economy_mode.loop_decision(minimum_round=minimum_round, event=event)
 

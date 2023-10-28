@@ -209,8 +209,8 @@ def get_on_screen(
         return None
 
     if offsets:
-        width = league_bounding_box.get_width()
-        height = league_bounding_box.get_height()
+        width = window_bounding_box.get_width()
+        height = window_bounding_box.get_height()
 
         resize_x = width / 1920
         resize_y = height / 1080
@@ -395,10 +395,10 @@ def get_items() -> list:
     Checks every position for items and looks if there is one present.
 
     Returns:
-        List of dictionaries, with "coordinates" and "item_name".
+        List of dictionaries, with tuple "coordinates" and string "item_name".
     """
     from tft_bot.helpers.click_helpers import move_to
-    
+
     item_positions = [(273, 753), (348, 737), (289, 692), (356, 676), (307, 631), (323, 586), (407, 679), (379, 632), (396, 582), (457, 628)]
 
     league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])

@@ -16,9 +16,8 @@ class DefaultEconomyMode(EconomyMode):
     """
 
     def loop_decision(self, minimum_round: int, event: bool):
-        if random.randint(0,1) == 1:
-            self.walk_random()
-            time.sleep(0.5)
+        self.walk_random()
+        time.sleep(0.5)
 
         if screen_helpers.gold_at_least(3):
             self.purchase_units(amount=3)

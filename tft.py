@@ -284,7 +284,9 @@ def start_match() -> None:
         )
         move_to(position_x=vote_option_offset.position_x, position_y=vote_option_offset.position_y)
         time.sleep(1)
-        click_to(position_x=vote_option_offset.position_x + 290, position_y=vote_option_offset.position_y + 122)
+        click_to_image(
+            image_search_result=get_on_screen_in_game(CONSTANTS["gamelogic"]["vote"])
+        )
         time.sleep(25)
 
     logger.info("Initial vote complete, continuing with game")

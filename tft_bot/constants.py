@@ -58,6 +58,7 @@ CONSTANTS = {
             "reroll": "captures/buttons/reroll.png",
             "take_all": "captures/buttons/take_all.png",
             "xp_buy": "captures/buttons/xp_buy.png",
+            "vote": "captures/buttons/vote.png",
         },
         "gold": {
             "0": "captures/gold/0.png",

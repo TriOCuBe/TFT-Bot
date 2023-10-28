@@ -15,7 +15,7 @@ class DefaultEconomyMode(EconomyMode):
     Default economy mode implementation.
     """
 
-    def loop_decision(self, minimum_round: int):
+    def loop_decision(self, minimum_round: int, event: bool):
         if random.randint(0,1) == 1:
             self.walk_random()
             time.sleep(0.5)
@@ -47,11 +47,9 @@ class DefaultEconomyMode(EconomyMode):
         if screen_helpers.gold_at_least(5):
             self.roll()
             time.sleep(0.5)
-        
-        global sell_and_move_event
 
-        if not sell_and_move_event:
-            sell_and_move_event = True
+        if event:
+            event = False
 
             self.sell_units(amount=5)
             time.sleep(0.5)
@@ -59,3 +57,5 @@ class DefaultEconomyMode(EconomyMode):
             for _ in range(3):
                 self.walk_random()
                 time.sleep(1.5)
+            
+        return event

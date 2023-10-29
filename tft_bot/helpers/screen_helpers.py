@@ -9,7 +9,6 @@ from pytesseract import pytesseract
 import win32gui
 
 from tft_bot.constants import CONSTANTS
-from tft_bot.config import get_tesseract_location
 
 
 @dataclass

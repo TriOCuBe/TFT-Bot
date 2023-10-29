@@ -173,7 +173,7 @@ class EconomyMode:
         time.sleep(0.5)
 
         champion_offset = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=target[0], position_y=target[1]
+            window_title=CONSTANTS["window_titles"]["game"], position_x=target_champion[0], position_y=target_champion[1]
         )
         hold_and_move_to(champion_offset.position_x, champion_offset.position_y)
         time.sleep(0.5)

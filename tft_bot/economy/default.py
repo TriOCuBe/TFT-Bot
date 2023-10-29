@@ -50,8 +50,7 @@ class DefaultEconomyMode(EconomyMode):
 
         if event:
             event = False
-
-            logger.info("Executing one time event at start of round 4")
+            logger.debug("Triggering event, selling a bunch of champs")
 
             self.sell_units(amount=5)
             time.sleep(0.5)

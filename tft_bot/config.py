@@ -215,3 +215,21 @@ def get_economy_mode(system_helpers) -> EconomyMode:
             return OCRStandardEconomyMode(
                 wanted_traits=wanted_traits, prioritized_order=prioritized_order, tesseract_location=tesseract_location
             )
+
+def get_item_config() -> bool:
+    """
+    Get the config for items.
+
+    Returns:
+        True or False for on or off
+    """
+    return _SELF.get("items", False)
+
+def get_round_ocr_config() -> bool:
+    """
+    Get the config for get_round method.
+
+    Returns:
+        True or False for OCR or cv2.
+    """
+    return _SELF.get("ocr_for_rounds", False)

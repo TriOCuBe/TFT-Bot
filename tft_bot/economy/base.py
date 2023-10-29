@@ -3,10 +3,12 @@ Module holding the base economy mode blueprint class.
 """
 import time
 import random
+from difflib import SequenceMatcher
 
+from tft import GAME_CLIENT_INTEGRATION
 from tft_bot.constants import CONSTANTS
 from tft_bot.helpers.click_helpers import click_to, click_to_image, move_to, hold_and_move_to, press
-from tft_bot.helpers.screen_helpers import get_on_screen_in_game, calculate_window_click_offset
+from tft_bot.helpers.screen_helpers import get_on_screen_in_game, calculate_window_click_offset, get_items
 
 
 class EconomyMode:
@@ -23,6 +25,8 @@ class EconomyMode:
         """
         self.wanted_traits = wanted_traits
         self.prioritized_order = prioritized_order
+        self.items = []
+        self.champ_locations = [(800, 530), (910, 530), (740, 475), (800, 390), (850, 475), (910, 390), None, None, None]
 
     def loop_decision(self, minimum_round: int) -> None:
         """
@@ -56,7 +60,6 @@ class EconomyMode:
             amount: The amount of units to sell.
         """
 
-        points = []
         for i in range(9):
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=410 + (120 * i), position_y=780)
             points.append({"x": point.position_x, "y": point.position_y})
@@ -74,7 +77,13 @@ class EconomyMode:
                 )
                 hold_and_move_to(sell_offset.position_x, sell_offset.position_y)
             else:
+                time.sleep(0.5)
                 press('E')  # hotkey for sell
+                # since this doesn't always seem to work, do it twice to be sure
+                time.sleep(0.5)
+                press('E')
+                
+            time.sleep(0.5)
 
     def roll(self) -> None:
         """
@@ -131,3 +140,41 @@ class EconomyMode:
         )
 
         click_to(position_x=goal_offset.position_x, position_y=goal_offset.position_y, action="right")
+
+    # essentially copied from https://github.com/jfd02/TFT-OCR-BOT/blob/main/arena.py#L203
+    def place_items(self) -> None:
+        """
+        Places items on bench on random champs
+        """
+        self.items = get_items()
+        for index, _ in enumerate(self.items):
+            if self.items[index]["item_name"] is not None:
+                self.add_item_to_champ(index)
+
+    def add_item_to_champ(self, item_index: int) -> None:
+        """
+        Take given item and add it to random champ on board.
+
+        Args:
+            item_index: The index of the item, in order to determine it's position
+        """
+        item = self.items[item_index]
+        targets = self.champ_locations
+        expected_champions = GAME_CLIENT_INTEGRATION.get_level()
+        # remove as many locations as our level is from 9
+        diff = 9 - expected_champions
+        for x in range(diff):
+            del targets[9-x]
+
+        target_champion = random.choice(targets)
+        item_offset = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=item["coordinates"][0], position_y=item["coordinates"][1]
+        )
+        move_to(item_offset.position_x, item_offset.position_y)
+        time.sleep(0.5)
+
+        champion_offset = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=target[0], position_y=target[1]
+        )
+        hold_and_move_to(champion_offset.position_x, champion_offset.position_y)
+        time.sleep(0.5)

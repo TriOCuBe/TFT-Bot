@@ -74,8 +74,10 @@ class OCRStandardEconomyMode(EconomyMode):
                 self.walk_random()
                 sleep(1.5)
 
-        if gold >= 60:
+        gold = screen_helpers.get_gold_with_ocr()
+        logger.debug(f"OCR recognized {gold} gold buying and selling")
+
+        if gold >= 58:
             self.roll()
-            self.purchase_units(amount=3)
 
         return event

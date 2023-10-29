@@ -101,6 +101,15 @@ CONSTANTS = {
             "elder_dragon_inactive": "captures/round/elder_dragon_inactive.png",
             "elder_dragon_active": "captures/round/elder_dragon_active.png",
         },
+        "round_text": {
+            "1-1", "1-2", "1-3", "1-4",
+            "2-1", "2-2", "2-3", "2-4", "2-5", "2-6", "2-7",
+            "3-1", "3-2", "3-3", "3-4", "3-5", "3-6", "3-7",
+            "4-1", "4-2", "4-3", "4-4", "4-5", "4-6", "4-7",
+            "5-1", "5-2", "5-3", "5-4", "5-5", "5-6", "5-7",
+            "6-1", "6-2", "6-3", "6-4", "6-5", "6-6", "6-7",
+            "7-1", "7-2", "7-3", "7-4", "7-5", "7-6", "7-7",
+        },
         "trait": {
             "bastion": "captures/trait/bastion.png",
             "bruiser": "captures/trait/bruiser.png",
@@ -128,6 +137,48 @@ CONSTANTS = {
             "wanderer": "captures/trait/wanderer.png",
             "yordle": "captures/trait/yordle.png",
             "zaun": "captures/trait/zaun.png",
+        },
+        # taken from https://github.com/jfd02/TFT-OCR-BOT/blob/main/game_assets.py
+        "items": {
+            # components
+            "BFSword",
+            "ChainVest",
+            "GiantsBelt",
+            "NeedlesslyLargeRod",
+            "NegatronCloak",
+            "RecurveBow",
+            "SparringGloves",
+            "Spatula",
+            "TearoftheGoddess",
+
+            # full_items
+            "BilgewaterEmblem","ChallengerEmblem","IoniaEmblem","JuggernautEmblem",
+            "NoxusEmblem","ShurimaEmblem","SorcererEmblem","VanquisherEmblem",
+            "AdaptiveHelm","ArchangelsStaff","Bloodthirster","BlueBuff",
+            "BrambleVest","Crownguard","Deathblade","DragonsClaw",
+            "EdgeofNight","Evenshroud","GargoyleStoneplate","GiantSlayer",
+            "Guardbreaker","GuinsoosRageblade","HandofJustice","HextechGunblade",
+            "InfinityEdge","IonicSpark","JeweledGauntlet","LastWhisper",
+            "Morellonomicon","NashorsTooth","NightHarvester","ProtectorsVow",
+            "Quicksilver","RabadonsDeathcap","RapidFirecannon","Redemption",
+            "RunaansHurricane","SpearofShojin","StatikkShiv","SteraksGage",
+            "SunfireCape","TacticiansCrown","ThiefsGloves","TitansResolve","WarmogsArmor",
+
+            # support_items
+            "AegisoftheLegion","BansheesVeil","ChaliceofPower","CrestofCinders",
+            "LocketoftheIronSolari","NeedlesslyBigGem","ObsidianCleaver","RanduinsOmen",
+            "ShroudofStillness","VirtueoftheMartyr","ZekesHerald","Zephyr","ZzRotPortal",
+
+            # ornn_items
+            "AnimaVisage","BlacksmithsGloves","DeathfireGrasp","DeathsDefiance",
+            "EternalWinter","GoldCollector","GoldmancersStaff","Hullcrusher",
+            "InfinityForce","MogulsMail","Muramana","Rocket-PropelledFist",
+            "SnipersFocus","TrickstersGlass","ZhonyasParadox",
+
+            # uncraftable_items
+            "BastionEmblem","BruiserEmblem","DeadeyeEmblem","FreljordEmblem",
+            "GunnerEmblem","InvokerEmblem","PiltoverEmblem","RogueEmblem",
+            "StrategistEmblem","TargonEmblem","VoidEmblem","ZaunEmblem"
         },
     },
 }

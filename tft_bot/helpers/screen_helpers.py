@@ -98,7 +98,7 @@ def check_league_game_size() -> None:
     width = league_game_bounding_box.get_width()
     height = league_game_bounding_box.get_height()
 
-    if width != 1920 or width != 1600 or height != 1080 or height != 900:
+    if (width != 1920 and height != 1080) or (width != 1600 and height != 900):
         logger.error(
             f"Your game's size is {width} x {height} "
             f"instead of 1920 x 1080 or 1600 x 900! This WILL cause issues!"
@@ -261,6 +261,41 @@ def get_on_screen_multiple_any(window_title: str, paths: list[str], precision: f
 _TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=0123456789 -c page_separator=""'
 
 
+# essentially copied from https://github.com/jfd02/TFT-OCR-BOT/blob/ea3eb15d3f96109a616eb9f3508db14347ac0339/game_functions.py#L13
+def get_round_with_ocr() -> str | None:
+    """
+    Get the current round using ocr
+
+    Returns:
+        The current round as a string or None if it can't identify anything
+    """
+    league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
+    if not league_bounding_box:
+        return 0
+
+    width = league_bounding_box.get_width()
+    height = league_bounding_box.get_height()
+
+    resize_x = width / 1920
+    resize_y = height / 1080
+
+    round_bounding_box = (
+        int(league_bounding_box.min_x + (767 * resize_x)),
+        int(league_bounding_box.min_y + (10 * resize_y)),
+        int(league_bounding_box.min_x + (870 * resize_x)),
+        int(league_bounding_box.min_y + (34 * resize_y)),
+    )
+    with mss.mss() as screenshot_taker:
+        screenshot = screenshot_taker.grab(round_bounding_box)
+    
+    pixels = numpy.array(screenshot)
+    gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
+    game_round: str = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
+    if game_round in CONSTANTS["game"]["round_text"]:
+        return game_round
+    
+    return None
+
 def get_gold_with_ocr() -> int:
     """
     Get the gold by taking a screenshot of the region where it is and running OCR over it.
@@ -390,6 +425,26 @@ def get_board_positions() -> list[Coordinates]:
 
 
 # essentially copied from https://github.com/jfd02/TFT-OCR-BOT/blob/main/arena_functions.py#L118
+def valid_item(item: str) -> str | None:
+    """
+    Checks if given item name is valid or not
+
+    Args:
+        item: A string of the item name to check
+
+    Returns:
+        String of item or None
+    """
+    return next(
+        (
+            valid_name
+            for valid_name in CONSTANTS["items"]
+            if valid_name in item or SequenceMatcher(a=valid_name, b=item).ratio() >= 0.7
+        ),
+        None,
+    )
+
+
 def get_items() -> list:
     """
     Checks every position for items and looks if there is one present.
@@ -441,9 +496,6 @@ def get_items() -> list:
         gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
         item_name = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
 
-        # if CONSTANTS["game"]["items"]["full_items"].includes(item_name) or CONSTANTS["game"]["items"]["components"].includes(item_name):
-        item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": item_name})
+        item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": valid_item(item_name)})
 
     return item_list
-
-        

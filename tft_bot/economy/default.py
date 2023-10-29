@@ -24,6 +24,9 @@ class DefaultEconomyMode(EconomyMode):
             self.purchase_units(amount=3)
             time.sleep(0.5)
 
+        self.place_items()
+        sleep(0.5)
+
         if minimum_round < 2:
             return
 

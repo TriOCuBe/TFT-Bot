@@ -25,6 +25,14 @@ wanted_traits:
 # to buy all traits.
 purchase_traits_in_prioritized_order: true
 
+# By default, the bot ignores items. You can make the bot keep track of items on the bench and place
+# them on random champions, but for that you need to have Tesseract-OCR installed.
+items: false
+
+# By default, the bot uses images to check the current round. You can enable the option below
+# to insead use Tesseract_OCR to get the current round.
+ocr_for_rounds: false
+
 # Settings for the bots decisions made for purchasing units, leveling and rolling.
 economy:
   # The mode itself to be used. ocr_* modes require Tesseract-OCR to be installed.

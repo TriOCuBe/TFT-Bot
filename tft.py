@@ -31,6 +31,7 @@ from tft_bot.helpers.screen_helpers import check_league_game_size
 from tft_bot.helpers.screen_helpers import get_board_positions
 from tft_bot.helpers.screen_helpers import get_on_screen_in_client
 from tft_bot.helpers.screen_helpers import get_on_screen_in_game
+from tft_bot.helpers.screen_helpers import get_round_with_ocr
 from tft_bot.league_api import league_api_integration
 
 auto.FAILSAFE = False
@@ -492,29 +493,36 @@ def determine_minimum_round() -> int:
         The major round as an integer.
 
     """
-    if get_on_screen_in_game(CONSTANTS["game"]["round"]["krugs_inactive"], 0.9) or get_on_screen_in_game(
-        CONSTANTS["game"]["round"]["krugs_active"], 0.9
-    ):
-        return 2
+    if not config.get_round_ocr_config():
+        if get_on_screen_in_game(CONSTANTS["game"]["round"]["krugs_inactive"], 0.9) or get_on_screen_in_game(
+            CONSTANTS["game"]["round"]["krugs_active"], 0.9
+        ):
+            return 2
 
-    if get_on_screen_in_game(CONSTANTS["game"]["round"]["wolves_inactive"], 0.9) or get_on_screen_in_game(
-        CONSTANTS["game"]["round"]["wolves_active"], 0.9
-    ):
-        return 3
+        if get_on_screen_in_game(CONSTANTS["game"]["round"]["wolves_inactive"], 0.9) or get_on_screen_in_game(
+            CONSTANTS["game"]["round"]["wolves_active"], 0.9
+        ):
+            return 3
 
-    if get_on_screen_in_game(CONSTANTS["game"]["round"]["birds_inactive"], 0.9) or get_on_screen_in_game(
-        CONSTANTS["game"]["round"]["birds_active"], 0.9
-    ):
-        return 4
+        if get_on_screen_in_game(CONSTANTS["game"]["round"]["birds_inactive"], 0.9) or get_on_screen_in_game(
+            CONSTANTS["game"]["round"]["birds_active"], 0.9
+        ):
+            return 4
 
-    if get_on_screen_in_game(CONSTANTS["game"]["round"]["elder_dragon_inactive"], 0.9) or get_on_screen_in_game(
-        CONSTANTS["game"]["round"]["elder_dragon_active"], 0.9
-    ):
-        return 5
+        if get_on_screen_in_game(CONSTANTS["game"]["round"]["elder_dragon_inactive"], 0.9) or get_on_screen_in_game(
+            CONSTANTS["game"]["round"]["elder_dragon_active"], 0.9
+        ):
+            return 5
 
-    for i in range(1, 7):
-        if get_on_screen_in_game(CONSTANTS["game"]["round"][f"{i}-"]):
-            return i
+        for i in range(1, 7):
+            if get_on_screen_in_game(CONSTANTS["game"]["round"][f"{i}-"]):
+                return i
+    
+    else:
+        current_round = get_round_with_ocr()
+        if current_round is not None:
+            # take first element of string and turn it into int
+            return int(current_round[0])
 
     logger.debug("Could not determine minimum round, returning 0.")
     return 0

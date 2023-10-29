@@ -4,6 +4,7 @@ Module holding the OCR standard economy mode.
 from loguru import logger
 from pytesseract import pytesseract
 from time import sleep
+import random
 
 from tft import GAME_CLIENT_INTEGRATION
 
@@ -27,8 +28,10 @@ class OCRStandardEconomyMode(EconomyMode):
         self.purchase_units(amount=3)
         sleep(0.5)
 
-        self.place_items()
-        sleep(0.5)
+        if random.randint(0, 8) == 1:    
+            self.place_items()
+            sleep(0.5)
+            
         # just buy champs till then. no other spendings
         if minimum_round <= 2:
             return

@@ -442,7 +442,7 @@ def valid_item(item: str) -> str | None:
     return next(
         (
             valid_name
-            for valid_name in CONSTANTS["items"]
+            for valid_name in CONSTANTS["game"]["items"]
             if valid_name in item or SequenceMatcher(a=valid_name, b=item).ratio() >= 0.7
         ),
         None,

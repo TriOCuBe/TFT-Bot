@@ -478,10 +478,10 @@ def get_items() -> list:
         move_to(position_x=offset.position_x, position_y=offset.position_y)
         
         item_box = (
-            offset.position_x + (100 * resize_x),
-            offset.position_y + (40 * resize_y),
-            offset.position_x + (240 * resize_x),
-            offset.position_y + (70 * resize_y),
+            int(offset.position_x + (100 * resize_x)),
+            int(offset.position_y + (40 * resize_y)),
+            int(offset.position_x + (240 * resize_x)),
+            int(offset.position_y + (70 * resize_y)),
         )
 
         with mss.mss() as screenshot_taker:

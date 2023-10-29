@@ -59,7 +59,8 @@ CONSTANTS = {
             "take_all": "captures/buttons/take_all.png",
             "xp_buy": "captures/buttons/xp_buy.png",
             "vote": "captures/buttons/vote.png",
-            "recipe": "captures/messages/recipes_text.png"
+            "recipe": "captures/messages/recipes_text.png",
+            "emblem": "captures/messages/unique.png",
         },
         "gold": {
             "0": "captures/gold/0.png",

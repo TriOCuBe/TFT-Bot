@@ -216,10 +216,10 @@ def get_on_screen(
         resize_x = width / 1920
         resize_y = height / 1080
 
-        window_bounding_box.min_x += offsets.min_x * resize_x
-        window_bounding_box.min_y += offsets.min_y * resize_y
-        window_bounding_box.max_x += offsets.max_x * resize_x
-        window_bounding_box.max_y += offsets.max_y * resize_y
+        window_bounding_box.min_x += int(offsets.min_x * resize_x)
+        window_bounding_box.min_y += int(offsets.min_y * resize_y)
+        window_bounding_box.max_x += int(offsets.max_x * resize_x)
+        window_bounding_box.max_y += int(offsets.max_y * resize_y)
 
     with mss.mss() as screenshot_taker:
         screenshot = screenshot_taker.grab(window_bounding_box.to_tuple())

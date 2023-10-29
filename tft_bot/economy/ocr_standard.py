@@ -37,6 +37,9 @@ class OCRStandardEconomyMode(EconomyMode):
         if minimum_round <= 2:
             return
 
+        if random.randint(0, 1) == 1:
+            self.sell_units(amount=1)
+
         gold = screen_helpers.get_gold_with_ocr()
         logger.debug(f"OCR recognized {gold} gold")
 

@@ -163,7 +163,7 @@ class EconomyMode:
         # remove as many locations as our level is from 9
         diff = 9 - expected_champions
         for x in range(diff):
-            del targets[9-x]
+            del targets[8-x]
 
         target_champion = random.choice(targets)
         item_offset = calculate_window_click_offset(

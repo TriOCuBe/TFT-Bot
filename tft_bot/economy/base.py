@@ -158,7 +158,7 @@ class EconomyMode:
         """
         from tft import GAME_CLIENT_INTEGRATION
         item = self.items[item_index]
-        targets = self.champ_locations
+        targets = self.champ_locations[:]
         expected_champions = GAME_CLIENT_INTEGRATION.get_level()
         # remove as many locations as our level is from 9
         diff = 9 - expected_champions

@@ -68,3 +68,14 @@ load_config(".\output")
 game_round = get_round_with_ocr(get_tesseract_location(system_helpers=system_helpers))
 
 print(game_round)
+game_round = int(game_round)
+print(game_round)
+game_round = str(game_round)
+
+if game_round in CONSTANTS["game"]["round_text"]:
+    print("hello")
+else:
+    print("not hello")
+
+if "61" in CONSTANTS["game"]["round_text"]:
+    print("hello 2")

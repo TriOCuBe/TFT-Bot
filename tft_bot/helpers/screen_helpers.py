@@ -7,6 +7,7 @@ import mss
 import numpy
 from pytesseract import pytesseract
 import win32gui
+from difflib import SequenceMatcher
 
 from tft_bot.constants import CONSTANTS
 

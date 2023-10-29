@@ -15,7 +15,7 @@ time.sleep(3)
 
 import pyautogui
 import cv2
-import numpy as np
+import numpy
 from tft_bot.constants import CONSTANTS
 
 # screenshot = pyautogui.screenshot()
@@ -33,24 +33,28 @@ from tft_bot.constants import CONSTANTS
 #     mouse.move(3000, 400)
 #     time.sleep(0.1)
 
-# import mss
-# from pytesseract import pytesseract
+import mss
+from pytesseract import pytesseract
 from tft_bot.helpers import system_helpers
 from tft_bot.config import get_tesseract_location
+from tft_bot.config import load_config
 
 # resize_x = 10/12
 # resize_y = 10/12
 
 # round_bounding_box = (
-#     int(league_bounding_box.min_x + (767 * resize_x)),
-#     int(league_bounding_box.min_y + (10 * resize_y)),
-#     int(league_bounding_box.min_x + (870 * resize_x)),
-#     int(league_bounding_box.min_y + (34 * resize_y)),
+#     int(0 + (767 * resize_x)),
+#     int(0 + (10 * resize_y)),
+#     int(0 + (870 * resize_x)),
+#     int(0 + (34 * resize_y)),
 # )
 # with mss.mss() as screenshot_taker:
 #     screenshot = screenshot_taker.grab(round_bounding_box)
 
+# load_config(".\output")
 # pytesseract.tesseract_cmd = get_tesseract_location(system_helpers=system_helpers)
+
+# _TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=0123456789 -c page_separator=""'
 
 # pixels = numpy.array(screenshot)
 # gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
@@ -60,6 +64,7 @@ from tft_bot.config import get_tesseract_location
 
 from tft_bot.helpers.screen_helpers import get_round_with_ocr
 
+load_config(".\output")
 game_round = get_round_with_ocr(get_tesseract_location(system_helpers=system_helpers))
 
 print(game_round)

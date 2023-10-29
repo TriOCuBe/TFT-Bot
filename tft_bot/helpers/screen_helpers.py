@@ -506,4 +506,5 @@ def get_items() -> list:
 
         item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": valid_item(item_name)})
 
+    logger.debug(f"Found items: {item_list}")
     return item_list

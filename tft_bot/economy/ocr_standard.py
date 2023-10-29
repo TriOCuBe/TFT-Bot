@@ -86,5 +86,6 @@ class OCRStandardEconomyMode(EconomyMode):
             if gold >= 58:
                 self.roll()
                 self.purchase_units(amount=5)
+                self.sell_units(amount=1)
 
         return event

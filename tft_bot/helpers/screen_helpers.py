@@ -502,21 +502,27 @@ def get_items() -> list:
         )
         move_to(position_x=offset.position_x, position_y=offset.position_y)
         
-        item_box = (
-            int(offset.position_x + (100 * resize_x)),
-            int(offset.position_y + (40 * resize_y)),
-            int(offset.position_x + (240 * resize_x)),
-            int(offset.position_y + (70 * resize_y)),
-        )
+        # commented out since it wasn't very reliable
+        # item_box = (
+        #     int(offset.position_x + (100 * resize_x)),
+        #     int(offset.position_y + (40 * resize_y)),
+        #     int(offset.position_x + (240 * resize_x)),
+        #     int(offset.position_y + (70 * resize_y)),
+        # )
 
-        with mss.mss() as screenshot_taker:
-            screenshot = screenshot_taker.grab(item_box)
+        # with mss.mss() as screenshot_taker:
+        #     screenshot = screenshot_taker.grab(item_box)
 
-        pixels = numpy.array(screenshot)
-        gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
-        item_name = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG_ITEMS)
+        # pixels = numpy.array(screenshot)
+        # gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
+        # item_name = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG_ITEMS)
 
-        item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": valid_item(item_name)})
+        # item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": valid_item(item_name)})
 
-    logger.debug(f"Found items: {item_list}")
+        if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["recipe"]):
+            item_list.append((offset.position_x, offset.position_y))
+        else:
+            item_list.append(None)
+
+    logger.debug(f"Found items at: {item_list}")
     return item_list

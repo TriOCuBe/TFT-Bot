@@ -146,7 +146,7 @@ class EconomyMode:
         """
         self.items = get_items()
         for index, _ in enumerate(self.items):
-            if self.items[index]["item_name"] is not None:
+            if self.items[index] is not None:
                 self.add_item_to_champ(index)
 
     def add_item_to_champ(self, item_index: int) -> None:
@@ -167,7 +167,7 @@ class EconomyMode:
 
         target_champion = random.choice(targets)
         # don't need to calculate offset as the coordinates in the list were already run through that
-        move_to(item["coordinates"][0], item["coordinates"][1])
+        move_to(item[0], item[1])
         time.sleep(0.5)
 
         champion_offset = calculate_window_click_offset(

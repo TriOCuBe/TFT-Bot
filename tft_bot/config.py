@@ -223,6 +223,7 @@ def get_tesseract_location() -> str | None:
     Returns:
         String or None
     """
+    from tft_bot import system_helpers
     tesseract_location: str = system_helpers.determine_tesseract_ocr_install_location() + "\\tesseract.exe"
     if not os.path.isfile(tesseract_location):
         return None

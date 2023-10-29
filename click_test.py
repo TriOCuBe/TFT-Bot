@@ -13,10 +13,10 @@ import time
 # mouse.up()
 # click_to(960 * (10/12), 540 * (10/12), action="right")
 
-# import pyautogui
-# import cv2
-# import numpy as np
-# from tft_bot.constants import CONSTANTS
+import pyautogui
+import cv2
+import numpy as np
+from tft_bot.constants import CONSTANTS
 
 # screenshot = pyautogui.screenshot()
 # screenshot_np = np.array(screenshot)

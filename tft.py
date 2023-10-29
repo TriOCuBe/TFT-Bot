@@ -520,7 +520,7 @@ def determine_minimum_round() -> int:
                 return i
     
     else:
-        current_round = get_round_with_ocr(tesseract_location=get_tesseract_location())
+        current_round = get_round_with_ocr(tesseract_location=get_tesseract_location(system_helpers=system_helpers))
         if current_round is not None:
             # take first element of string and turn it into int
             return int(current_round[0])

@@ -216,14 +216,16 @@ def get_economy_mode(system_helpers) -> EconomyMode:
                 wanted_traits=wanted_traits, prioritized_order=prioritized_order, tesseract_location=tesseract_location
             )
 
-def get_tesseract_location() -> str | None:
+def get_tesseract_location(system_helpers) -> str | None:
     """
     Get location of tesseract
+
+    Args:
+        system_helpers: Dependency injected system_helpers module.
     
     Returns:
         String or None
     """
-    from tft_bot import system_helpers
     tesseract_location: str = system_helpers.determine_tesseract_ocr_install_location() + "\\tesseract.exe"
     if not os.path.isfile(tesseract_location):
         return None

@@ -88,9 +88,15 @@ def get_window_bounding_box(window_title: str) -> BoundingBox | None:
     return BoundingBox(*win32gui.GetWindowRect(league_game_window_handle))
 
 
-def check_league_game_size() -> None:
+def check_league_game_size(log: bool = True) -> tuple | None:
     """
     Check the league game size and print an error if it is not what we need it to be.
+
+    Args:
+        log: If you want to use this outside of init, set this to False. It will then return a tuple of the game's size
+
+    Returns:
+        If log is False, returns a tuple of the game's size in the format (width, height) 
     """
     league_game_bounding_box = get_window_bounding_box(window_title="League of Legends (TM) Client")
     if not league_game_bounding_box:
@@ -99,11 +105,14 @@ def check_league_game_size() -> None:
     width = league_game_bounding_box.get_width()
     height = league_game_bounding_box.get_height()
 
-    if (width != 1920 and height != 1080) or (width != 1600 and height != 900):
-        logger.error(
-            f"Your game's size is {width} x {height} "
-            f"instead of 1920 x 1080 or 1600 x 900! This WILL cause issues!"
-        )
+    if log:
+        if (width != 1920 and height != 1080) or (width != 1600 and height != 900):
+            logger.error(
+                f"Your game's size is {width} x {height} "
+                f"instead of 1920 x 1080 or 1600 x 900! This WILL cause issues!"
+            )
+    else:
+        return (width, height)
 
 
 def calculate_window_click_offset(window_title: str, position_x: int, position_y: int) -> Coordinates | None:
@@ -273,24 +282,13 @@ def get_round_with_ocr(tesseract_location) -> str | None:
     Returns:
         The current round as a string or None if it can't identify anything
     """
-    league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
-    if not league_bounding_box:
-        return 0
+    size = check_league_game_size(log=False)
 
-    width = league_bounding_box.get_width()
-    height = league_bounding_box.get_height()
-
-    resize_x = width / 1920
-    resize_y = height / 1080
-
-    round_bounding_box = (
-        int(league_bounding_box.min_x + (767 * resize_x)),
-        int(league_bounding_box.min_y + (10 * resize_y)),
-        int(league_bounding_box.min_x + (870 * resize_x)),
-        int(league_bounding_box.min_y + (34 * resize_y)),
-    )
+    resize_x = size[0] / 1920
+    resize_y = size[1] / 1080
     with mss.mss() as screenshot_taker:
-        screenshot = screenshot_taker.grab(round_bounding_box)    
+        monitor = {"top": int(10 * resize_y), "left": int(767 * resize_x), "width": int(103 * resize_x), "height": int(34 * resize_y)}
+        screenshot = screenshot_taker.grab(monitor)    
 
     pytesseract.tesseract_cmd = tesseract_location
 

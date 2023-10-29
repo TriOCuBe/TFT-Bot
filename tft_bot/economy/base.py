@@ -24,7 +24,7 @@ class EconomyMode:
         self.wanted_traits = wanted_traits
         self.prioritized_order = prioritized_order
         self.items = []
-        self.champ_locations = [(800, 530), (910, 530), (740, 475), (800, 390), (850, 475), (910, 390), None, None, None]
+        self.champ_locations = [(966, 651), (903, 571), (962, 494), (1082, 494), (1091, 651), (1022, 571), (1222, 651), None, None]
 
     def loop_decision(self, minimum_round: int) -> None:
         """

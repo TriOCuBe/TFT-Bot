@@ -11,7 +11,6 @@ from tft import GAME_CLIENT_INTEGRATION
 from ..helpers import screen_helpers
 from .base import EconomyMode
 
-
 class OCRStandardEconomyMode(EconomyMode):
     """
     OCR standard economy mode implementation.
@@ -22,13 +21,15 @@ class OCRStandardEconomyMode(EconomyMode):
         pytesseract.tesseract_cmd = tesseract_location
 
     def loop_decision(self, minimum_round: int, event: bool):
+        from tft_bot.config import get_item_config
+
         self.walk_random()
         sleep(0.5)
 
         self.purchase_units(amount=3)
         sleep(0.5)
 
-        if random.randint(0, 8) == 1:    
+        if random.randint(0, 8) == 1 and get_item_config():
             self.place_items()
             sleep(0.5)
 

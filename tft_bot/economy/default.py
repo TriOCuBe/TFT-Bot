@@ -17,6 +17,8 @@ class DefaultEconomyMode(EconomyMode):
     """
 
     def loop_decision(self, minimum_round: int, event: bool):
+        from tft_bot.config import get_item_config
+
         self.walk_random()
         time.sleep(0.5)
 
@@ -24,7 +26,7 @@ class DefaultEconomyMode(EconomyMode):
             self.purchase_units(amount=3)
             time.sleep(0.5)
 
-        if random.randint(0, 8) == 1:    
+        if random.randint(0, 8) == 1 and get_item_config():    
             self.place_items()
             sleep(0.5)
 

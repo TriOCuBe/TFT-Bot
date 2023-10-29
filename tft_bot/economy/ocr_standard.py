@@ -25,8 +25,24 @@ class OCRStandardEconomyMode(EconomyMode):
         sleep(0.5)
 
         self.purchase_units(amount=3)
+        sleep(0.5)
 
+        self.place_items()
+        sleep(0.5)
         # just buy champs till then. no other spendings
+        if minimum_round <= 2:
+            return
+
+        gold = screen_helpers.get_gold_with_ocr()
+        logger.debug(f"OCR recognized {gold} gold")
+
+        if gold >= 54 and GAME_CLIENT_INTEGRATION.get_level() < 8:
+            self.purchase_xp()
+            gold -= 4
+            if gold >= 54:
+                self.purchase_xp()
+                gold -= 4
+
         if minimum_round <= 3:
             return
 
@@ -57,16 +73,6 @@ class OCRStandardEconomyMode(EconomyMode):
             for _ in range(3):
                 self.walk_random()
                 sleep(1.5)
-
-        gold = screen_helpers.get_gold_with_ocr()
-        logger.debug(f"OCR recognized {gold} gold")
-
-        if gold >= 54 and GAME_CLIENT_INTEGRATION.get_level() < 8:
-            self.purchase_xp()
-            gold -= 4
-            if gold >= 54:
-                self.purchase_xp()
-                gold -= 4
 
         if gold >= 60:
             self.roll()

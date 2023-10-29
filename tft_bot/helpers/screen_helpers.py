@@ -282,13 +282,26 @@ def get_round_with_ocr(tesseract_location) -> str | None:
     Returns:
         The current round as a string or None if it can't identify anything
     """
-    size = check_league_game_size(log=False)
+    league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
+    if not league_bounding_box:
+        return 0
 
-    resize_x = size[0] / 1920
-    resize_y = size[1] / 1080
+    width = league_bounding_box.get_width()
+    height = league_bounding_box.get_height()
+    min_x = league_bounding_box.min_x
+    min_y = league_bounding_box.min_y
+
+    resize_x = width / 1920
+    resize_y = height / 1080
+
     with mss.mss() as screenshot_taker:
-        monitor = {"top": int(10 * resize_y), "left": int(767 * resize_x), "width": int(103 * resize_x), "height": int(34 * resize_y)}
-        screenshot = screenshot_taker.grab(monitor)    
+        round_bounding_box = (
+            int(min_x + (767 * resize_x)),
+            int(min_y + (10 * resize_y)),
+            int(min_x + (870 * resize_x)),
+            int(min_y + (34 * resize_y)),
+        )
+        screenshot = screenshot_taker.grab(round_bounding_box)    
 
     pytesseract.tesseract_cmd = tesseract_location
 

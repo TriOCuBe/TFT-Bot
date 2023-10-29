@@ -460,6 +460,7 @@ def valid_item(item: str) -> str | None:
         None,
     )
 
+_TESSERACT_CONFIG_ITEMS = '--oem 3 --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz -c page_separator=""'
 
 def get_items() -> list:
     """
@@ -501,7 +502,7 @@ def get_items() -> list:
 
         pixels = numpy.array(screenshot)
         gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
-        item_name = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
+        item_name = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG_ITEMS)
 
         item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": valid_item(item_name)})
 

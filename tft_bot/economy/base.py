@@ -5,7 +5,6 @@ import time
 import random
 from difflib import SequenceMatcher
 
-from tft import GAME_CLIENT_INTEGRATION
 from tft_bot.constants import CONSTANTS
 from tft_bot.helpers.click_helpers import click_to, click_to_image, move_to, hold_and_move_to, press
 from tft_bot.helpers.screen_helpers import get_on_screen_in_game, calculate_window_click_offset, get_items
@@ -82,7 +81,7 @@ class EconomyMode:
                 # since this doesn't always seem to work, do it twice to be sure
                 time.sleep(0.5)
                 press('E')
-                
+
             time.sleep(0.5)
 
     def roll(self) -> None:
@@ -158,6 +157,7 @@ class EconomyMode:
         Args:
             item_index: The index of the item, in order to determine it's position
         """
+        from tft import GAME_CLIENT_INTEGRATION
         item = self.items[item_index]
         targets = self.champ_locations
         expected_champions = GAME_CLIENT_INTEGRATION.get_level()

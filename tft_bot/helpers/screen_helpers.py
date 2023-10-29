@@ -315,8 +315,9 @@ def get_round_with_ocr(tesseract_location) -> str | None:
     game_round: str = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
 
     # i dont fucking know why i need to do this, but it wont work otherwise. is pytesseract returning some invisible symbol???
-    game_round = int(game_round)
-    game_round = str(game_round)
+    if game_round != '':
+        game_round = int(game_round)
+        game_round = str(game_round)
 
     if game_round in CONSTANTS["game"]["round_text"]:
         return game_round

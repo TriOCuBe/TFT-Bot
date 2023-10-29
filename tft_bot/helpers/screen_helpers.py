@@ -320,6 +320,7 @@ def get_round_with_ocr(tesseract_location) -> str | None:
         game_round = str(game_round)
 
     if game_round in CONSTANTS["game"]["round_text"]:
+        logger.debug(f"OCR recognized current round as {game_round[0]}-{game_round[1]}")
         return game_round
     
     return None

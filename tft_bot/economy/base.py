@@ -57,7 +57,7 @@ class EconomyMode:
         Args:
             amount: The amount of units to sell.
         """
-
+        points = []
         for i in range(9):
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=410 + (120 * i), position_y=780)
             points.append({"x": point.position_x, "y": point.position_y})
@@ -166,10 +166,8 @@ class EconomyMode:
             del targets[8-x]
 
         target_champion = random.choice(targets)
-        item_offset = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=item["coordinates"][0], position_y=item["coordinates"][1]
-        )
-        move_to(item_offset.position_x, item_offset.position_y)
+        # don't need to calculate offset as the coordinates in the list were already run through that
+        move_to(item["coordinates"][0], item["coordinates"][1])
         time.sleep(0.5)
 
         champion_offset = calculate_window_click_offset(

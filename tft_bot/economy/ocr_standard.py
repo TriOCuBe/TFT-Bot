@@ -63,27 +63,28 @@ class OCRStandardEconomyMode(EconomyMode):
         # elif gold >= 55:
         #     self.purchase_units(amount=3)
 
-        if event:
-            event = False
-            logger.debug("Triggering event, selling a bunch of champs")
+        # if event:
+        #     event = False
+        #     logger.debug("Triggering event, selling a bunch of champs")
 
-            self.sell_units(amount=5)
-            sleep(0.5)
+        #     self.sell_units(amount=5)
+        #     sleep(0.5)
 
-            self.roll()
-            sleep(0.5)
-            self.purchase_units(3)
-            sleep(0.5)
+        #     self.roll()
+        #     sleep(0.5)
+        #     self.purchase_units(3)
+        #     sleep(0.5)
             
-            for _ in range(3):
-                self.walk_random()
-                sleep(1.5)
+        #     for _ in range(3):
+        #         self.walk_random()
+        #         sleep(1.5)
 
         gold = screen_helpers.get_gold_with_ocr()
         logger.debug(f"OCR recognized {gold} gold buying and selling")
 
-        if gold >= 58:
-            self.roll()
-            self.purchase_units(amount=5)
+        for _ in range(3):
+            if gold >= 58:
+                self.roll()
+                self.purchase_units(amount=5)
 
         return event

@@ -519,7 +519,7 @@ def get_items() -> list:
 
         # item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": valid_item(item_name)})
 
-        if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["recipe"]):
+        if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["recipe"]) or get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["emblem"]):
             item_list.append((offset.position_x, offset.position_y))
         else:
             item_list.append(None)

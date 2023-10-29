@@ -470,15 +470,6 @@ def get_items() -> list:
     resize_x = width / 1920
     resize_y = height / 1080
 
-    item_box = (
-        league_bounding_box.min_x + (867 * resize_x),
-        league_bounding_box.min_y + (881 * resize_y),
-        league_bounding_box.min_x + (924 * resize_x),
-        league_bounding_box.min_y + (909 * resize_y),
-    )
-    with mss.mss() as screenshot_taker:
-        screenshot = screenshot_taker.grab(gold_bounding_box)
-
     item_list = []
     for pos in item_positions:
         offset = calculate_window_click_offset(
@@ -487,10 +478,10 @@ def get_items() -> list:
         move_to(position_x=offset.position_x, position_y=offset.position_y)
         
         item_box = (
-            offset.position_x + 100,
-            offset.position_y + 40,
-            offset.position_x + 240,
-            offset.position_y + 70,
+            offset.position_x + (100 * resize_x),
+            offset.position_y + (40 * resize_y),
+            offset.position_x + (240 * resize_x),
+            offset.position_y + (70 * resize_y),
         )
 
         with mss.mss() as screenshot_taker:

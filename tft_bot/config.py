@@ -216,6 +216,20 @@ def get_economy_mode(system_helpers) -> EconomyMode:
                 wanted_traits=wanted_traits, prioritized_order=prioritized_order, tesseract_location=tesseract_location
             )
 
+def get_tesseract_location() -> str | None:
+    """
+    Get location of tesseract
+    
+    Returns:
+        String or None
+    """
+    tesseract_location: str = system_helpers.determine_tesseract_ocr_install_location() + "\\tesseract.exe"
+    if not os.path.isfile(tesseract_location):
+        return None
+    
+    return tesseract_location
+
+
 def get_item_config() -> bool:
     """
     Get the config for items.

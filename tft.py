@@ -17,6 +17,7 @@ import requests
 from requests import HTTPError
 
 from tft_bot import config
+from tft_bot.config import get_tesseract_location
 from tft_bot.constants import CONSTANTS
 from tft_bot.constants import exit_now_images
 from tft_bot.constants import league_processes
@@ -493,7 +494,7 @@ def determine_minimum_round() -> int:
         The major round as an integer.
 
     """
-    if not config.get_round_ocr_config():
+    if not config.get_round_ocr_config() or get_tesseract_location is None:
         if get_on_screen_in_game(CONSTANTS["game"]["round"]["krugs_inactive"], 0.9) or get_on_screen_in_game(
             CONSTANTS["game"]["round"]["krugs_active"], 0.9
         ):
@@ -519,7 +520,7 @@ def determine_minimum_round() -> int:
                 return i
     
     else:
-        current_round = get_round_with_ocr()
+        current_round = get_round_with_ocr(tesseract_location=get_tesseract_location())
         if current_round is not None:
             # take first element of string and turn it into int
             return int(current_round[0])

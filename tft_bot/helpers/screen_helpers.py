@@ -9,6 +9,7 @@ from pytesseract import pytesseract
 import win32gui
 
 from tft_bot.constants import CONSTANTS
+from tft_bot.config import get_tesseract_location
 
 
 @dataclass
@@ -262,9 +263,12 @@ _TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=0123456789 -c pa
 
 
 # essentially copied from https://github.com/jfd02/TFT-OCR-BOT/blob/ea3eb15d3f96109a616eb9f3508db14347ac0339/game_functions.py#L13
-def get_round_with_ocr() -> str | None:
+def get_round_with_ocr(tesseract_location) -> str | None:
     """
     Get the current round using ocr
+
+    Args:
+        tesseract_location: Required to initialize pytesseract. String of path to tesseract.exe
 
     Returns:
         The current round as a string or None if it can't identify anything
@@ -286,8 +290,10 @@ def get_round_with_ocr() -> str | None:
         int(league_bounding_box.min_y + (34 * resize_y)),
     )
     with mss.mss() as screenshot_taker:
-        screenshot = screenshot_taker.grab(round_bounding_box)
-    
+        screenshot = screenshot_taker.grab(round_bounding_box)    
+
+    pytesseract.tesseract_cmd = tesseract_location
+
     pixels = numpy.array(screenshot)
     gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
     game_round: str = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
@@ -303,7 +309,6 @@ def get_gold_with_ocr() -> int:
 
     Returns:
         The amount of gold the player currently has.
-
     """
     league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
     if not league_bounding_box:

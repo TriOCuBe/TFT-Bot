@@ -31,7 +31,7 @@ class DefaultEconomyMode(EconomyMode):
             sleep(0.5)
 
         if minimum_round < 2:
-            return
+            return event
 
         if screen_helpers.gold_at_least(4) and GAME_CLIENT_INTEGRATION.get_level() < 8:
             self.purchase_xp()
@@ -48,7 +48,7 @@ class DefaultEconomyMode(EconomyMode):
             time.sleep(0.5)
 
         if minimum_round < 3:
-            return
+            return event
 
         if screen_helpers.gold_at_least(5):
             self.roll()
@@ -59,10 +59,15 @@ class DefaultEconomyMode(EconomyMode):
             logger.debug("Triggering event, selling a bunch of champs")
 
             self.sell_units(amount=5)
-            time.sleep(0.5)
+            sleep(0.5)
 
-            for _ in range(3):
-                self.walk_random()
-                time.sleep(1.5)
+            self.roll()
+            sleep(0.5)
+            self.purchase_units(3)
+            sleep(0.5)
+            
+            self.collect_items()
+            self.place_items()
+            return event
             
         return event

@@ -23,8 +23,9 @@ class EconomyMode:
         """
         self.wanted_traits = wanted_traits
         self.prioritized_order = prioritized_order
-        self.items = []
-        self.champ_locations = [(966, 651), (903, 571), (962, 494), (1082, 494), (1091, 651), (1022, 571), (1222, 651), None, None]
+        self.items: list = []
+        self.champ_locations: list = [(966, 651), (903, 571), (962, 494), (1091, 651), (1022, 571), (1082, 494), (1222, 651), (1147, 571), (1198, 494)]
+        self.bench_locations: list = [(425, 777), (542, 777), (658, 777), (778, 777), (892, 777), (1010, 777), (1128, 777), (1244, 777), (1359, 777)]
 
     def loop_decision(self, minimum_round: int) -> None:
         """
@@ -57,9 +58,9 @@ class EconomyMode:
         Args:
             amount: The amount of units to sell.
         """
-        points = []
-        for i in range(9):
-            point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=410 + (120 * i), position_y=780)
+        points = self.bench_locations[:]
+        for i in range(points):
+            point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=points[i][0], position_y=points[i][1])
             points.append({"x": point.position_x, "y": point.position_y})
 
         for _ in range(amount):
@@ -101,31 +102,30 @@ class EconomyMode:
         else:
             press('F')  # hotkey for xp
 
-    # unused
-    # def collect_items(self) -> None:
-    #     """
-    #     Runs a circle (square) around the map, trying to collect items on the way.
-    #     """
-    #     checkpoint1 = calculate_window_click_offset(
-    #         window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=650
-    #     )
-    #     checkpoint2 = calculate_window_click_offset(
-    #         window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=650
-    #     )
-    #     checkpoint3 = calculate_window_click_offset(
-    #         window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300
-    #     )
-    #     checkpoint4 = calculate_window_click_offset(
-    #         window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=300
-    #     )
-    #     logger.info("Running around, trying to collect items")
+    def collect_items(self) -> None:
+        """
+        Runs a circle (square) around the map, trying to collect items on the way.
+        """
+        checkpoint1 = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=650
+        )
+        checkpoint2 = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=650
+        )
+        checkpoint3 = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300
+        )
+        checkpoint4 = calculate_window_click_offset(
+            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=300
+        )
+        logger.info("Running around, trying to collect items")
 
-    #     checkpoint_list = [checkpoint1, checkpoint2, checkpoint3, checkpoint4]
-    #     # for i in range(2):
-    #     random.shuffle(checkpoint_list)
-    #     for point in checkpoint_list:
-    #         click_to(position_x=point.x, position_y=point.y, action="right")
-    #         time.sleep(2.5)
+        checkpoint_list = [checkpoint1, checkpoint2, checkpoint3, checkpoint4]
+        # for i in range(2):
+        random.shuffle(checkpoint_list)
+        for point in checkpoint_list:
+            click_to(position_x=point.x, position_y=point.y, action="right")
+            time.sleep(4)
 
     def walk_random(self) -> None:
         """
@@ -154,7 +154,7 @@ class EconomyMode:
         Take given item and add it to random champ on board.
 
         Args:
-            item_index: The index of the item, in order to determine it's position
+            item_index: The index of the item, in order to determine its position
         """
         from tft import GAME_CLIENT_INTEGRATION
         item = self.items[item_index]
@@ -165,8 +165,13 @@ class EconomyMode:
         for x in range(diff):
             del targets[8-x]
 
+        random.shuffle(targets)
         target_champion = random.choice(targets)
-        # don't need to calculate offset as the coordinates in the list were already run through that
+
+        logger.debug(f"Recognizing {len(targets)} champions")
+        logger.debug(f"Moving item to target {targets.index(target_champion)} with coordinates {target_champion}")
+
+        # don't need to calculate offset as the coordinates in the list were already run through that in get_items()
         move_to(item[0], item[1])
         time.sleep(0.5)
 

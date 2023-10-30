@@ -3,6 +3,7 @@ Module holding the base economy mode blueprint class.
 """
 import time
 import random
+from loguru import logger
 
 from tft_bot.constants import CONSTANTS
 from tft_bot.helpers.click_helpers import click_to, click_to_image, move_to, hold_and_move_to, press

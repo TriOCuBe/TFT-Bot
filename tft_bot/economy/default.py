@@ -16,7 +16,7 @@ class DefaultEconomyMode(EconomyMode):
     Default economy mode implementation.
     """
 
-    def loop_decision(self, minimum_round: int, event: bool):
+    def loop_decision(self, minimum_round: int):
         from tft_bot.config import get_item_config
 
         self.walk_random()
@@ -31,7 +31,7 @@ class DefaultEconomyMode(EconomyMode):
             sleep(0.5)
 
         if minimum_round < 2:
-            return event
+            return
 
         if screen_helpers.gold_at_least(4) and GAME_CLIENT_INTEGRATION.get_level() < 8:
             self.purchase_xp()
@@ -48,26 +48,8 @@ class DefaultEconomyMode(EconomyMode):
             time.sleep(0.5)
 
         if minimum_round < 3:
-            return event
+            return
 
         if screen_helpers.gold_at_least(5):
             self.roll()
             time.sleep(0.5)
-
-        if event:
-            event = False
-            logger.debug("Triggering event, selling a bunch of champs")
-
-            self.sell_units(amount=5)
-            sleep(0.5)
-
-            self.roll()
-            sleep(0.5)
-            self.purchase_units(3)
-            sleep(0.5)
-            
-            self.collect_items()
-            self.place_items()
-            return event
-            
-        return event

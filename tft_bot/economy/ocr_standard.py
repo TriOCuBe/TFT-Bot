@@ -20,7 +20,7 @@ class OCRStandardEconomyMode(EconomyMode):
         super().__init__(wanted_traits, prioritized_order)
         pytesseract.tesseract_cmd = tesseract_location
 
-    def loop_decision(self, minimum_round: int, event: bool):
+    def loop_decision(self, minimum_round: int):
         from tft_bot.config import get_item_config
 
         self.walk_random()
@@ -48,7 +48,7 @@ class OCRStandardEconomyMode(EconomyMode):
 
         # just buy champs till then. no other spendings
         if minimum_round <= 2:
-            return event
+            return
 
         if random.randint(0, 3) == 1:
             self.sell_units(amount=1)
@@ -65,22 +65,4 @@ class OCRStandardEconomyMode(EconomyMode):
             self.roll()
 
         if minimum_round <= 3:
-            return event
-
-        if event:
-            event = False
-            logger.debug("Triggering event, selling a bunch of champs")
-
-            self.sell_units(amount=5)
-            sleep(0.5)
-
-            # self.roll()
-            # sleep(0.5)
-            # self.purchase_units(3)
-            # sleep(0.5)
-            
-            # self.collect_items()
-            # self.place_items()
-            # return event
-
-        return event
+            return

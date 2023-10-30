@@ -539,8 +539,6 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
     Skips 5-second increments if a pause logic request is made,
     repeating until toggled or an event triggers an early exit.
     """
-    event = True
-    counter = 0
     while True:
         if PAUSE_LOGIC:
             time.sleep(5)
@@ -570,14 +568,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             # logger.debug(f"Board positions: {get_board_positions()}")
             continue
 
-        if minimum_round > 3 and not event:
-            counter += 1
-        
-        if counter >= 8:
-            counter = 0
-            event = True
-
-        event = economy_mode.loop_decision(minimum_round=minimum_round, event=event)
+        economy_mode.loop_decision(minimum_round=minimum_round)
 
         if minimum_round >= 3 and config.forfeit_early():
             logger.info("Attempting to surrender early")

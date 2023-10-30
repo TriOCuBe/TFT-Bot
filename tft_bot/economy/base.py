@@ -125,7 +125,7 @@ class EconomyMode:
         # for i in range(2):
         random.shuffle(checkpoint_list)
         for point in checkpoint_list:
-            click_to(position_x=point.x, position_y=point.y, action="right")
+            click_to(position_x=point.position_x, position_y=point.position_y, action="right")
             time.sleep(4)
 
     def walk_random(self) -> None:

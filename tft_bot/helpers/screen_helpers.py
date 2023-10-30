@@ -282,19 +282,14 @@ def get_round_with_ocr(tesseract_location) -> str | None:
     Returns:
         The current round as a string or None if it can't identify anything
     """
-    # league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
-    # if not league_bounding_box:
-    #     return 0
+    league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
+    if not league_bounding_box:
+        return 0
 
-    # width = league_bounding_box.get_width()
-    # height = league_bounding_box.get_height()
-    # min_x = league_bounding_box.min_x
-    # min_y = league_bounding_box.min_y
-
-    width = 1600
-    height = 900
-    min_x = 0
-    min_y = 0
+    width = league_bounding_box.get_width()
+    height = league_bounding_box.get_height()
+    min_x = league_bounding_box.min_x
+    min_y = league_bounding_box.min_y
 
     resize_x = width / 1920
     resize_y = height / 1080

@@ -59,7 +59,7 @@ class EconomyMode:
             amount: The amount of units to sell.
         """
         points = self.bench_locations[:]
-        for i in range(points):
+        for i in range(len(points)):
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=points[i][0], position_y=points[i][1])
             points.append({"x": point.position_x, "y": point.position_y})
 

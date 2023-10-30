@@ -25,8 +25,6 @@ class EconomyMode:
         self.wanted_traits = wanted_traits
         self.prioritized_order = prioritized_order
         self.items: list = []
-        self.champ_locations: list = [(966, 651), (903, 571), (962, 494), (1091, 651), (1022, 571), (1082, 494), (1222, 651), (1147, 571), (1198, 494)]
-        self.bench_locations: list = [(425, 777), (542, 777), (658, 777), (778, 777), (892, 777), (1010, 777), (1128, 777), (1244, 777), (1359, 777)]
 
     def loop_decision(self, minimum_round: int) -> None:
         """
@@ -59,7 +57,7 @@ class EconomyMode:
         Args:
             amount: The amount of units to sell.
         """
-        points = self.bench_locations[:]
+        points = CONSTANTS["game"]["coordinates"]["bench"]
         for i in range(len(points)):
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=points[i][0], position_y=points[i][1])
             points[i] = (point.position_x, point.position_y)
@@ -159,9 +157,11 @@ class EconomyMode:
         """
         from tft import GAME_CLIENT_INTEGRATION
         item = self.items[item_index]
-        targets = self.champ_locations[:]
+        targets = CONSTANTS["game"]["coordinates"]["board"]
         expected_champions = GAME_CLIENT_INTEGRATION.get_level()
+
         # remove as many locations as our level is from 9
+        # the list is in the order in which the game auto places the champions
         diff = 9 - expected_champions
         for x in range(diff):
             del targets[8-x]

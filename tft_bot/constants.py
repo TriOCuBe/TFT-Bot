@@ -141,46 +141,62 @@ CONSTANTS = {
             "zaun": "captures/trait/zaun.png",
         },
         # taken from https://github.com/jfd02/TFT-OCR-BOT/blob/main/game_assets.py
-        "items": {
-            # components
-            "BFSword",
-            "ChainVest",
-            "GiantsBelt",
-            "NeedlesslyLargeRod",
-            "NegatronCloak",
-            "RecurveBow",
-            "SparringGloves",
-            "Spatula",
-            "TearoftheGoddess",
+        # "items": {
+        #     # components
+        #     "BFSword",
+        #     "ChainVest",
+        #     "GiantsBelt",
+        #     "NeedlesslyLargeRod",
+        #     "NegatronCloak",
+        #     "RecurveBow",
+        #     "SparringGloves",
+        #     "Spatula",
+        #     "TearoftheGoddess",
 
-            # full_items
-            "BilgewaterEmblem","ChallengerEmblem","IoniaEmblem","JuggernautEmblem",
-            "NoxusEmblem","ShurimaEmblem","SorcererEmblem","VanquisherEmblem",
-            "AdaptiveHelm","ArchangelsStaff","Bloodthirster","BlueBuff",
-            "BrambleVest","Crownguard","Deathblade","DragonsClaw",
-            "EdgeofNight","Evenshroud","GargoyleStoneplate","GiantSlayer",
-            "Guardbreaker","GuinsoosRageblade","HandofJustice","HextechGunblade",
-            "InfinityEdge","IonicSpark","JeweledGauntlet","LastWhisper",
-            "Morellonomicon","NashorsTooth","NightHarvester","ProtectorsVow",
-            "Quicksilver","RabadonsDeathcap","RapidFirecannon","Redemption",
-            "RunaansHurricane","SpearofShojin","StatikkShiv","SteraksGage",
-            "SunfireCape","TacticiansCrown","ThiefsGloves","TitansResolve","WarmogsArmor",
+        #     # full_items
+        #     "BilgewaterEmblem","ChallengerEmblem","IoniaEmblem","JuggernautEmblem",
+        #     "NoxusEmblem","ShurimaEmblem","SorcererEmblem","VanquisherEmblem",
+        #     "AdaptiveHelm","ArchangelsStaff","Bloodthirster","BlueBuff",
+        #     "BrambleVest","Crownguard","Deathblade","DragonsClaw",
+        #     "EdgeofNight","Evenshroud","GargoyleStoneplate","GiantSlayer",
+        #     "Guardbreaker","GuinsoosRageblade","HandofJustice","HextechGunblade",
+        #     "InfinityEdge","IonicSpark","JeweledGauntlet","LastWhisper",
+        #     "Morellonomicon","NashorsTooth","NightHarvester","ProtectorsVow",
+        #     "Quicksilver","RabadonsDeathcap","RapidFirecannon","Redemption",
+        #     "RunaansHurricane","SpearofShojin","StatikkShiv","SteraksGage",
+        #     "SunfireCape","TacticiansCrown","ThiefsGloves","TitansResolve","WarmogsArmor",
 
-            # support_items
-            "AegisoftheLegion","BansheesVeil","ChaliceofPower","CrestofCinders",
-            "LocketoftheIronSolari","NeedlesslyBigGem","ObsidianCleaver","RanduinsOmen",
-            "ShroudofStillness","VirtueoftheMartyr","ZekesHerald","Zephyr","ZzRotPortal",
+        #     # support_items
+        #     "AegisoftheLegion","BansheesVeil","ChaliceofPower","CrestofCinders",
+        #     "LocketoftheIronSolari","NeedlesslyBigGem","ObsidianCleaver","RanduinsOmen",
+        #     "ShroudofStillness","VirtueoftheMartyr","ZekesHerald","Zephyr","ZzRotPortal",
 
-            # ornn_items
-            "AnimaVisage","BlacksmithsGloves","DeathfireGrasp","DeathsDefiance",
-            "EternalWinter","GoldCollector","GoldmancersStaff","Hullcrusher",
-            "InfinityForce","MogulsMail","Muramana","Rocket-PropelledFist",
-            "SnipersFocus","TrickstersGlass","ZhonyasParadox",
+        #     # ornn_items
+        #     "AnimaVisage","BlacksmithsGloves","DeathfireGrasp","DeathsDefiance",
+        #     "EternalWinter","GoldCollector","GoldmancersStaff","Hullcrusher",
+        #     "InfinityForce","MogulsMail","Muramana","Rocket-PropelledFist",
+        #     "SnipersFocus","TrickstersGlass","ZhonyasParadox",
 
-            # uncraftable_items
-            "BastionEmblem","BruiserEmblem","DeadeyeEmblem","FreljordEmblem",
-            "GunnerEmblem","InvokerEmblem","PiltoverEmblem","RogueEmblem",
-            "StrategistEmblem","TargonEmblem","VoidEmblem","ZaunEmblem"
+        #     # uncraftable_items
+        #     "BastionEmblem","BruiserEmblem","DeadeyeEmblem","FreljordEmblem",
+        #     "GunnerEmblem","InvokerEmblem","PiltoverEmblem","RogueEmblem",
+        #     "StrategistEmblem","TargonEmblem","VoidEmblem","ZaunEmblem"
+        # },
+        "coordinates": {
+            "board": [
+                (966, 651), (903, 571), (962, 494),
+                (1091, 651), (1022, 571), (1082, 494),
+                (1222, 651), (1147, 571), (1198, 494)
+            ],
+            "bench": [
+                (425, 777), (542, 777), (658, 777),
+                (778, 777), (892, 777), (1010, 777),
+                (1128, 777), (1244, 777), (1359, 777)
+            ],
+            "items": [
+                (273, 753), (348, 737), (289, 692), (356, 676), (307, 631),
+                (323, 586), (407, 679), (379, 632), (396, 582), (457, 628)
+            ]
         },
     },
 }

@@ -483,8 +483,6 @@ def get_items() -> list:
     """
     from tft_bot.helpers.click_helpers import move_to
 
-    item_positions = [(273, 753), (348, 737), (289, 692), (356, 676), (307, 631), (323, 586), (407, 679), (379, 632), (396, 582), (457, 628)]
-
     league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
     if not league_bounding_box:
         return 0
@@ -496,7 +494,7 @@ def get_items() -> list:
     resize_y = height / 1080
 
     item_list = []
-    for pos in item_positions:
+    for pos in CONSTANTS["game"]["coordinates"]["items"]:
         offset = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], position_x=pos[0], position_y=pos[1]
         )

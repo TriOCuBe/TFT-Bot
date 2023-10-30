@@ -57,7 +57,7 @@ class EconomyMode:
         Args:
             amount: The amount of units to sell.
         """
-        points = CONSTANTS["game"]["coordinates"]["bench"]
+        points = CONSTANTS["game"]["coordinates"]["bench"][:]
         for i in range(len(points)):
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=points[i][0], position_y=points[i][1])
             points[i] = (point.position_x, point.position_y)
@@ -157,7 +157,7 @@ class EconomyMode:
         """
         from tft import GAME_CLIENT_INTEGRATION
         item = self.items[item_index]
-        targets = CONSTANTS["game"]["coordinates"]["board"]
+        targets = CONSTANTS["game"]["coordinates"]["board"][:]
         expected_champions = GAME_CLIENT_INTEGRATION.get_level()
 
         # remove as many locations as our level is from 9

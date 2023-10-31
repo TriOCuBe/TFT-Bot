@@ -49,10 +49,9 @@ class OCRStandardEconomyMode(EconomyMode):
         gold = screen_helpers.get_gold_with_ocr()
         logger.debug(f"OCR recognized {gold} gold")
 
-        while gold >= 58:
-            if GAME_CLIENT_INTEGRATION.get_level() < 8:
-                self.purchase_xp()
-                gold -= 4
+        while gold >= 58 and GAME_CLIENT_INTEGRATION.get_level() < 8:
+            self.purchase_xp()
+            gold -= 4
 
         if gold >= 55:
             self.roll()

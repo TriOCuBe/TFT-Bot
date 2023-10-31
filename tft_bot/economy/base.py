@@ -223,6 +223,8 @@ class EconomyMode:
                 target = self.bench_targets[index]
                 self.sell_unit(target)
                 sleep(0.5)
+                logger.info(f"Sold champion with index {index} and coordinates {target}")
+        logger.info(f"list of bench champs: {self.bench_champions}")
 
     def board_cleanup(self) -> None:
         """

@@ -552,14 +552,21 @@ def check_champion(wanted_traits: list) -> str | None:
         int(min_x + (1800 * resize_x)),
         int(min_y + (375 * resize_y)),
     )
+    
+    with mss.mss() as screenshot_taker:
+        screenshot = screenshot_taker.grab(region)
+
+    pixels = numpy.array(screenshot)
 
     checked_champs = []
     for trait in wanted_traits:
         for champion in CONSTANTS["game"]["champions"]["trait"][trait]:
             path = CONSTANTS["game"]["champions"]["full"][champion]
             if champion not in checked_champs:
-                if get_on_screen_in_game(path=path, precision=0.95, offsets=region) is not None:
+                search_result = cv2.matchTemplate(pixels, path, cv2.TM_CCOEFF_NORMED)
+                _, max_precision, _, max_location = cv2.minMaxLoc(search_result)
+                if max_precision > 0.95:
                     return champion
-            checked_champs.append(champion)
+                checked_champs.append(champion)
 
     return None

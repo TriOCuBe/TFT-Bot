@@ -34,14 +34,17 @@ class OCRStandardEconomyMode(EconomyMode):
             sleep(0.5)
         elif num == 0:
             self.collect_items()
+        elif num == 3:
+            self.board_cleanup()
+            sleep(0.5)
 
         # just buy champs till then. no other spendings
         if minimum_round <= 2:
             return
 
-        if random.randint(0, 10) == 1:
-            self.board_cleanup
-            sleep(0.5)
+        # if random.randint(0, 10) == 1:
+        #     self.board_cleanup
+        #     sleep(0.5)
 
         gold = screen_helpers.get_gold_with_ocr()
         logger.debug(f"OCR recognized {gold} gold")

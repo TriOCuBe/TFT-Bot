@@ -43,8 +43,8 @@ class DefaultEconomyMode(EconomyMode):
                 self.purchase_xp()
                 time.sleep(0.5)
 
-        if random.randint(0, 3) == 1:
-            self.sell_units(amount=random.randint(1,2))
+        if random.randint(0, 10) == 1:
+            self.board_cleanup
             time.sleep(0.5)
 
         if minimum_round < 3:

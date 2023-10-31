@@ -1,9 +1,7 @@
-import random
+from tft_bot.constants import CONSTANTS
 
-myList = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+expected_champs = 8
+targets = CONSTANTS["game"]["coordinates"]["board"][:expected_champs]
 
-diff = 9 - 3
-for x in range(diff):
-    del myList[8-x]
-
-print(myList)
+print(targets)
+print(len(targets))

@@ -547,10 +547,10 @@ def check_champion(wanted_traits: list) -> str | None:
     resize_y = height / 1080
 
     region = (
-        int(min_x + (1650 * resize_x)),
-        int(min_y + (150 * resize_y)),
-        int(min_x + (1920 * resize_x)),
-        int(min_y + (400 * resize_y)),
+        int(min_x + (1690 * resize_x)),
+        int(min_y + (330 * resize_y)),
+        int(min_x + (1800 * resize_x)),
+        int(min_y + (375 * resize_y)),
     )
 
     checked_champs = []

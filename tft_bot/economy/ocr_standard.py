@@ -39,11 +39,11 @@ class OCRStandardEconomyMode(EconomyMode):
         # elif gold >= 55:
         #     self.purchase_units(amount=3)
 
-        num = random.randint(0, 8)
-        if num == 1 and get_item_config():
+        num = random.randint(0, 14)
+        if (num == 1 or num == 2) and get_item_config():
             self.place_items()
             sleep(0.5)
-        elif num == 2:
+        elif num == 0:
             self.collect_items()
 
         # just buy champs till then. no other spendings

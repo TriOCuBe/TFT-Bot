@@ -229,10 +229,10 @@ def get_on_screen(
             resize_x = width / 1280
             resize_y = height / 720
 
-        window_bounding_box.min_x += int(offsets.min_x * resize_x)
-        window_bounding_box.min_y += int(offsets.min_y * resize_y)
-        window_bounding_box.max_x += int(offsets.max_x * resize_x)
-        window_bounding_box.max_y += int(offsets.max_y * resize_y)
+        window_bounding_box.min_x += int(offsets[0] * resize_x)
+        window_bounding_box.min_y += int(offsets[1] * resize_y)
+        window_bounding_box.max_x += int(offsets[2] * resize_x)
+        window_bounding_box.max_y += int(offsets[3] * resize_y)
 
     with mss.mss() as screenshot_taker:
         screenshot = screenshot_taker.grab(window_bounding_box.to_tuple())
@@ -524,7 +524,7 @@ def get_items() -> list:
     logger.debug(f"Found items at: {item_list}")
     return item_list
 
-def check_champion(wanted_traits: list) -> champion[str] | None:
+def check_champion(wanted_traits: list) -> str | None:
     """
     Checks if and what champion is displayed on the right-hand side of the screen. Should be used in combination with clicking to bench or board slot.
 
@@ -543,6 +543,9 @@ def check_champion(wanted_traits: list) -> champion[str] | None:
     min_x = league_bounding_box.min_x
     min_y = league_bounding_box.min_y
 
+    resize_x = width / 1920
+    resize_y = height / 1080
+
     region = (
         int(min_x + (1650 * resize_x)),
         int(min_y + (150 * resize_y)),
@@ -551,9 +554,9 @@ def check_champion(wanted_traits: list) -> champion[str] | None:
     )
 
     for trait in wanted_traits:
-        for champion in CONSTANTS["game"]["champions"][trait]:
+        for champion in CONSTANTS["game"]["champions"]["trait"][trait]:
             path = CONSTANTS["game"]["champions"]["full"][champion]
             if get_on_screen_in_game(path=path, precision=0.95, offsets=region) is not None:
-                return champion[str]
+                return champion
 
     return None

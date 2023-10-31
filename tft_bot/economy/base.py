@@ -25,8 +25,8 @@ class EconomyMode:
         self.wanted_traits = wanted_traits
         self.prioritized_order = prioritized_order
         self.items: list = []
-        self.level: int = GAME_CLIENT_INTEGRATION.get_level()
-        self.board_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["board"][:self.level]
+        # self.level: int = GAME_CLIENT_INTEGRATION.get_level()
+        # self.board_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["board"][:self.level]
         self.board_champions: list[str | None] = []
         self.bench_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["bench"][:]
         self.bench_champions: list[str | None] = []
@@ -145,9 +145,8 @@ class EconomyMode:
         Args:
             item_index: The index of the item, in order to determine its position
         """
-        from tft import GAME_CLIENT_INTEGRATION
         item = self.items[item_index]
-        targets = self.board_targets[:]
+        targets = self.get_board_targets()
 
         random.shuffle(targets)
         target_champion = random.choice(targets)
@@ -164,6 +163,20 @@ class EconomyMode:
         )
         hold_and_move_to(champion_offset.position_x, champion_offset.position_y)
         sleep(0.5)
+
+    def get_board_targets(self) -> list:
+        """
+        Checks current level and how many champions we expect there to be on the board.
+
+        Returns:
+        List of coordinates of board champions. Length is equal to current level/expected amount of champs.
+        """
+        from tft import GAME_CLIENT_INTEGRATION
+
+        level = GAME_CLIENT_INTEGRATION.get_level()
+        board_targets = CONSTANTS["game"]["coordinates"]["board"][:level]
+
+        return board_targets
 
     def check_bench(self) -> list:
         """
@@ -182,22 +195,23 @@ class EconomyMode:
             champion = check_champion(self.wanted_traits)
             self.bench_champions[self.bench_targets.index(coordinates)] = champion
 
-    def check_board(self) -> list:
+    def check_board(self) -> None:
         """
         Checks what champions are currently on the board.
 
         Returns:
         List of str or None. Length of list is equal to number of expected champions.
         """
-        self.board_champions = []
-        for coordinates in self.board_targets:
+        self.board_champions = [None] * 9
+        board_targets = self.get_board_targets()
+        for coordinates in board_targets:
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=coordinates[0], position_y=coordinates[1])
 
             click_to(position_x=point.position_x, position_y=point.position_y, action="right")
             sleep(0.5)
 
             champion = check_champion(self.wanted_traits)
-            self.board_champions[self.board_champions.index(coordinates)] = champion
+            self.board_champions[board_targets.index(coordinates)] = champion
 
     def bench_cleanup(self) -> None:
         """
@@ -208,9 +222,12 @@ class EconomyMode:
         """
         Sells all champions we don't want on the board.
         """
+        logger.info("trigger cleanup")
+        board_targets = self.get_board_targets()
+        self.check_board()
         for champion in self.board_champions:
             if champion is None:
                 index = self.board_champions.index(champion)
-                target = self.board_targets[index]
+                target = board_targets[index]
                 self.sell_unit(target)
                 sleep(0.5)

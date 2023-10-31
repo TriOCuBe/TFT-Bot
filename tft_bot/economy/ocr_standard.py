@@ -34,7 +34,7 @@ class OCRStandardEconomyMode(EconomyMode):
             sleep(0.5)
         elif num == 0:
             self.collect_items()
-        elif num == 3:
+        else:
             self.board_cleanup()
             sleep(0.5)
 

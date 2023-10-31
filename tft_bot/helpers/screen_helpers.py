@@ -553,10 +553,13 @@ def check_champion(wanted_traits: list) -> str | None:
         int(min_y + (400 * resize_y)),
     )
 
+    checked_champs = []
     for trait in wanted_traits:
         for champion in CONSTANTS["game"]["champions"]["trait"][trait]:
             path = CONSTANTS["game"]["champions"]["full"][champion]
-            if get_on_screen_in_game(path=path, precision=0.95, offsets=region) is not None:
-                return champion
+            if champion not in checked_champs:
+                if get_on_screen_in_game(path=path, precision=0.95, offsets=region) is not None:
+                    return champion
+            checked_champs.append(champion)
 
     return None

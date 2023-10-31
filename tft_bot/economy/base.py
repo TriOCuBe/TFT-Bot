@@ -184,12 +184,13 @@ class EconomyMode:
         List of str or None.
         """
         self.bench_champions = [None] * 9
+        safe_point = calculate_window_click_offset(CONSTANTS["window_titles"]["game"], position_x=430, position_y=625)
         for coordinates in self.bench_targets:
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=coordinates[0], position_y=coordinates[1])
 
             click_to(position_x=point.position_x, position_y=point.position_y, action="right")
+            click_to(position_x=safe_point.position_x, position_y=safe_point.position_y, action="right")
             sleep(0.5)
-            click_to(position_x=point.position_x, position_y=point.position_y-100, action="right")
 
             champion = check_champion(self.wanted_traits)
             self.bench_champions[self.bench_targets.index(coordinates)] = champion

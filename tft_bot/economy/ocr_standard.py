@@ -35,7 +35,7 @@ class OCRStandardEconomyMode(EconomyMode):
         elif num == 0:
             self.collect_items()
         else:
-            self.board_cleanup()
+            self.bench_cleanup()
             sleep(0.5)
 
         # just buy champs till then. no other spendings

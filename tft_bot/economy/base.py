@@ -25,8 +25,6 @@ class EconomyMode:
         self.wanted_traits = wanted_traits
         self.prioritized_order = prioritized_order
         self.items: list = []
-        # self.level: int = GAME_CLIENT_INTEGRATION.get_level()
-        # self.board_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["board"][:self.level]
         self.board_champions: list[str | None] = []
         self.bench_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["bench"][:]
         self.bench_champions: list[str | None] = []
@@ -183,7 +181,7 @@ class EconomyMode:
         Checks what champions are currently on the bench.
 
         Returns:
-        List of str or None. Length of list is equal to number of expected champions.
+        List of str or None.
         """
         self.bench_champions = []
         for coordinates in self.bench_targets:
@@ -217,12 +215,18 @@ class EconomyMode:
         """
         Sells all champions we don't want on the bench.
         """
+        self.check_bench()
+        for champion in self.bench_champions:
+            if champion is None:
+                index = self.bench_champions.index(champion)
+                target = self.bench_targets[index]
+                self.sell_unit(target)
+                sleep(0.5)
 
     def board_cleanup(self) -> None:
         """
         Sells all champions we don't want on the board.
         """
-        logger.info("trigger cleanup")
         board_targets = self.get_board_targets()
         self.check_board()
         for champion in self.board_champions:

@@ -26,6 +26,7 @@ from tft_bot.helpers import system_helpers
 from tft_bot.helpers.click_helpers import click_to
 from tft_bot.helpers.click_helpers import click_to_image
 from tft_bot.helpers.click_helpers import move_to
+from tft_bot.helpers.click_helpers import press
 from tft_bot.helpers.screen_helpers import calculate_window_click_offset
 from tft_bot.helpers.screen_helpers import check_league_game_size
 from tft_bot.helpers.screen_helpers import get_board_positions
@@ -550,6 +551,8 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             break
 
         minimum_round = determine_minimum_round()
+        press('space')
+        
         # Free champ round
         if minimum_round > 1 and get_on_screen_in_game(CONSTANTS["game"]["round"]["draft_active"], 0.95):
             logger.info("Active draft detected, pathing to carousel")

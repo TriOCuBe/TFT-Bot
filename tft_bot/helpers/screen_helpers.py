@@ -180,13 +180,12 @@ def get_on_screen_in_game(
     Check if a given image is detected on screen, but only check the league game window.
 
     Args:
-        path: The relative or absolute path to the image to be found.
-        precision: The precision to be used when matching the image. Defaults to 0.8.
-        offsets: A bounding box to off-set the region by. Useful if you only want to check a specific region.
-          Defaults to None.
+    path: The relative or absolute path to the image to be found.
+    precision: The precision to be used when matching the image. Defaults to 0.8.
+    offsets: A bounding box to off-set the region by. Useful if you only want to check a specific region. Defaults to None.
 
     Returns:
-        The position of the image and it's width and height or None if it wasn't found
+    The position of the image and it's width and height or None if it wasn't found
     """
     return get_on_screen(
         window_title=CONSTANTS["window_titles"]["game"], path=path, precision=precision, offsets=offsets
@@ -200,14 +199,13 @@ def get_on_screen(
     Check if a given image is detected on screen in a specific window's area.
 
     Args:
-        window_title: The title of the window we should look at.
-        path: The relative or absolute path to the image to be found.
-        precision: The precision to be used when matching the image. Defaults to 0.8.
-        offsets: A bounding box to off-set the region by. Useful if you only want to check a specific region.
-          Defaults to None.
+    window_title: The title of the window we should look at.
+    path: The relative or absolute path to the image to be found.
+    precision: The precision to be used when matching the image. Defaults to 0.8.
+    offsets: A bounding box to off-set the region by. Useful if you only want to check a specific region. Defaults to None.
 
     Returns:
-        The position of the image and it's width and height or None if it wasn't found
+    The position of the image and it's width and height or None if it wasn't found
     """
     window_bounding_box = get_window_bounding_box(window_title=window_title)
     if not window_bounding_box:
@@ -222,8 +220,14 @@ def get_on_screen(
         width = window_bounding_box.get_width()
         height = window_bounding_box.get_height()
 
-        resize_x = width / 1920
-        resize_y = height / 1080
+        resize_x = 1
+        resize_y = 1
+        if window_title == CONSTANTS["window_titles"]["game"]:
+            resize_x = width / 1920
+            resize_y = height / 1080
+        elif window_title == CONSTANTS["window_titles"]["client"]:
+            resize_x = width / 1280
+            resize_y = height / 720
 
         window_bounding_box.min_x += int(offsets.min_x * resize_x)
         window_bounding_box.min_y += int(offsets.min_y * resize_y)
@@ -282,19 +286,14 @@ def get_round_with_ocr(tesseract_location) -> str | None:
     Returns:
         The current round as a string or None if it can't identify anything
     """
-    # league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
-    # if not league_bounding_box:
-    #     return 0
+    league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
+    if not league_bounding_box:
+        return 0
 
-    # width = league_bounding_box.get_width()
-    # height = league_bounding_box.get_height()
-    # min_x = league_bounding_box.min_x
-    # min_y = league_bounding_box.min_y
-
-    width = 1600
-    height = 900
-    min_x = 0
-    min_y = 0
+    width = league_bounding_box.get_width()
+    height = league_bounding_box.get_height()
+    min_x = league_bounding_box.min_x
+    min_y = league_bounding_box.min_y
 
     resize_x = width / 1920
     resize_y = height / 1080
@@ -524,3 +523,37 @@ def get_items() -> list:
 
     logger.debug(f"Found items at: {item_list}")
     return item_list
+
+def check_champion(wanted_traits: list) -> champion[str] | None:
+    """
+    Checks if and what champion is displayed on the right-hand side of the screen. Should be used in combination with clicking to bench or board slot.
+
+    Args:
+    wanted_traits: List of traits we are searching for.
+
+    Returns:
+    Name of detected champ as string or None if nothing was found. (Currently only void and sorcerer champs can be found)
+    """
+    league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
+    if not league_bounding_box:
+        return 0
+
+    width = league_bounding_box.get_width()
+    height = league_bounding_box.get_height()
+    min_x = league_bounding_box.min_x
+    min_y = league_bounding_box.min_y
+
+    region = (
+        int(min_x + (1650 * resize_x)),
+        int(min_y + (150 * resize_y)),
+        int(min_x + (1920 * resize_x)),
+        int(min_y + (400 * resize_y)),
+    )
+
+    for trait in wanted_traits:
+        for champion in CONSTANTS["game"]["champions"][trait]:
+            path = CONSTANTS["game"]["champions"]["full"][champion]
+            if get_on_screen_in_game(path=path, precision=0.95, offsets=region) is not None:
+                return champion[str]
+
+    return None

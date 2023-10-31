@@ -1,13 +1,13 @@
 """
 Module holding the base economy mode blueprint class.
 """
-import time
+from time import sleep
 import random
 from loguru import logger
 
 from tft_bot.constants import CONSTANTS
 from tft_bot.helpers.click_helpers import click_to, click_to_image, move_to, hold_and_move_to, press
-from tft_bot.helpers.screen_helpers import get_on_screen_in_game, calculate_window_click_offset, get_items
+from tft_bot.helpers.screen_helpers import get_on_screen_in_game, calculate_window_click_offset, get_items, check_champion
 
 
 class EconomyMode:
@@ -25,6 +25,11 @@ class EconomyMode:
         self.wanted_traits = wanted_traits
         self.prioritized_order = prioritized_order
         self.items: list = []
+        self.level: int = GAME_CLIENT_INTEGRATION.get_level()
+        self.board_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["board"][:self.level]
+        self.board_champions: list[str | None] = []
+        self.bench_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["bench"][:]
+        self.bench_champions: list[str | None] = []
 
     def loop_decision(self, minimum_round: int) -> None:
         """
@@ -45,43 +50,27 @@ class EconomyMode:
         for _ in range(amount):
             for trait in self.wanted_traits:
                 if click_to_image(image_search_result=get_on_screen_in_game(CONSTANTS["game"]["trait"][trait])):
-                    time.sleep(0.5)
+                    sleep(0.5)
                 elif self.prioritized_order:
                     return
 
-    def sell_units(self, amount: int) -> None:
-        # y=780, x=400 + 130 * 8 (total 9)
+    def sell_unit(self, coordinates: tuple[int, int], calculate_offset: bool = True) -> None:
         """
-        Attempts to sell a random unit on the bench.
+        Attempts to sell a unit.
 
         Args:
-            amount: The amount of units to sell.
+        coordinates: Coordinates of the champion to sell in a tuple
+        calculate_offset: Wether to calculate the offset of the given coordinates or not. Defaults to True
         """
-        points = CONSTANTS["game"]["coordinates"]["bench"][:]
-        for i in range(len(points)):
-            point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=points[i][0], position_y=points[i][1])
-            points[i] = (point.position_x, point.position_y)
+        if calculate_offset:
+            point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=coordinates[0], position_y=coordinates[1])
+            coordinates = (point.position_x, point.position_y)
 
-        for _ in range(amount):
-            # this block removes used points, so the same slot can't be picked multiple times
-            index = random.randint(0, len(points)-1)
-            point = points[index]
-            points.remove(point)
+        move_to(position_x=coordinates[0], position_y=coordinates[1])
+        sleep(0.5)
 
-            move_to(position_x=point[0], position_y=point[1])
-            if random.randint(0, 1) == 1:
-                sell_offset = calculate_window_click_offset(
-                    window_title=CONSTANTS["window_titles"]["game"], position_x=random.randint(850, 1000), position_y=980
-                )
-                hold_and_move_to(sell_offset.position_x, sell_offset.position_y)
-            else:
-                time.sleep(0.5)
-                press('E')  # hotkey for sell
-                # since this doesn't always seem to work, do it twice to be sure
-                time.sleep(0.5)
-                press('E')
-
-            time.sleep(0.5)
+        sell_offset = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=random.randint(800, 1300), position_y=980)
+        hold_and_move_to(sell_offset.position_x, sell_offset.position_y)
 
     def roll(self) -> None:
         """
@@ -124,7 +113,7 @@ class EconomyMode:
         random.shuffle(checkpoint_list)
         for point in checkpoint_list:
             click_to(position_x=point.position_x, position_y=point.position_y, action="right")
-            time.sleep(4)
+            sleep(4)
 
     def walk_random(self) -> None:
         """
@@ -148,6 +137,7 @@ class EconomyMode:
             if self.items[index] is not None:
                 self.add_item_to_champ(index)
 
+    # cont
     def add_item_to_champ(self, item_index: int) -> None:
         """
         Take given item and add it to random champ on board.
@@ -157,14 +147,7 @@ class EconomyMode:
         """
         from tft import GAME_CLIENT_INTEGRATION
         item = self.items[item_index]
-        targets = CONSTANTS["game"]["coordinates"]["board"][:]
-        expected_champions = GAME_CLIENT_INTEGRATION.get_level()
-
-        # remove as many locations as our level is from 9
-        # the list is in the order in which the game auto places the champions
-        diff = 9 - expected_champions
-        for x in range(diff):
-            del targets[8-x]
+        targets = self.board_targets[:]
 
         random.shuffle(targets)
         target_champion = random.choice(targets)
@@ -174,10 +157,60 @@ class EconomyMode:
 
         # don't need to calculate offset as the coordinates in the list were already run through that in get_items()
         move_to(item[0], item[1])
-        time.sleep(0.5)
+        sleep(0.5)
 
         champion_offset = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], position_x=target_champion[0], position_y=target_champion[1]
         )
         hold_and_move_to(champion_offset.position_x, champion_offset.position_y)
-        time.sleep(0.5)
+        sleep(0.5)
+
+    def check_bench(self) -> list:
+        """
+        Checks what champions are currently on the bench.
+
+        Returns:
+        List of str or None. Length of list is equal to number of expected champions.
+        """
+        self.bench_champions = []
+        for coordinates in self.bench_targets:
+            point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=coordinates[0], position_y=coordinates[1])
+
+            click_to(position_x=point.position_x, position_y=point.position_y, action="right")
+            sleep(0.5)
+
+            champion = check_champion(self.wanted_traits)
+            self.bench_champions[self.bench_targets.index(coordinates)] = champion
+
+    def check_board(self) -> list:
+        """
+        Checks what champions are currently on the board.
+
+        Returns:
+        List of str or None. Length of list is equal to number of expected champions.
+        """
+        self.board_champions = []
+        for coordinates in self.board_targets:
+            point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=coordinates[0], position_y=coordinates[1])
+
+            click_to(position_x=point.position_x, position_y=point.position_y, action="right")
+            sleep(0.5)
+
+            champion = check_champion(self.wanted_traits)
+            self.board_champions[self.board_champions.index(coordinates)] = champion
+
+    def bench_cleanup(self) -> None:
+        """
+        Sells all champions we don't want on the bench.
+        """
+
+    def board_cleanup(self) -> None:
+        """
+        Sells all champions we don't want on the board.
+        """
+        for champion in self.board_champions:
+            if champion is None:
+                index = self.board_champions.index(champion)
+                target = self.board_targets[index]
+                self.sell_unit(target)
+                sleep(0.5)

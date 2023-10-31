@@ -27,17 +27,6 @@ class OCRStandardEconomyMode(EconomyMode):
         sleep(0.5)
 
         self.purchase_units(amount=3)
-        # if minimum_round == 1 or (gold >= 5 and minimum_round == 2):
-        #     self.purchase_units(amount=3)
-        #     time.sleep(0.5)
-        #     return event
-        # elif gold >= 35 and minimum_round <= 3:
-        #     self.purchase_units(amount=3)
-        #     if random.randint(0, 3) == 1:
-        #         self.sell_units(amount=2)
-        #     return event
-        # elif gold >= 55:
-        #     self.purchase_units(amount=3)
 
         num = random.randint(0, 14)
         if (num == 1 or num == 2) and get_item_config():
@@ -50,8 +39,9 @@ class OCRStandardEconomyMode(EconomyMode):
         if minimum_round <= 2:
             return
 
-        if random.randint(0, 3) == 1:
-            self.sell_units(amount=1)
+        if random.randint(0, 10) == 1:
+            self.board_cleanup
+            sleep(0.5)
 
         gold = screen_helpers.get_gold_with_ocr()
         logger.debug(f"OCR recognized {gold} gold")

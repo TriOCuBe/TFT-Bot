@@ -532,7 +532,7 @@ def determine_minimum_round() -> tuple[bool, int]:
         if current_round is not None:
             # take first element of string and turn it into int
             # return int(current_round[0])
-            return (True, current_round)
+            return (True, int(current_round))
 
     logger.debug("Could not determine minimum round, returning 0.")
     return (False, 0)

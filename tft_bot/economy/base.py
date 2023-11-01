@@ -144,12 +144,7 @@ class EconomyMode:
         """
         item = self.items[item_index]
         targets = self.get_board_targets()
-
-        random.shuffle(targets)
         target_champion = random.choice(targets)
-
-        logger.debug(f"Recognizing {len(targets)} champions")
-        logger.debug(f"Moving item to target {targets.index(target_champion)} with coordinates {target_champion}")
 
         # don't need to calculate offset as the coordinates in the list were already run through that in get_items()
         move_to(item[0], item[1])

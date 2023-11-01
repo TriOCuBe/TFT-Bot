@@ -67,8 +67,11 @@ class EconomyMode:
         move_to(position_x=coordinates[0], position_y=coordinates[1])
         sleep(0.5)
 
-        sell_offset = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=random.randint(800, 1300), position_y=980)
-        hold_and_move_to(sell_offset.position_x, sell_offset.position_y)
+        if random.randint(0, 1) == 1:
+            sell_offset = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=random.randint(800, 1300), position_y=980)
+            hold_and_move_to(sell_offset.position_x, sell_offset.position_y)
+        else:
+            press('E')
 
     def roll(self) -> None:
         """

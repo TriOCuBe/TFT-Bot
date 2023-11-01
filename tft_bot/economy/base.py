@@ -218,13 +218,14 @@ class EconomyMode:
         Sells all champions we don't want on the bench.
         """
         bench_champions = self.check_bench()
+        index = 0
         for champion in bench_champions:
             if champion is None:
-                index = self.bench_champions.index(champion)
                 target = self.bench_targets[index]
                 self.sell_unit(target)
                 sleep(0.5)
                 logger.info(f"Sold champion with index {index} and coordinates {target}")
+            index += 1
         logger.info(f"list of bench champs: {bench_champions}")
 
     def board_cleanup(self) -> None:

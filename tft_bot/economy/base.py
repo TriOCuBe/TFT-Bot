@@ -25,7 +25,6 @@ class EconomyMode:
         self.wanted_traits = wanted_traits
         self.prioritized_order = prioritized_order
         self.items: list = []
-        self.board_champions: list[str | None] = []
         self.bench_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["bench"][:]
 
     def loop_decision(self, minimum_round: int) -> None:
@@ -202,16 +201,17 @@ class EconomyMode:
         Returns:
         List of str or None. Length of list is equal to number of expected champions.
         """
-        self.board_champions = [None] * 9
+        board_champions = []
         board_targets = self.get_board_targets()
         for coordinates in board_targets:
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=coordinates[0], position_y=coordinates[1])
 
             click_to(position_x=point.position_x, position_y=point.position_y, action="right")
-            sleep(0.5)
 
             champion = check_champion(self.wanted_traits)
-            self.board_champions[board_targets.index(coordinates)] = champion
+            board_champions.append(champion)
+
+        return board_champions
 
     def bench_cleanup(self) -> None:
         """
@@ -224,19 +224,18 @@ class EconomyMode:
                 target = self.bench_targets[index]
                 self.sell_unit(target)
                 sleep(0.5)
-                logger.info(f"Sold champion with index {index} and coordinates {target}")
             index += 1
-        logger.info(f"list of bench champs: {bench_champions}")
 
     def board_cleanup(self) -> None:
         """
         Sells all champions we don't want on the board.
         """
+        board_champions = self.check_board()
         board_targets = self.get_board_targets()
-        self.check_board()
-        for champion in self.board_champions:
+        index = 0
+        for champion in board_champions:
             if champion is None:
-                index = self.board_champions.index(champion)
                 target = board_targets[index]
                 self.sell_unit(target)
                 sleep(0.5)
+            index += 1

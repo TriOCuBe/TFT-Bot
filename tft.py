@@ -485,49 +485,57 @@ def check_if_post_game() -> bool:
     return attempt_reconnect_to_existing_game()
 
 
-def determine_minimum_round() -> int:
+def determine_minimum_round() -> tuple[bool, int]:
     """
     Determines minimum round we are at.
     Prioritizes PvE markers, falls back to the round display.
 
     Returns:
-        The major round as an integer.
-
+    If OCR is turned on, return (True, round) with the round being the exact round (like 11 or 35).
+    If OCR is turned off, returns (False, minimum_round) with minimum_round being the major round (like 1, 3, 4).
+    If the round isn't determined, returns (False, 0)
     """
     from tft_bot.config import get_tesseract_location
     if not config.get_round_ocr_config() or get_tesseract_location is None:
+        output = 0
+
         if get_on_screen_in_game(CONSTANTS["game"]["round"]["krugs_inactive"], 0.9) or get_on_screen_in_game(
             CONSTANTS["game"]["round"]["krugs_active"], 0.9
         ):
-            return 2
+            output = 2
 
         if get_on_screen_in_game(CONSTANTS["game"]["round"]["wolves_inactive"], 0.9) or get_on_screen_in_game(
             CONSTANTS["game"]["round"]["wolves_active"], 0.9
         ):
-            return 3
+            output = 3
 
         if get_on_screen_in_game(CONSTANTS["game"]["round"]["birds_inactive"], 0.9) or get_on_screen_in_game(
             CONSTANTS["game"]["round"]["birds_active"], 0.9
         ):
-            return 4
+            output = 4
 
         if get_on_screen_in_game(CONSTANTS["game"]["round"]["elder_dragon_inactive"], 0.9) or get_on_screen_in_game(
             CONSTANTS["game"]["round"]["elder_dragon_active"], 0.9
         ):
-            return 5
+            output = 5
 
-        for i in range(1, 7):
-            if get_on_screen_in_game(CONSTANTS["game"]["round"][f"{i}-"]):
-                return i
+        if output == 0:
+            for i in range(1, 7):
+                if get_on_screen_in_game(CONSTANTS["game"]["round"][f"{i}-"]):
+                    output = i
+                    break
+
+        return (False, output)
     
     else:
         current_round = get_round_with_ocr(tesseract_location=get_tesseract_location(system_helpers=system_helpers))
         if current_round is not None:
             # take first element of string and turn it into int
-            return int(current_round[0])
+            # return int(current_round[0])
+            return (True, current_round)
 
     logger.debug("Could not determine minimum round, returning 0.")
-    return 0
+    return (False, 0)
 
 
 def main_game_loop(economy_mode: EconomyMode) -> None:
@@ -540,6 +548,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
     Skips 5-second increments if a pause logic request is made,
     repeating until toggled or an event triggers an early exit.
     """
+    prev_round = 0
     while True:
         if PAUSE_LOGIC:
             time.sleep(5)
@@ -550,11 +559,12 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             match_complete()
             break
 
-        minimum_round = determine_minimum_round()
+        current_round = determine_minimum_round()[1]
+        major_round = current_round[0]
         press('space')
         
         # Free champ round
-        if minimum_round > 1 and get_on_screen_in_game(CONSTANTS["game"]["round"]["draft_active"], 0.95):
+        if major_round > 1 and get_on_screen_in_game(CONSTANTS["game"]["round"]["draft_active"], 0.95):
             logger.info("Active draft detected, pathing to carousel")
             shared_draft_pathing()
             continue
@@ -566,14 +576,17 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             )
             click_to(position_x=augment_offset.position_x, position_y=augment_offset.position_y)
             time.sleep(3)
-
-            # commented out since i dont know why this is done, and perfomance boost
-            # logger.debug(f"Board positions: {get_board_positions()}")
             continue
+    
+        if prev_round != current_round and current_round != 0:
+            event = True
+        else:
+            event = False
 
-        economy_mode.loop_decision(minimum_round=minimum_round)
+        economy_mode.loop_decision(current_round=current_round, event=event, item_config=get_item_config())
+        prev_round = current_round
 
-        if minimum_round >= 3 and config.forfeit_early():
+        if major_round >= 3 and config.forfeit_early():
             logger.info("Attempting to surrender early")
             surrender()
             break

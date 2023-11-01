@@ -16,17 +16,20 @@ class DefaultEconomyMode(EconomyMode):
     Default economy mode implementation.
     """
 
-    def loop_decision(self, current_round: int, event: bool, item_config: bool):
-        if event:
-            num = random.randint(0, 3 if item_config else 2)
-            if num == 0:
+    def loop_decision(self, current_round: int, event: bool):
+        if event != 0:
+            if event == 1:
                 self.bench_cleanup()
-            elif num == 1:
-                self.board_cleanup()
-            elif num == 2:
+                logger.debug("Triggered event bench_cleanup")
+            elif event == 2:
+                self.board_cleanup(current_round=current_round)
+                logger.debug("Triggered event board_cleanup")
+            elif event == 3:
                 self.collect_items()
-            else:
+                logger.debug("Triggered event collect_items")
+            elif event == 4:
                 self.place_items()
+                logger.debug("Triggered event place_items")
             return
 
         self.walk_random()

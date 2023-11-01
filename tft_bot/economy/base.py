@@ -3,6 +3,7 @@ Module holding the base economy mode blueprint class.
 """
 from time import sleep
 import random
+import keyboard
 from loguru import logger
 
 from tft_bot.constants import CONSTANTS
@@ -27,12 +28,13 @@ class EconomyMode:
         self.items: list = []
         self.bench_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["bench"][:]
 
-    def loop_decision(self, minimum_round: int) -> None:
+    def loop_decision(self, minimum_round: int, event: int) -> None:
         """
         Method to be called by the main game loop for the mode to make a decision.
 
         Args:
-            minimum_round: The n-th round (N-*) we are at.
+        minimum_round: The n-th round (N-*) we are at.
+        event: What event to trigger. No event if event == 0
         """
         raise NotImplementedError
 
@@ -97,15 +99,12 @@ class EconomyMode:
             window_title=CONSTANTS["window_titles"]["game"], position_x=1300, position_y=650
         )
         checkpoint3 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=1300, position_y=300
+            window_title=CONSTANTS["window_titles"]["game"], position_x=1250, position_y=250
         )
         checkpoint4 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=550, position_y=300
+            window_title=CONSTANTS["window_titles"]["game"], position_x=600, position_y=250
         )
-        logger.info("Running around, trying to collect items")
-
         checkpoint_list = [checkpoint1, checkpoint2, checkpoint3, checkpoint4]
-        # for i in range(2):
         random.shuffle(checkpoint_list)
         for point in checkpoint_list:
             click_to(position_x=point.position_x, position_y=point.position_y, action="right")
@@ -222,16 +221,31 @@ class EconomyMode:
                 sleep(0.5)
             index += 1
 
-    def board_cleanup(self) -> None:
+    def board_cleanup(self, current_round: int) -> None:
         """
         Sells all champions we don't want on the board.
         """
+        ocr_round = False
+        # if we are using ocr, we get rounds as double digits (12, 34, 55 etc). That means if the int is > 8, we are using ocr
+        if current_round > 8:
+            ocr_round = True
+
         board_champions = self.check_board()
         board_targets = self.get_board_targets()
+        
+        known_champions = []
         index = 0
         for champion in board_champions:
             if champion is None:
                 target = board_targets[index]
                 self.sell_unit(target)
-                sleep(0.5)
+                sleep(0.1)
+
+            # this sells duplicate champs, even if they have the trait we want. Only triggers round 4 onwards
+            elif (ocr_round and current_round > 40) or (not ocr_round and current_round > 3) and champion in known_champions:
+                target = board_targets[index]
+                self.sell_unit(target)
+                sleep(0.1)
+            
+            known_champions.append(champion)
             index += 1

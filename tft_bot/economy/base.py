@@ -27,7 +27,6 @@ class EconomyMode:
         self.items: list = []
         self.board_champions: list[str | None] = []
         self.bench_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["bench"][:]
-        self.bench_champions: list[str | None] = []
 
     def loop_decision(self, minimum_round: int) -> None:
         """
@@ -176,24 +175,25 @@ class EconomyMode:
 
         return board_targets
 
-    def check_bench(self) -> list:
+    def check_bench(self) -> None:
         """
         Checks what champions are currently on the bench.
 
         Returns:
         List of str or None.
         """
-        self.bench_champions = [None] * 9
-        safe_point = calculate_window_click_offset(CONSTANTS["window_titles"]["game"], position_x=430, position_y=625)
+        bench_champions = []
+        safe_point = calculate_window_click_offset(CONSTANTS["window_titles"]["game"], position_x=800, position_y=625)
         for coordinates in self.bench_targets:
             point = calculate_window_click_offset(window_title=CONSTANTS["window_titles"]["game"], position_x=coordinates[0], position_y=coordinates[1])
 
             click_to(position_x=point.position_x, position_y=point.position_y, action="right")
             click_to(position_x=safe_point.position_x, position_y=safe_point.position_y, action="right")
-            sleep(0.5)
 
             champion = check_champion(self.wanted_traits)
-            self.bench_champions[self.bench_targets.index(coordinates)] = champion
+            bench_champions.append(champion)
+
+        return bench_champions
 
     def check_board(self) -> None:
         """
@@ -217,15 +217,15 @@ class EconomyMode:
         """
         Sells all champions we don't want on the bench.
         """
-        self.check_bench()
-        for champion in self.bench_champions:
+        bench_champions = self.check_bench()
+        for champion in bench_champions:
             if champion is None:
                 index = self.bench_champions.index(champion)
                 target = self.bench_targets[index]
                 self.sell_unit(target)
                 sleep(0.5)
                 logger.info(f"Sold champion with index {index} and coordinates {target}")
-        logger.info(f"list of bench champs: {self.bench_champions}")
+        logger.info(f"list of bench champs: {bench_champions}")
 
     def board_cleanup(self) -> None:
         """

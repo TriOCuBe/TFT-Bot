@@ -515,8 +515,16 @@ def get_items() -> list:
         # item_name = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG_ITEMS)
 
         # item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": valid_item(item_name)})
+        region = (
+            0,
+            540,
+            500,
+            0
+        )
 
-        if get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["recipe"]) or get_on_screen_in_game(CONSTANTS["game"]["gamelogic"]["emblem"]):
+        if get_on_screen_in_game(
+            CONSTANTS["game"]["gamelogic"]["recipe"], offsets=region) or get_on_screen_in_game(
+            CONSTANTS["game"]["gamelogic"]["emblem"], offsets=region):
             item_list.append((offset.position_x, offset.position_y))
         else:
             item_list.append(None)

@@ -586,6 +586,8 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
         else:
             event = 0
 
+        logger.info(f"current event: {event}")
+
         economy_mode.loop_decision(current_round=current_round, event=event)
         prev_round = current_round
 

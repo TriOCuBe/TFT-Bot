@@ -16,16 +16,9 @@ def click(delay=0.1, button="left") -> None:
         button (str, optional): Button of the mouse to activate : "left" "right" "middle",
             see pyautogui.click documentation for more info. Defaults to "left".
     """
-    if action == "right":
-        # holding a button allows right clicks to move the character even when clicking on a champion. This way we ensure that we actually move to the points.
-        keyboard.press('S')
-    
     mouse.down(button=button)
     time.sleep(delay)
     mouse.up(button=button)
-    
-    if action == "right":
-        keyboard.release('S')
 
 
 def move_to(

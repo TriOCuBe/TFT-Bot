@@ -583,7 +583,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
         else:
             event = False
 
-        economy_mode.loop_decision(current_round=current_round, event=event, item_config=get_item_config())
+        economy_mode.loop_decision(current_round=current_round, event=event, item_config=config.get_item_config())
         prev_round = current_round
 
         if major_round >= 3 and config.forfeit_early():

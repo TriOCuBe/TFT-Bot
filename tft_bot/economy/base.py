@@ -91,16 +91,16 @@ class EconomyMode:
         Runs a circle (square) around the map, trying to collect items on the way.
         """
         checkpoint1 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=650
+            window_title=CONSTANTS["window_titles"]["game"], position_x=550, position_y=650
         )
         checkpoint2 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=650
+            window_title=CONSTANTS["window_titles"]["game"], position_x=1300, position_y=650
         )
         checkpoint3 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=1400, position_y=300
+            window_title=CONSTANTS["window_titles"]["game"], position_x=1300, position_y=300
         )
         checkpoint4 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=500, position_y=300
+            window_title=CONSTANTS["window_titles"]["game"], position_x=550, position_y=300
         )
         logger.info("Running around, trying to collect items")
 
@@ -109,7 +109,7 @@ class EconomyMode:
         random.shuffle(checkpoint_list)
         for point in checkpoint_list:
             click_to(position_x=point.position_x, position_y=point.position_y, action="right")
-            sleep(4)
+            sleep(2.5)
 
     def walk_random(self) -> None:
         """
@@ -143,12 +143,7 @@ class EconomyMode:
         """
         item = self.items[item_index]
         targets = self.get_board_targets()
-
-        random.shuffle(targets)
         target_champion = random.choice(targets)
-
-        logger.debug(f"Recognizing {len(targets)} champions")
-        logger.debug(f"Moving item to target {targets.index(target_champion)} with coordinates {target_champion}")
 
         # don't need to calculate offset as the coordinates in the list were already run through that in get_items()
         move_to(item[0], item[1])

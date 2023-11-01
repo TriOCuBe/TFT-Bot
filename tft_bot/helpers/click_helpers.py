@@ -39,7 +39,7 @@ def move_to(
     # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
     position_x = position_x + random.randint(0, 2)
     position_y = position_y + random.randint(0, 2)
-    mouse.move(position_x, position_y)
+    mouse.move(position_x, position_y, multiplier=0.8)
 
 
 def click_to(

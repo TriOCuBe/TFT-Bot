@@ -44,7 +44,7 @@ class OCRStandardEconomyMode(EconomyMode):
             sleep(0.5)
         elif num == 0:
             self.collect_items()
-        else:
+        elif num == 3 or num == 4:
             self.bench_cleanup()
             sleep(0.5)
 

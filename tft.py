@@ -578,7 +578,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             time.sleep(3)
             continue
     
-        if prev_round != current_round and prev_round != 0 and current_round != 0:
+        if prev_round != current_round and prev_round != 0 and current_round != 0 and current_round not in [1, 11, 12, 13, 14]:
             event += 1
             if (event >= 4 and not config.get_item_config()) or event >= 5:
                 event = 1

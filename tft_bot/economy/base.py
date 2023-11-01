@@ -96,7 +96,7 @@ class EconomyMode:
         Runs a circle (square) around the map, trying to collect items on the way.
         """
         checkpoint1 = calculate_window_click_offset(
-            window_title=CONSTANTS["window_titles"]["game"], position_x=550, position_y=650
+            window_title=CONSTANTS["window_titles"]["game"], position_x=550, position_y=620
         )
         checkpoint2 = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], position_x=1300, position_y=650
@@ -144,7 +144,7 @@ class EconomyMode:
             item_index: The index of the item, in order to determine its position
         """
         item = self.items[item_index]
-        targets = self.get_board_targets()
+        targets = self.get_board_targets()[2:]
         target_champion = random.choice(targets)
 
         # don't need to calculate offset as the coordinates in the list were already run through that in get_items()
@@ -167,7 +167,7 @@ class EconomyMode:
         from tft import GAME_CLIENT_INTEGRATION
 
         level = GAME_CLIENT_INTEGRATION.get_level()
-        board_targets = CONSTANTS["game"]["coordinates"]["board"][:level]
+        board_targets = CONSTANTS["game"]["coordinates"]["board"][:level + 2]
 
         return board_targets
 

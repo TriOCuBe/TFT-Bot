@@ -560,7 +560,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             break
 
         current_round = determine_minimum_round()[1]
-        major_round = current_round[0]
+        major_round = int(str(current_round)[0])
         press('space')
         
         # Free champ round
@@ -578,7 +578,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
             time.sleep(3)
             continue
     
-        if prev_round != current_round and current_round != 0:
+        if prev_round != current_round and prev_round != 0 and current_round != 0:
             event = True
         else:
             event = False

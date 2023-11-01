@@ -39,13 +39,13 @@ def move_to(
     # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
     position_x = position_x + random.randint(0, 2)
     position_y = position_y + random.randint(0, 2)
-    mouse.move(position_x, position_y, multiplier=0.8)
+    mouse.move(position_x, position_y, multiplier=0.6)
 
 
 def click_to(
     position_x: int,
     position_y: int,
-    delay: float = 0.2,
+    delay: float = 0.1,
     action: str = "left",
 ) -> None:
     """
@@ -109,9 +109,9 @@ def hold_and_move_to(position_x: int, position_y: int, action: str = "left"):
         action: The mouse button to perform. Defaults to "left".
     """
     mouse.down(button=action)
-    time.sleep(random.randint(1, 5)/10)
+    time.sleep(0.1)
     move_to(position_x, position_y)
-    time.sleep(random.randint(1, 5)/10)
+    time.sleep(0.1)
     mouse.up(button=action)
 
 def press(key: str) -> None:

@@ -549,7 +549,7 @@ def main_game_loop(economy_mode: EconomyMode) -> None:
     repeating until toggled or an event triggers an early exit.
     """
     prev_round = 0
-    pre_event = 0
+    prev_event = 0
     while True:
         if PAUSE_LOGIC:
             time.sleep(5)

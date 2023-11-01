@@ -21,7 +21,7 @@ class OCRStandardEconomyMode(EconomyMode):
         pytesseract.tesseract_cmd = tesseract_location
 
     def loop_decision(self, current_round: int, event: bool, item_config: bool):
-        if event and random.randint(0, 1) == 1:
+        if event and random.randint(0, 4) == 1:
             num = random.randint(0, 3 if item_config else 2)
             if num == 0:
                 self.bench_cleanup()

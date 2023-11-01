@@ -547,23 +547,27 @@ def check_champion(wanted_traits: list) -> str | None:
     resize_y = height / 1080
 
     region = (
-        int(min_x + (1690 * resize_x)),
-        int(min_y + (330 * resize_y)),
-        int(min_x + (1800 * resize_x)),
-        int(min_y + (375 * resize_y)),
+        int(min_x + (1650 * resize_x)),
+        int(min_y + (315 * resize_y)),
+        int(min_x + (1840 * resize_x)),
+        int(min_y + (390 * resize_y)),
     )
     
     with mss.mss() as screenshot_taker:
         screenshot = screenshot_taker.grab(region)
+        # screenshot = Image.frombytes('RGB', screenshot.size, screenshot.bgra, 'raw', 'BGRX').tobytes()
+        # screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2BGR)
 
     pixels = numpy.array(screenshot)
+    gray_scaled = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
 
     checked_champs = []
     for trait in wanted_traits:
         for champion in CONSTANTS["game"]["champions"]["trait"][trait]:
             path = CONSTANTS["game"]["champions"]["full"][champion]
+            champ_img = cv2.imread(path, 0)
             if champion not in checked_champs:
-                search_result = cv2.matchTemplate(pixels, path, cv2.TM_CCOEFF_NORMED)
+                search_result = cv2.matchTemplate(gray_scaled, champ_img, cv2.TM_CCOEFF_NORMED)
                 _, max_precision, _, max_location = cv2.minMaxLoc(search_result)
                 if max_precision > 0.95:
                     return champion

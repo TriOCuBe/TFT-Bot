@@ -243,7 +243,7 @@ class EconomyMode:
                 sleep(0.1)
 
             # this sells duplicate champs, even if they have the trait we want. Only triggers round 4 onwards
-            elif (ocr_round and current_round > 40) or (not ocr_round and current_round > 3) and champion in known_champions:
+            elif ((ocr_round and current_round > 40) or (not ocr_round and current_round > 3)) and champion in known_champions:
                 target = board_targets[index]
                 self.sell_unit(target)
                 sleep(0.1)

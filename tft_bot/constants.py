@@ -222,7 +222,7 @@ CONSTANTS = {
 
             "full": {
                 "ahri": "captures/champions/ahri.png",
-                "belveth": "captures/champion/belveth.png",
+                "belveth": "captures/champions/belveth.png",
                 "chogath": "captures/champions/chogath.png",
                 "kaisa": "captures/champions/kaisa.png",
                 "kassadin": "captures/champions/kassadin.png",

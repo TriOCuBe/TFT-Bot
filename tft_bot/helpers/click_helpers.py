@@ -122,3 +122,5 @@ def press(key: str) -> None:
         key: The key to press.
     """
     keyboard.press(key)
+    time.sleep(0.1)
+    keyboard.release(key)

@@ -16,7 +16,7 @@ class DefaultEconomyMode(EconomyMode):
     Default economy mode implementation.
     """
 
-    def loop_decision(self, current_round: int, event: bool):
+    def loop_decision(self, current_round: int, event: int):
         if event != 0:
             if event == 1:
                 self.bench_cleanup()

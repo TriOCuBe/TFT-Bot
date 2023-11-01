@@ -32,7 +32,6 @@ def move_to(
         position_x: The x coordinate to move to
         position_y: The y coordinate to move to
     """
-    # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
     position_x = position_x + random.randint(0, 2)
     position_y = position_y + random.randint(0, 2)
     mouse.move(position_x, position_y, multiplier=0.6)
@@ -53,13 +52,8 @@ def click_to(
         delay (float, optional): The delay between mouse down & up. Defaults to 0.2.
         action (str, optional): The mouse button to perform. Defaults to "left".
     """
-    # auto.moveTo(position_x, position_y, random.uniform(0.4, 1.1))
     move_to(position_x, position_y)
     click(delay=delay, button=action)
-    # if action == "left":
-    #     mouse.click(position_x, position_y)
-    # else:
-    #     mouse.right_click(position_x, position_y)
 
 
 def click_to_image(

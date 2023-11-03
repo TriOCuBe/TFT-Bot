@@ -344,25 +344,57 @@ class LCUIntegration:
 
         return None if not session_response else session_response.json()["puuid"]
 
-    def get_win_rate(self, number_of_games: int) -> str:
-        """
-        Get the win rate for the last N games.
+    # obsolete
+    # def get_win_rate(self, number_of_games: int) -> str:
+    #     """
+    #     Get the win rate for the last N games.
 
-        Args:
-            number_of_games: The amount of the games to get the win rate for, min 1 max 20.
+    #     Args:
+    #         number_of_games: The amount of the games to get the win rate for, min 1 max 20.
+
+    #     Returns:
+    #         A human-readable string holding the percentage, for example '20.3'.
+
+    #     """
+    #     player_uid = self._get_player_uid()
+    #     # Clamp to min 1, max 20 games
+    #     number_of_games = max(1, min(number_of_games, 20))
+
+    #     matches_response = _http_error_wrapper(
+    #         self._session.get,
+    #         raise_and_catch=False,
+    #         url=f"{self._url}/lol-match-history/v1/products/tft/{player_uid}/matches?count={number_of_games}",
+    #     )
+
+    #     try:
+    #         matches_response.raise_for_status()
+    #     except (AttributeError, HTTPError):
+    #         return "ERROR"
+
+    #     games = matches_response.json()["games"]
+    #     games_played = len(games)
+    #     wins = 0
+    #     for game in games:
+    #         player = [player for player in game["json"]["participants"] if player["puuid"] == player_uid][0]
+    #         if player["placement"] <= 4:
+    #             wins += 1
+
+
+    #     return f"{(wins / games_played) * 100:.2f}"
+
+    def get_last_game_outcome(self) -> bool:
+        """
+        Get the outcome of the last game played (Win or Lose)
 
         Returns:
-            A human-readable string holding the percentage, for example '20.3'.
-
+        True for Win, False for Loss
         """
         player_uid = self._get_player_uid()
-        # Clamp to min 1, max 20 games
-        number_of_games = max(1, min(number_of_games, 20))
 
         matches_response = _http_error_wrapper(
             self._session.get,
             raise_and_catch=False,
-            url=f"{self._url}/lol-match-history/v1/products/tft/{player_uid}/matches?count={number_of_games}",
+            url=f"{self._url}/lol-match-history/v1/products/tft/{player_uid}/matches?count=1",
         )
 
         try:
@@ -370,15 +402,13 @@ class LCUIntegration:
         except (AttributeError, HTTPError):
             return "ERROR"
 
-        games = matches_response.json()["games"]
-        games_played = len(games)
-        wins = 0
-        for game in games:
-            player = [player for player in game["json"]["participants"] if player["puuid"] == player_uid][0]
-            if player["placement"] <= 4:
-                wins += 1
-
-        return f"{(wins / games_played) * 100:.2f}"
+        game = matches_response.json()["games"]
+        
+        player = [player for player in game["json"]["participants"] if player["puuid"] == player_uid][0]
+        if player["placement"] <= 4:
+            return True
+        
+        return False
 
 
 class GameClientIntegration:

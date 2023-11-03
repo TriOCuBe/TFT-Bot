@@ -36,7 +36,7 @@ from tft_bot.helpers.screen_helpers import get_round_with_ocr
 from tft_bot.league_api import league_api_integration
 
 auto.FAILSAFE = False
-GAME_COUNT = 0
+WIN = LOSS = 0
 PROGRAM_START: datetime
 LAST_TIMER_PRINTED_AT: datetime = datetime.now()
 PAUSE_LOGIC = False
@@ -691,14 +691,20 @@ def print_timer() -> None:
         return
 
     delta_seconds = int((now - PROGRAM_START).total_seconds())
-    global GAME_COUNT
-    GAME_COUNT += 1
+    global WIN, LOSS
+
+    outcome = LCU_INTEGRATION.get_last_game_outcome()
+    if outcome != "ERROR":
+        if outcome:
+            WIN += 1
+        else:
+            LOSS += 1
 
     logger.info("-----------------------------------------")
     logger.info("Game End")
     logger.info(f"Time since start: {delta_seconds // 3600}h {(delta_seconds // 60) % 60}m {delta_seconds % 60}s")
-    logger.info(f"Games played: {str(GAME_COUNT)}")
-    logger.info(f"Win rate (at most last 20 games): {LCU_INTEGRATION.get_win_rate(GAME_COUNT)}%")
+    logger.info(f"Games played: {str(WIN + LOSS)}")
+    logger.info(f"Win rate: {(WIN / (WIN + LOSS)) * 100:.2f}%")
     logger.info("-----------------------------------------")
 
     LAST_TIMER_PRINTED_AT = datetime.now()

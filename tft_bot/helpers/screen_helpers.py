@@ -241,7 +241,13 @@ def get_on_screen(
     gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
     search_result = cv2.matchTemplate(gray_scaled_pixels, image_to_find, cv2.TM_CCOEFF_NORMED)
 
+    del screenshot
+    del pixels
+    del gray_scaled_pixels
+
     _, max_precision, _, max_location = cv2.minMaxLoc(search_result)
+    
+    del search_result
     if max_precision < precision:
         return None
 
@@ -312,6 +318,10 @@ def get_round_with_ocr(tesseract_location) -> str | None:
     pixels = numpy.array(screenshot)
     gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
     game_round: str = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
+    
+    del screenshot
+    del pixels
+    del gray_scaled_pixels
 
     # i dont fucking know why i need to do this, but it wont work otherwise. is pytesseract returning some invisible symbol???
     if game_round != '':
@@ -353,6 +363,10 @@ def get_gold_with_ocr() -> int:
 
     pixels = numpy.array(screenshot)
     gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
+
+    del screenshot
+    del pixels
+
     return int(pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG) or 0)
 
 
@@ -576,8 +590,12 @@ def check_champion(wanted_traits: list) -> str | None:
             champ_img = cv2.imread(path, 0)
             if champion not in checked_champs:
                 search_result = cv2.matchTemplate(gray_scaled, champ_img, cv2.TM_CCOEFF_NORMED)
+                del champ_img
                 _, max_precision, _, max_location = cv2.minMaxLoc(search_result)
                 if max_precision > 0.95:
+                    del screenshot
+                    del gray_scaled
+                    del search_result
                     return champion
                 checked_champs.append(champion)
 

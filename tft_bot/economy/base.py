@@ -159,10 +159,10 @@ class EconomyMode:
 
     def get_board_targets(self) -> list:
         """
-        Checks current level and how many champions we expect there to be on the board.
+        Checks how many champions we expect there to be on the board by using the players level.
 
         Returns:
-        List of coordinates of board champions. Length is equal to current level/expected amount of champs.
+        List of coordinates of board champions. Length of list is equal to current level/expected amount of champs.
         """
         from tft import GAME_CLIENT_INTEGRATION
 

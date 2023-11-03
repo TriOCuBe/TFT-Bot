@@ -184,9 +184,13 @@ CONSTANTS = {
         # },
         "coordinates": {
             "board": [
+                # extra two slots for champs that may arrive from shared draft
                 (707, 651), (839, 651),
+                # bottom row
                 (966, 651), (903, 571), (962, 494),
+                # middle row
                 (1091, 651), (1022, 571), (1082, 494),
+                # top row
                 (1222, 651), (1147, 571), (1198, 494)
             ],
             "bench": [

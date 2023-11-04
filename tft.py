@@ -700,11 +700,16 @@ def print_timer() -> None:
         else:
             LOSS += 1
 
+    if (WIN + LOSS) == 0:
+        winrate = "ERROR"
+    else:
+        winrate = WIN / (WIN + LOSS)
+
     logger.info("-----------------------------------------")
     logger.info("Game End")
     logger.info(f"Time since start: {delta_seconds // 3600}h {(delta_seconds // 60) % 60}m {delta_seconds % 60}s")
     logger.info(f"Games played: {str(WIN + LOSS)}")
-    logger.info(f"Win rate: {(WIN / (WIN + LOSS)) * 100:.2f}%")
+    logger.info(f"Win rate: {winrate * 100:.2f}%")
     logger.info("-----------------------------------------")
 
     LAST_TIMER_PRINTED_AT = datetime.now()

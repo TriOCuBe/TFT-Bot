@@ -402,11 +402,12 @@ class LCUIntegration:
         except (AttributeError, HTTPError):
             return "ERROR"
 
-        game = matches_response.json()["games"]
+        games = matches_response.json()["games"]
         
-        player = [player for player in game["json"]["participants"] if player["puuid"] == player_uid][0]
-        if player["placement"] <= 4:
-            return True
+        for game in games:
+            player = [player for player in game["json"]["participants"] if player["puuid"] == player_uid][0]
+            if player["placement"] <= 4:
+                return True
         
         return False
 

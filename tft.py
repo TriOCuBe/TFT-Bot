@@ -693,23 +693,17 @@ def print_timer() -> None:
     delta_seconds = int((now - PROGRAM_START).total_seconds())
     global WIN, LOSS
 
-    outcome = LCU_INTEGRATION.get_last_game_outcome()
-    if outcome != "ERROR":
-        if outcome:
-            WIN += 1
-        else:
-            LOSS += 1
-
-    if (WIN + LOSS) == 0:
-        winrate = "ERROR"
+    winrate = LCU_INTEGRATION.get_win_rate(WIN=WIN, LOSS=LOSS)
+    if winrate == "ERROR":
+        TOTAL = winrate
     else:
-        winrate = WIN / (WIN + LOSS)
+        TOTAL = WIN + LOSS
 
     logger.info("-----------------------------------------")
     logger.info("Game End")
     logger.info(f"Time since start: {delta_seconds // 3600}h {(delta_seconds // 60) % 60}m {delta_seconds % 60}s")
-    logger.info(f"Games played: {str(WIN + LOSS)}")
-    logger.info(f"Win rate: {winrate * 100:.2f}%")
+    logger.info(f"Games played: {str(TOTAL)}")
+    logger.info(f"Win rate: {winrate}%")
     logger.info("-----------------------------------------")
 
     LAST_TIMER_PRINTED_AT = datetime.now()

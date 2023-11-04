@@ -411,6 +411,28 @@ class LCUIntegration:
         
         return False
 
+    def get_win_rate(self, WIN: int, LOSS: int) -> str:
+        """
+        Calculate winrate of games played.
+
+        Args:
+        WIN: The amount of games we won
+        LOSS: The amount of games we lost
+    
+        Returns:
+        String with human-readable percentage of our winrate
+        """
+        outcome = self.get_last_game_outcome()
+
+        if outcome == "ERROR":
+            logger.error("Could not determine outcome of last game. Values displayed do not include last game.")
+            return outcome
+        elif outcome:
+            WIN += 1
+        else:
+            LOSS += 1
+
+        return f"{(WIN / (WIN + LOSS)) * 100:.2f}"
 
 class GameClientIntegration:
     """

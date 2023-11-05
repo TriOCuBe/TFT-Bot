@@ -693,11 +693,15 @@ def print_timer() -> None:
     delta_seconds = int((now - PROGRAM_START).total_seconds())
     global WIN, LOSS
 
-    winrate = LCU_INTEGRATION.get_win_rate(WIN=WIN, LOSS=LOSS)
-    if winrate == "ERROR":
-        TOTAL = winrate
+    output = LCU_INTEGRATION.get_win_rate(WIN=WIN, LOSS=LOSS)
+    if output == "ERROR":
+        winrate = output
     else:
-        TOTAL = WIN + LOSS
+        winrate = output[0]
+        WIN = output[1]
+        LOSS = output[2]
+    
+    TOTAL = WIN + LOSS
 
     logger.info("-----------------------------------------")
     logger.info("Game End")

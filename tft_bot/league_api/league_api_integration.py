@@ -416,7 +416,7 @@ class LCUIntegration:
         
         return False
 
-    def get_win_rate(self, WIN: int, LOSS: int) -> str:
+    def get_win_rate(self, WIN: int, LOSS: int) -> tuple | str:
         """
         Calculate winrate of games played.
 
@@ -425,7 +425,12 @@ class LCUIntegration:
         LOSS: The amount of games we lost
     
         Returns:
-        String with human-readable percentage of our winrate
+        tuple:
+        [0] string with human-readable percentage of our winrate
+        [1] int of total games won
+        [2] int of total games lost
+        
+        or string "ERROR" if the API didn't work
         """
         outcome = self.get_last_game_outcome()
 
@@ -437,7 +442,7 @@ class LCUIntegration:
         else:
             LOSS += 1
 
-        return f"{(WIN / (WIN + LOSS)) * 100:.2f}"
+        return (f"{(WIN / (WIN + LOSS)) * 100:.2f}", WIN, LOSS)
 
 class GameClientIntegration:
     """

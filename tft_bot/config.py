@@ -250,3 +250,21 @@ def get_round_ocr_config() -> bool:
         True or False for OCR or cv2.
     """
     return _SELF.get("ocr_for_rounds", False)
+
+def get_deceive_config() -> bool:
+    """
+    Check if we want to use deceive.
+
+    Returns:
+        True or False.
+    """
+    return _SELF.get("use_deceive", False)
+
+def get_install_location_deceive() -> str:
+    """
+    Get the path of Deceive.exe.
+
+    Returns:
+    String containing path.
+    """
+    return _SELF.get("install_location_deceive", '')

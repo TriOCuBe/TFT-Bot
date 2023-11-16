@@ -77,6 +77,14 @@ override_install_location_league_client: ''
 # Same as above, but for the Riot Client
 override_install_location_riot_client: ''
 
+# By default, the bot only opens the Riot Client itself if something goes wrong. If you have Deceive installed and want to use it,
+# please set the following condition from 'false' to 'true'. Additionally, since this is not part of the game folder, 
+# you need to manually define its install location right below.
+# IMPORTANT: If you want the bot to use deceive, enable deceive to automatically choose League of Legends instead of asking you what you want to launch!
+# You can do this by opening deceive and then checking the box "remember my choice", then choosing League.
+use_deceive: false
+install_location_deceive: ''
+
 # Changing these below values manually can potentially break the bot, so don't!
 # Version of the YAML.
 version: 7

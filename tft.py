@@ -131,9 +131,16 @@ def restart_league_client() -> None:
         wait_for_internet()
         time.sleep(1)
 
-    executable_with_launch_args = [CONSTANTS["executables"]["riot_client"]["client_services"]] + CONSTANTS[
-        "executables"
-    ]["riot_client"]["league_launch_arguments"]
+    if get_deceive_config() and get_install_location_deceive() != '':
+        executable_with_launch_args = get_install_location_deceive() + CONSTANTS[
+            "executables"
+        ]["riot_client"]["league_launch_arguments"]
+        logger.debug(f"Using deceive with the following path: {get_install_location_deceive()}")
+    else:
+        executable_with_launch_args = [CONSTANTS["executables"]["riot_client"]["client_services"]] + CONSTANTS[
+            "executables"
+        ]["riot_client"]["league_launch_arguments"]
+
     subprocess.Popen(  # pylint: disable=consider-using-with
         args=executable_with_launch_args,
         stdin=None,

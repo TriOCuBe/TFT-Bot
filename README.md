@@ -4,9 +4,7 @@
 This is an auto TFT bot, with some decent logic built in.
 
 > ⚠️ WARNING
-> Users have been reporting an uptick in bans while utilizing TFT botting software. Users of this repo appear to have all been related to using the executable releases, and as such we are removing the uploaded executables from future releases. It is strongly advised against building them yourselves or using older releases, at this time.
-> We can not currently verify if there are source-code users being banned as well, and until we hear otherwise, would recommend users stick to running the python/source method only.
-> Checkpoints / times that users should update their local git copy will be noted with 'releases' in the same consistentcy as before, just without the executables to be downloaded.
+> While users had reported bans while utilizing the older executable releases, we have not heard reports since removing those and switching to running via Python directly.
 
 Some features of this bot:
 - Compiles to release executables, so you do not need Python / pip installed in order to use it.

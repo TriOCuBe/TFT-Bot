@@ -260,11 +260,11 @@ def get_deceive_config() -> bool:
     """
     return _SELF.get("use_deceive", False)
 
-def get_install_location_deceive() -> str:
+def get_install_location_deceive() -> str | None:
     """
     Get the path of Deceive.exe.
 
     Returns:
     String containing path.
     """
-    return _SELF.get("install_location_deceive", '')
+    return _SELF.get("install_location_deceive") or None

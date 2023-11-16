@@ -131,7 +131,7 @@ def restart_league_client() -> None:
         wait_for_internet()
         time.sleep(1)
 
-    if config.get_deceive_config() and config.get_install_location_deceive() != '':
+    if config.get_deceive_config() and config.get_install_location_deceive() is not None:
         executable_with_launch_args = config.get_install_location_deceive() + CONSTANTS[
             "executables"
         ]["riot_client"]["league_launch_arguments"]

@@ -123,30 +123,37 @@ def restart_league_client() -> None:
         logger.debug(f"Killing {process_to_kill}")
         result = kill_process(process_to_kill)
         parse_task_kill_result(result)
-    time.sleep(1)
+    time.sleep(5)
 
     if not system_helpers.internet():
         wait_for_internet()
         time.sleep(1)
 
     if config.get_deceive_config() and config.get_install_location_deceive() is not None:
-        executable_with_launch_args = config.get_install_location_deceive() + CONSTANTS[
-            "executables"
-        ]["riot_client"]["league_launch_arguments"]
+        executable = config.get_install_location_deceive()
         logger.debug(f"Using deceive with the following path: {config.get_install_location_deceive()}")
+
+        subprocess.Popen(
+            executable,
+            stdin=None,
+            stdout=None,
+            stderr=None,
+            close_fds=True,
+            creationflags=DETACHED_PROCESS,
+        )
     else:
         executable_with_launch_args = [CONSTANTS["executables"]["riot_client"]["client_services"]] + CONSTANTS[
             "executables"
         ]["riot_client"]["league_launch_arguments"]
 
-    subprocess.Popen(  # pylint: disable=consider-using-with
-        args=executable_with_launch_args,
-        stdin=None,
-        stdout=None,
-        stderr=None,
-        close_fds=True,
-        creationflags=DETACHED_PROCESS,
-    )
+        subprocess.Popen(  # pylint: disable=consider-using-with
+            args=executable_with_launch_args,
+            stdin=None,
+            stdout=None,
+            stderr=None,
+            close_fds=True,
+            creationflags=DETACHED_PROCESS,
+        )
     time.sleep(3)
     if not LCU_INTEGRATION.connect_to_lcu(wait_for_availability=True):
         restart_league_client()
@@ -890,6 +897,7 @@ def main():
     logger.info("===== TFT Bot Started =====")
     logger.info(f"Bot will only display messages at severity level {log_level}.")
     logger.info(f"Bot will {'' if config.forfeit_early() else 'NOT '}surrender early.")
+    logger.info(f"Bot will {'' if config.get_deceive_config() else 'NOT '}use Deceive" + f" with location: {config.get_install_location_deceive()}" if config.get_deceive_config() else "")
 
     absolute_storage_path = os.path.abspath(storage_path)
     if not os.access(absolute_storage_path, os.W_OK):

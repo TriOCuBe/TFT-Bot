@@ -249,12 +249,12 @@ def determine_deceive_install_location() -> str | None:
     If successful, a string of the determined location, if not, None.
     """
     # Check downloads folder first. Might just find it
-    # downloads_path = str(pathlib.Path.home() / "Downloads")
-    # for root, dirs, files in os.walk(downloads_path):
-    #     for file in files:
-    #         if "Deceive.exe" in file:
-    #             logger.debug("Found Deceive in Downloads folder")
-    #             return os.path.join(root, file)
+    downloads_path = str(pathlib.Path.home() / "Downloads")
+    for root, dirs, files in os.walk(downloads_path):
+        for file in files:
+            if "Deceive.exe" in file:
+                logger.debug("Found Deceive in Downloads folder")
+                return os.path.join(root, file)
     
     # Search registry now
     key_to_read = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store"

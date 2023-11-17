@@ -218,7 +218,7 @@ def get_economy_mode(system_helpers) -> EconomyMode:
 
 def get_deceive_config() -> bool:
     """
-    Check if we want to use deceive.
+    Checks if the bot should use Deceive.
 
     Returns:
         True or False.
@@ -227,10 +227,10 @@ def get_deceive_config() -> bool:
 
 def get_install_location_deceive() -> str | None:
     """
-    Get the path of Deceive.exe.
+    Gets the path of Deceive.exe.
 
     Returns:
-    String containing path.
+    String containing path or None if empty.
     """
     return _SELF.get("install_location_deceive") or None
 

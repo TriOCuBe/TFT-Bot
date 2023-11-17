@@ -1,7 +1,4 @@
-from tft_bot.constants import CONSTANTS
+from tft_bot import config
 
-expected_champs = 8
-targets = CONSTANTS["game"]["coordinates"]["board"][2:]
-
-print(targets)
-print(len(targets))
+config.load_config(storage_path="tft_bot\\output")
+print(config.get_log_level())

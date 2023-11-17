@@ -233,3 +233,12 @@ def get_install_location_deceive() -> str | None:
     String containing path.
     """
     return _SELF.get("install_location_deceive") or None
+
+def update_deceive_config(update: bool) -> None:
+    """
+    Updates whether the bot should use Deceive or not.
+
+    Args:
+    update: The new bool that should be used henceforth
+    """
+    _SELF["use_deceive"] = update

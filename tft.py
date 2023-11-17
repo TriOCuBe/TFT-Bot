@@ -130,11 +130,10 @@ def restart_league_client() -> None:
         time.sleep(1)
 
     if config.get_deceive_config() and config.get_install_location_deceive() is not None:
-        executable = config.get_install_location_deceive()
         logger.debug(f"Using deceive with the following path: {config.get_install_location_deceive()}")
 
         subprocess.Popen(
-            executable,
+            config.get_install_location_deceive(),
             stdin=None,
             stdout=None,
             stderr=None,
@@ -145,6 +144,7 @@ def restart_league_client() -> None:
         executable_with_launch_args = [CONSTANTS["executables"]["riot_client"]["client_services"]] + CONSTANTS[
             "executables"
         ]["riot_client"]["league_launch_arguments"]
+        logger.debug("Opening League through the riot client")
 
         subprocess.Popen(  # pylint: disable=consider-using-with
             args=executable_with_launch_args,

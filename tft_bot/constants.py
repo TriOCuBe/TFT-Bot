@@ -15,9 +15,6 @@ CONSTANTS = {
             "client_services": r"\RiotClientServices.exe",
             "league_launch_arguments": ["--launch-product=league_of_legends", "--launch-patchline=live"],
         },
-        "deceive": {
-            "deceive_launch_arguments": ["--launch-product=deceive"]
-        }
     },
     "window_titles": {
         "game": "League of Legends (TM) Client",

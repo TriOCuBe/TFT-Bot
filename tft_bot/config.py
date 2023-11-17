@@ -215,3 +215,21 @@ def get_economy_mode(system_helpers) -> EconomyMode:
             return OCRStandardEconomyMode(
                 wanted_traits=wanted_traits, prioritized_order=prioritized_order, tesseract_location=tesseract_location
             )
+
+def get_deceive_config() -> bool:
+    """
+    Check if we want to use deceive.
+
+    Returns:
+        True or False.
+    """
+    return _SELF.get("use_deceive", False)
+
+def get_install_location_deceive() -> str:
+    """
+    Get the path of Deceive.exe.
+
+    Returns:
+    String containing path.
+    """
+    return _SELF.get("install_location_deceive", '')

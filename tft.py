@@ -2,7 +2,6 @@
 The main TFT Bot code
 """
 from datetime import datetime
-from pathlib import Path
 import os
 import random
 import subprocess

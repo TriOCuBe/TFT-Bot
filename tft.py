@@ -2,6 +2,7 @@
 The main TFT Bot code
 """
 from datetime import datetime
+from pathlib import Path
 import os
 import random
 import subprocess
@@ -117,25 +118,31 @@ def kill_process(process_executable: str, force: bool = True) -> subprocess.Comp
         text=True,
     )
 
+def launch_league_client(deceive_config: bool) -> None:
+    """
+    Launches the client
 
-def restart_league_client() -> None:
-    """Restarts the league client."""
-    logger.debug("Killing League Processes!")
-    for process_to_kill in league_processes:
-        logger.debug(f"Killing {process_to_kill}")
-        result = kill_process(process_to_kill)
-        parse_task_kill_result(result)
-    time.sleep(5)
-
-    if not system_helpers.internet():
-        wait_for_internet()
-        time.sleep(1)
-
-    if config.get_deceive_config() and config.get_install_location_deceive() is not None:
-        logger.debug(f"Using deceive with the following path: {config.get_install_location_deceive()}")
+    Args:
+    deceive_config: Whether to open the client through Riot or through Deceive
+    """
+    if deceive_config:
+        location = config.get_install_location_deceive()
+        if location is None:
+            logger.warning("Deceive is enabled in config.yaml, but no path was given! The bot will attempt to find the .exe on its own")
+            location = system_helpers.determine_deceive_install_location()
+            if location is None:
+                logger.error("Could not determine Deceive location. Please manually add the location in output/config.yaml")
+                logger.warning("Bot will now continue without Deceive")
+                config.update_deceive_config(update=False)
+                launch_league_client(deceive_config=False)
+                return
+            else:
+                logger.warning(f"Found Deceive at: {location}")
+        else:
+            logger.debug(f"Using deceive with the given path: {location}")
 
         subprocess.Popen(
-            config.get_install_location_deceive(),
+            location,
             stdin=None,
             stdout=None,
             stderr=None,
@@ -156,6 +163,22 @@ def restart_league_client() -> None:
             close_fds=True,
             creationflags=DETACHED_PROCESS,
         )
+
+def restart_league_client() -> None:
+    """Restarts the league client."""
+    logger.debug("Killing League Processes!")
+    for process_to_kill in league_processes:
+        logger.debug(f"Killing {process_to_kill}")
+        result = kill_process(process_to_kill)
+        parse_task_kill_result(result)
+    time.sleep(5)
+
+    if not system_helpers.internet():
+        wait_for_internet()
+        time.sleep(1)
+
+    launch_league_client(deceive_config=config.get_deceive_config())
+
     time.sleep(3)
     if not LCU_INTEGRATION.connect_to_lcu(wait_for_availability=True):
         restart_league_client()
@@ -520,8 +543,7 @@ def determine_minimum_round() -> tuple[bool, int]:
     If OCR is turned off, returns (False, minimum_round) with minimum_round being the major round (like 1, 3, 4).
     If the round isn't determined, returns (False, 0)
     """
-    from tft_bot.config import get_tesseract_location
-    if not config.get_round_ocr_config() or get_tesseract_location is None:
+    if not config.get_round_ocr_config() or config.get_tesseract_location() is None:
         output = 0
 
         if get_on_screen_in_game(CONSTANTS["game"]["round"]["krugs_inactive"], 0.9) or get_on_screen_in_game(

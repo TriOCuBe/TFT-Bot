@@ -1,4 +1,3 @@
-from tft_bot import config
+from tft_bot.helpers.system_helpers import determine_deceive_install_location
 
-config.load_config(storage_path="tft_bot\\output")
-print(config.get_log_level())
+determine_deceive_install_location()

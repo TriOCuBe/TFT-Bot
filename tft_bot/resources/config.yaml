@@ -75,7 +75,7 @@ override_install_location_riot_client: ''
 # IMPORTANT: If you want the bot to use deceive, enable deceive to automatically choose League of Legends instead of asking you what you want to launch!
 # You can do this by opening deceive and then checking the box "remember my choice", then choosing League.
 use_deceive: false
-install_location_deceive: ''
+install_location_deceive: ""
 
 # Changing these below values manually can potentially break the bot, so don't!
 # Version of the YAML.

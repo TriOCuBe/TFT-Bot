@@ -216,6 +216,7 @@ def get_economy_mode(system_helpers) -> EconomyMode:
                 wanted_traits=wanted_traits, prioritized_order=prioritized_order, tesseract_location=tesseract_location
             )
 
+
 def get_deceive_config() -> bool:
     """
     Checks if the bot should use Deceive.
@@ -225,6 +226,7 @@ def get_deceive_config() -> bool:
     """
     return _SELF.get("use_deceive", False)
 
+
 def get_install_location_deceive() -> str | None:
     """
     Gets the path of Deceive.exe.
@@ -233,6 +235,7 @@ def get_install_location_deceive() -> str | None:
     String containing path or None if empty.
     """
     return _SELF.get("install_location_deceive") or None
+
 
 def update_deceive_config(update: bool) -> None:
     """

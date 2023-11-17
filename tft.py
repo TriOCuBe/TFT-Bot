@@ -115,6 +115,7 @@ def kill_process(process_executable: str, force: bool = True) -> subprocess.Comp
         text=True,
     )
 
+
 def launch_league_client(deceive_config: bool) -> None:
     """
     Launches the client
@@ -125,20 +126,20 @@ def launch_league_client(deceive_config: bool) -> None:
     if deceive_config:
         location = config.get_install_location_deceive()
         if location is None:
-            logger.warning("Deceive is enabled in config.yaml, but no path was given! The bot will attempt to find the .exe on its own")
+            logger.warning("Deceive is enabled in config.yaml, but no path was given! The bot will attempt to find the .exe on its own")    # pylint: disable=line-too-long
             location = system_helpers.determine_deceive_install_location()
             if location is None:
-                logger.error("Could not determine Deceive location. Please manually add the location in output/config.yaml")
+                logger.error("Could not determine Deceive location. Please manually add the location in output/config.yaml")    # pylint: disable=line-too-long
                 logger.warning("Bot will now continue without Deceive")
                 config.update_deceive_config(update=False)
                 launch_league_client(deceive_config=False)
                 return
-            else:
-                logger.info(f"Found Deceive at: {location}")
+
+            logger.info(f"Found Deceive at: {location}")
         else:
             logger.debug(f"Using deceive with the given path: {location}")
 
-        subprocess.Popen(
+        subprocess.Popen(   # pylint: disable=consider-using-with
             location,
             stdin=None,
             stdout=None,
@@ -160,6 +161,7 @@ def launch_league_client(deceive_config: bool) -> None:
             close_fds=True,
             creationflags=DETACHED_PROCESS,
         )
+
 
 def restart_league_client() -> None:
     """Restarts the league client."""
@@ -919,7 +921,8 @@ def main():
     logger.info("===== TFT Bot Started =====")
     logger.info(f"Bot will only display messages at severity level {log_level}.")
     logger.info(f"Bot will {'' if config.forfeit_early() else 'NOT '}surrender early.")
-    logger.info(f"Bot will {'' if config.get_deceive_config() else 'NOT '}use Deceive" + (f" with location: {config.get_install_location_deceive()}." if config.get_deceive_config() else "."))
+    logger.info(f"Bot will {'' if config.get_deceive_config() else 'NOT '}use Deceive" +
+    (f" with location: {config.get_install_location_deceive()}." if config.get_deceive_config() else "."))
 
     absolute_storage_path = os.path.abspath(storage_path)
     if not os.access(absolute_storage_path, os.W_OK):

@@ -241,6 +241,7 @@ def determine_tesseract_ocr_install_location() -> str:
 
     return tesseract_ocr_path
 
+
 def determine_deceive_install_location() -> str | None:
     """
     Tries to determine the install location of Deceive.
@@ -250,12 +251,12 @@ def determine_deceive_install_location() -> str | None:
     """
     # Check downloads folder first. Might just find it
     downloads_path = str(pathlib.Path.home() / "Downloads")
-    for root, dirs, files in os.walk(downloads_path):
+    for root, dirs, files in os.walk(downloads_path):   # pylint: disable=unused-variable
         for file in files:
             if "Deceive.exe" in file:
                 logger.debug("Found Deceive in Downloads folder")
                 return os.path.join(root, file)
-    
+
     # Search registry now
     key_to_read = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store"
     k = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_to_read, 0, winreg.KEY_READ)

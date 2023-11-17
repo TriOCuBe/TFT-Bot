@@ -137,7 +137,7 @@ def launch_league_client(deceive_config: bool) -> None:
                 launch_league_client(deceive_config=False)
                 return
             else:
-                logger.warning(f"Found Deceive at: {location}")
+                logger.info(f"Found Deceive at: {location}")
         else:
             logger.debug(f"Using deceive with the given path: {location}")
 

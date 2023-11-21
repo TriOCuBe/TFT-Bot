@@ -216,6 +216,7 @@ def get_economy_mode(system_helpers) -> EconomyMode:
                 wanted_traits=wanted_traits, prioritized_order=prioritized_order, tesseract_location=tesseract_location
             )
 
+
 def get_tesseract_location(system_helpers) -> str | None:
     """
     Get location of tesseract
@@ -242,6 +243,7 @@ def get_item_config() -> bool:
     """
     return _SELF.get("items", False)
 
+
 def get_round_ocr_config() -> bool:
     """
     Get the config for get_round method.
@@ -251,23 +253,26 @@ def get_round_ocr_config() -> bool:
     """
     return _SELF.get("ocr_for_rounds", False)
 
+
 def get_deceive_config() -> bool:
     """
-    Check if we want to use deceive.
+    Checks if the bot should use Deceive.
 
     Returns:
         True or False.
     """
     return _SELF.get("use_deceive", False)
 
+
 def get_install_location_deceive() -> str | None:
     """
-    Get the path of Deceive.exe.
+    Gets the path of Deceive.exe.
 
     Returns:
-    String containing path.
+    String containing path or None if empty.
     """
     return _SELF.get("install_location_deceive") or None
+
 
 def update_deceive_config(update: bool) -> None:
     """

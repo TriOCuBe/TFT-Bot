@@ -2,7 +2,6 @@
 The main TFT Bot code
 """
 from datetime import datetime
-from pathlib import Path
 import os
 import random
 import subprocess
@@ -31,7 +30,6 @@ from tft_bot.helpers.click_helpers import move_to
 from tft_bot.helpers.click_helpers import press
 from tft_bot.helpers.screen_helpers import calculate_window_click_offset
 from tft_bot.helpers.screen_helpers import check_league_game_size
-from tft_bot.helpers.screen_helpers import get_board_positions
 from tft_bot.helpers.screen_helpers import get_on_screen_in_client
 from tft_bot.helpers.screen_helpers import get_on_screen_in_game
 from tft_bot.helpers.screen_helpers import get_round_with_ocr
@@ -118,6 +116,7 @@ def kill_process(process_executable: str, force: bool = True) -> subprocess.Comp
         text=True,
     )
 
+
 def launch_league_client(deceive_config: bool) -> None:
     """
     Launches the client
@@ -128,20 +127,20 @@ def launch_league_client(deceive_config: bool) -> None:
     if deceive_config:
         location = config.get_install_location_deceive()
         if location is None:
-            logger.warning("Deceive is enabled in config.yaml, but no path was given! The bot will attempt to find the .exe on its own")
+            logger.warning("Deceive is enabled in config.yaml, but no path was given! The bot will attempt to find the .exe on its own")    # pylint: disable=line-too-long
             location = system_helpers.determine_deceive_install_location()
             if location is None:
-                logger.error("Could not determine Deceive location. Please manually add the location in output/config.yaml")
+                logger.error("Could not determine Deceive location. Please manually add the location in output/config.yaml")    # pylint: disable=line-too-long
                 logger.warning("Bot will now continue without Deceive")
                 config.update_deceive_config(update=False)
                 launch_league_client(deceive_config=False)
                 return
-            else:
-                logger.info(f"Found Deceive at: {location}")
+
+            logger.info(f"Found Deceive at: {location}")
         else:
             logger.debug(f"Using deceive with the given path: {location}")
 
-        subprocess.Popen(
+        subprocess.Popen(   # pylint: disable=consider-using-with
             location,
             stdin=None,
             stdout=None,
@@ -163,6 +162,7 @@ def launch_league_client(deceive_config: bool) -> None:
             close_fds=True,
             creationflags=DETACHED_PROCESS,
         )
+
 
 def restart_league_client() -> None:
     """Restarts the league client."""
@@ -543,7 +543,7 @@ def determine_minimum_round() -> tuple[bool, int]:
     If OCR is turned off, returns (False, minimum_round) with minimum_round being the major round (like 1, 3, 4).
     If the round isn't determined, returns (False, 0)
     """
-    if not config.get_round_ocr_config() or config.get_tesseract_location() is None:
+    if not config.get_round_ocr_config() or config.get_tesseract_location(system_helpers=system_helpers) is None:
         output = 0
 
         if get_on_screen_in_game(CONSTANTS["game"]["round"]["krugs_inactive"], 0.9) or get_on_screen_in_game(
@@ -573,13 +573,12 @@ def determine_minimum_round() -> tuple[bool, int]:
                     break
 
         return (False, output)
-    
-    else:
-        current_round = get_round_with_ocr(tesseract_location=get_tesseract_location(system_helpers=system_helpers))
-        if current_round is not None:
-            # take first element of string and turn it into int
-            # return int(current_round[0])
-            return (True, int(current_round))
+
+    current_round = get_round_with_ocr(tesseract_location=config.get_tesseract_location(system_helpers=system_helpers))
+    if current_round is not None:
+        # take first element of string and turn it into int
+        # return int(current_round[0])
+        return (True, int(current_round))
 
     logger.debug("Could not determine minimum round, returning 0.")
     return (False, 0)
@@ -968,7 +967,8 @@ def main():
     logger.info("===== TFT Bot Started =====")
     logger.info(f"Bot will only display messages at severity level {log_level}.")
     logger.info(f"Bot will {'' if config.forfeit_early() else 'NOT '}surrender early.")
-    logger.info(f"Bot will {'' if config.get_deceive_config() else 'NOT '}use Deceive" + f" with location: {config.get_install_location_deceive()}" if config.get_deceive_config() else "")
+    logger.info(f"Bot will {'' if config.get_deceive_config() else 'NOT '}use Deceive" +
+    (f" with location: {config.get_install_location_deceive()}." if config.get_deceive_config() else "."))
 
     absolute_storage_path = os.path.abspath(storage_path)
     if not os.access(absolute_storage_path, os.W_OK):

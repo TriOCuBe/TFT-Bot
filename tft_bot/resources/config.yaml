@@ -78,7 +78,7 @@ override_install_location_league_client: ''
 override_install_location_riot_client: ''
 
 # If you want the bot to open League through Deceive instead of the Riot Client, please enable the option right below.
-# The bot will automatically search for the install location of Deceive when need, but it is still recommended to manually input it.
+# The bot will automatically search for the install location of Deceive when needed, but it is still recommended to manually set it.
 # IMPORTANT: If you want the bot to use Deceive, you need to make sure that Deceive automatically runs League of Legends when executed.
 # You can enable this by opening Deceive and checking the box "Remember my decision", then clicking on League.
 use_deceive: false

@@ -1,3 +1,8 @@
-from tft_bot.helpers.system_helpers import determine_deceive_install_location
+from tft import restart_league_client
+from tft_bot import config
+import time
 
-determine_deceive_install_location()
+config.load_config()
+while True:
+    restart_league_client()
+    time.sleep(5)

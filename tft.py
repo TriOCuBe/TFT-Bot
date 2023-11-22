@@ -121,7 +121,7 @@ def launch_league_client(deceive_config: bool) -> None:
     Launches the client
 
     Args:
-    deceive_config: Whether to open the client through Riot or through Deceive
+        deceive_config: Whether to open the client through Riot or through Deceive
     """
     if deceive_config:
         location = config.get_install_location_deceive()
@@ -922,7 +922,7 @@ def main():
     logger.info(f"Bot will only display messages at severity level {log_level}.")
     logger.info(f"Bot will {'' if config.forfeit_early() else 'NOT '}surrender early.")
     logger.info(f"Bot will {'' if config.get_deceive_config() else 'NOT '}use Deceive" +
-    (f" with location: {config.get_install_location_deceive()}." if config.get_deceive_config() else "."))
+                (f" with location: {config.get_install_location_deceive()}." if config.get_deceive_config() else "."))
 
     absolute_storage_path = os.path.abspath(storage_path)
     if not os.access(absolute_storage_path, os.W_OK):

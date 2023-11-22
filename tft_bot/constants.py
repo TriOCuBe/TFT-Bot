@@ -23,6 +23,7 @@ CONSTANTS = {
     "processes": {
         "client": "LeagueClient.exe",
         "client_ux": "LeagueClientUx.exe",
+        "deceive": "Deceive.exe",
         "game": "League of Legends.exe",
         "rito_client": "RiotClientUx.exe",
         "rito_client_service": "RiotClientServices.exe",
@@ -151,6 +152,7 @@ message_exit_buttons = [
 league_processes = [
     CONSTANTS["processes"]["client"],
     CONSTANTS["processes"]["client_ux"],
+    CONSTANTS["processes"]["deceive"],
     CONSTANTS["processes"]["game"],
     CONSTANTS["processes"]["rito_client"],
     CONSTANTS["processes"]["rito_client_service"],

@@ -126,41 +126,36 @@ def launch_league_client(deceive_config: bool) -> None:
     if deceive_config:
         location = config.get_install_location_deceive()
         if location is None:
-            logger.warning("Deceive is enabled in config.yaml, but no path was given! The bot will attempt to find the .exe on its own")    # pylint: disable=line-too-long
+            logger.warning("Deceive is enabled in config.yaml, but no path was given!")
+            logger.warning("The bot will attempt to find the .exe on its own")
             location = system_helpers.determine_deceive_install_location()
             if location is None:
-                logger.error("Could not determine Deceive location. Please manually add the location in output/config.yaml")    # pylint: disable=line-too-long
+                logger.error("Could not determine Deceive location. Please manually add the path in output/config.yaml")
                 logger.warning("Bot will now continue without Deceive")
                 config.update_deceive_config(update=False)
                 launch_league_client(deceive_config=False)
                 return
-
             logger.info(f"Found Deceive at: {location}")
+
         else:
             logger.debug(f"Using deceive with the given path: {location}")
 
-        subprocess.Popen(   # pylint: disable=consider-using-with
-            location,
-            stdin=None,
-            stdout=None,
-            stderr=None,
-            close_fds=True,
-            creationflags=DETACHED_PROCESS,
-        )
+        executable_with_launch_args = location
+
     else:
         executable_with_launch_args = [CONSTANTS["executables"]["riot_client"]["client_services"]] + CONSTANTS[
             "executables"
         ]["riot_client"]["league_launch_arguments"]
         logger.debug("Opening League through the riot client")
 
-        subprocess.Popen(  # pylint: disable=consider-using-with
-            args=executable_with_launch_args,
-            stdin=None,
-            stdout=None,
-            stderr=None,
-            close_fds=True,
-            creationflags=DETACHED_PROCESS,
-        )
+    subprocess.Popen(  # pylint: disable=consider-using-with
+        args=executable_with_launch_args,
+        stdin=None,
+        stdout=None,
+        stderr=None,
+        close_fds=True,
+        creationflags=DETACHED_PROCESS,
+    )
 
 
 def restart_league_client() -> None:

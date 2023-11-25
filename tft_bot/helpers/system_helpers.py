@@ -240,3 +240,37 @@ def determine_tesseract_ocr_install_location() -> str:
     logger.debug(f"Tesseract-OCR location determined to be: {tesseract_ocr_path}")
 
     return tesseract_ocr_path
+
+
+def determine_deceive_install_location() -> str | None:
+    """
+    Tries to determine the install location of Deceive.
+
+    Returns:
+        If successful, a string of the determined location, if not, None.
+    """
+    # Check downloads folder first. Might just find it
+    downloads_path = str(pathlib.Path.home() / "Downloads")
+    for root, dirs, files in os.walk(downloads_path):  # pylint: disable=unused-variable
+        for file in files:
+            if "Deceive.exe" in file:
+                logger.debug("Found Deceive in Downloads folder")
+                return os.path.join(root, file)
+
+    # Search registry now
+    key_to_read = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store"
+    k = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_to_read, 0, winreg.KEY_READ)
+
+    results = []
+    for i in range(0, winreg.QueryInfoKey(k)[1]):
+        if "Deceive.exe" in winreg.EnumValue(k, i)[0]:
+            results.append(winreg.EnumValue(k, i)[0])
+
+    # Registry actually never deletes entries, therefore if Deceive ever gets moved, there will be multiple entries.
+    # Therefore we need to check all paths and find the real one
+    for result in results:
+        if os.path.isfile(result):
+            logger.debug("Found Deceive through registry")
+            return result
+
+    return None

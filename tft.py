@@ -116,22 +116,38 @@ def kill_process(process_executable: str, force: bool = True) -> subprocess.Comp
     )
 
 
-def restart_league_client() -> None:
-    """Restarts the league client."""
-    logger.debug("Killing League Processes!")
-    for process_to_kill in league_processes:
-        logger.debug(f"Killing {process_to_kill}")
-        result = kill_process(process_to_kill)
-        parse_task_kill_result(result)
-    time.sleep(1)
+def launch_league_client(deceive_config: bool) -> None:
+    """
+    Launches the client
 
-    if not system_helpers.internet():
-        wait_for_internet()
-        time.sleep(1)
+    Args:
+        deceive_config: Whether to open the client through Riot or through Deceive
+    """
+    if deceive_config:
+        location = config.get_install_location_deceive()
+        if location is None:
+            logger.warning("Deceive is enabled in config.yaml, but no path was given!")
+            logger.warning("The bot will attempt to find the .exe on its own")
+            location = system_helpers.determine_deceive_install_location()
+            if location is None:
+                logger.error("Could not determine Deceive location. Please manually add the path in output/config.yaml")
+                logger.warning("Bot will now continue without Deceive")
+                config.update_deceive_config(update=False)
+                launch_league_client(deceive_config=False)
+                return
+            logger.info(f"Found Deceive at: {location}")
 
-    executable_with_launch_args = [CONSTANTS["executables"]["riot_client"]["client_services"]] + CONSTANTS[
-        "executables"
-    ]["riot_client"]["league_launch_arguments"]
+        else:
+            logger.debug(f"Using deceive with the given path: {location}")
+
+        executable_with_launch_args = location
+
+    else:
+        executable_with_launch_args = [CONSTANTS["executables"]["riot_client"]["client_services"]] + CONSTANTS[
+            "executables"
+        ]["riot_client"]["league_launch_arguments"]
+        logger.debug("Opening League through the riot client")
+
     subprocess.Popen(  # pylint: disable=consider-using-with
         args=executable_with_launch_args,
         stdin=None,
@@ -140,6 +156,23 @@ def restart_league_client() -> None:
         close_fds=True,
         creationflags=DETACHED_PROCESS,
     )
+
+
+def restart_league_client() -> None:
+    """Restarts the league client."""
+    logger.debug("Killing League Processes!")
+    for process_to_kill in league_processes:
+        logger.debug(f"Killing {process_to_kill}")
+        result = kill_process(process_to_kill)
+        parse_task_kill_result(result)
+    time.sleep(5)
+
+    if not system_helpers.internet():
+        wait_for_internet()
+        time.sleep(1)
+
+    launch_league_client(deceive_config=config.get_deceive_config())
+
     time.sleep(3)
     if not LCU_INTEGRATION.connect_to_lcu(wait_for_availability=True):
         restart_league_client()
@@ -892,6 +925,10 @@ def main():
     logger.info("===== TFT Bot Started =====")
     logger.info(f"Bot will only display messages at severity level {log_level}.")
     logger.info(f"Bot will {'' if config.forfeit_early() else 'NOT '}surrender early.")
+    logger.info(
+        f"Bot will {'' if config.get_deceive_config() else 'NOT '}use Deceive"
+        + (f" with location: {config.get_install_location_deceive()}." if config.get_deceive_config() else ".")
+    )
 
     absolute_storage_path = os.path.abspath(storage_path)
     if not os.access(absolute_storage_path, os.W_OK):

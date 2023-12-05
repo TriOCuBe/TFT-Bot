@@ -1,3 +1,9 @@
+> # This is a Fork
+> This is my own modification of the bot, in order to fit the resolution of 1600x900 my old laptop I'm running this script on.
+> I've made a bunch of changes, including replacing some images to get the bot working. If you have a machine running the same resolution as my laptop, you should be able to use this just fine.
+> If not, don't install this, go the original repo and use their version.
+> The rest of the README was not written by me, and has nothing to do with my repo specifically.
+
 # Python TFT Auto Battler Bot
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 

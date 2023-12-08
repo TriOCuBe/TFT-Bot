@@ -465,7 +465,7 @@ def get_board_positions() -> list[Coordinates]:
     return positions
 
 
-# essentially copied from https://github.com/jfd02/TFT-OCR-BOT/blob/main/arena_functions.py#L118
+# essentially copied from https://github.com/jfd02/TFT-OCR-BOT/blob/main/arena_functions.py#L121
 def valid_item(item: str) -> str | None:
     """
     Checks if given item name is valid or not
@@ -485,8 +485,8 @@ def valid_item(item: str) -> str | None:
         None,
     )
 
-_TESSERACT_CONFIG_ITEMS = '--oem 3 --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz -c page_separator=""'
 
+_TESSERACT_CONFIG_ITEMS = '--oem 3 --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz -c page_separator=""'
 def get_items() -> list:
     """
     Checks every position for items and looks if there is one present.
@@ -523,19 +523,41 @@ def get_items() -> list:
     logger.debug(f"Found items at: {item_list}")
     return item_list
 
-def check_champion(wanted_traits: list) -> str | None:
+
+def valid_champion(champion: str, valid_champions: list[str]) -> str | None:
     """
-    Checks if and what champion is displayed on the right-hand side of the screen. Should be used in combination with clicking to bench or board slot.
+    Checks if given item name is valid or not
 
     Args:
-    wanted_traits: List of traits we are searching for.
+        item: A string of the item name to check
 
     Returns:
-    Name of detected champ as string or None if nothing was found. (Currently only void and sorcerer champs can be found)
+        String of item or None
+    """
+    return next(
+        (
+            valid_name
+            for valid_name in valid_champions
+            if valid_name in champion or SequenceMatcher(a=valid_name, b=champion).ratio() >= 0.7
+        ),
+        None,
+    )
+
+
+def check_champion(tesseract_location, wanted_traits: list) -> str | None:
+    """
+    Checks if and what champion is displayed on the right-hand side of the screen.
+
+    Args:
+        tesseract_location: Required to initialize pytesseract. String of path to tesseract.exe
+        wanted_traits: List of traits we are searching for.
+
+    Returns:
+        Name of detected champ as string or None if nothing was found. (Currently only void and sorcerer champs can be found)
     """
     league_bounding_box = get_window_bounding_box(CONSTANTS["window_titles"]["game"])
     if not league_bounding_box:
-        return 0
+        return None
 
     width = league_bounding_box.get_width()
     height = league_bounding_box.get_height()
@@ -546,34 +568,24 @@ def check_champion(wanted_traits: list) -> str | None:
     resize_y = height / 1080
 
     region = (
-        int(min_x + (1650 * resize_x)),
-        int(min_y + (315 * resize_y)),
-        int(min_x + (1840 * resize_x)),
-        int(min_y + (390 * resize_y)),
+        int(min_x + (1700 * resize_x)),
+        int(min_y + (325 * resize_y)),
+        int(min_x + (1860 * resize_x)),
+        int(min_y + (350 * resize_y)),
     )
-    
+
     with mss.mss() as screenshot_taker:
         screenshot = screenshot_taker.grab(region)
-        # screenshot = Image.frombytes('RGB', screenshot.size, screenshot.bgra, 'raw', 'BGRX').tobytes()
-        # screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2BGR)
 
     pixels = numpy.array(screenshot)
     gray_scaled = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
 
-    checked_champs = []
+    pytesseract.tesseract_cmd = tesseract_location
+    valid_champions = []
     for trait in wanted_traits:
         for champion in CONSTANTS["game"]["champions"]["trait"][trait]:
-            path = CONSTANTS["game"]["champions"]["full"][champion]
-            champ_img = cv2.imread(path, 0)
-            if champion not in checked_champs:
-                search_result = cv2.matchTemplate(gray_scaled, champ_img, cv2.TM_CCOEFF_NORMED)
-                del champ_img
-                _, max_precision, _, _ = cv2.minMaxLoc(search_result)
-                if max_precision > 0.95:
-                    del screenshot
-                    del gray_scaled
-                    del search_result
-                    return champion
-                checked_champs.append(champion)
+            if champion not in valid_champions:
+                valid_champions.append(champion)
 
-    return None
+    detected_champ = pytesseract.image_to_string(~gray_scaled, config=_TESSERACT_CONFIG)
+    return valid_champion(detected_champ, valid_champions)

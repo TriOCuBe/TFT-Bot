@@ -9,6 +9,7 @@ from tft import GAME_CLIENT_INTEGRATION
 
 from ..helpers import screen_helpers
 from .base import EconomyMode
+from ..config import get_item_config
 
 
 class DefaultEconomyMode(EconomyMode):
@@ -41,7 +42,7 @@ class DefaultEconomyMode(EconomyMode):
 
         if random.randint(0, 8) == 1 and get_item_config():    
             self.place_items()
-            sleep(0.5)
+            time.sleep(0.5)
 
         if current_round[1] < 2:
             return
@@ -57,7 +58,7 @@ class DefaultEconomyMode(EconomyMode):
                 time.sleep(0.5)
 
         if random.randint(0, 10) == 1:
-            self.board_cleanup
+            self.board_cleanup(current_round=current_round)
             time.sleep(0.5)
 
         if current_round[1] < 3:

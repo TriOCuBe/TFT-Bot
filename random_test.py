@@ -6,11 +6,13 @@ import cv2
 from tft_bot.helpers import system_helpers
 from tft_bot import config
 
+resize_x = resize_y = 10/12
+
 bounding_box = (
-    1415,
-    265,
-    1550,
-    295
+    int(1700 * resize_x),
+    int(325 * resize_y),
+    int(1860 * resize_x),
+    int(350 * resize_y),
 )
 
 print("taking ss in 5 seconds")

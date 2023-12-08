@@ -15,6 +15,7 @@ forfeit_early: false
 # The trait names are almost as written in-game, with spaces replaced by _ and . and : being ignored.
 # For example: admin, star_guardian, mecha_prime, lasercorps
 # For a full list, visit https://github.com/Kyrluckechuck/TFT-Bot/tree/main/captures/trait
+# Es funktionieren nur: dazzler, guardian, mosher, sentinel
 wanted_traits:
   - mosher
   - guardian

@@ -210,26 +210,39 @@ CONSTANTS = {
             ]
         },
         "champions": {
-            # "trait": {
-            #     "sorcerer": [
-            #         "ahri",
-            #         "malzahar",
-            #         "orianna",
-            #         "silco",
-            #         "swain",
-            #         "taric",
-            #         "velkoz",
-            #     ],
-            #     "void": [
-            #         "belveth",
-            #         "chogath",
-            #         "kaisa",
-            #         "kassadin",
-            #         "malzahar",
-            #         "reksai",
-            #         "velkoz",
-            #     ],
-            # },
+            "trait": {
+                "dazzler": [
+                    "bard",
+                    "nami",
+                    "lux",
+                    "twisted fate",
+                    "ziggs",
+                ],
+                "guardian": [
+                    "amumu",
+                    "kennen",
+                    "neeko",
+                    "pantheon",
+                    "taric",
+                    "thresh",
+                ],
+                "mosher": [
+                    "gnar",
+                    "jax",
+                    "poppy",
+                    "sett",
+                    "urgot",
+                    "vi",
+                ],
+                "sentinel": [
+                    "blitzcrank",
+                    "ekko",
+                    "garen",
+                    "ksante",
+                    "lillia",
+                    "mordekaiser",
+                ],
+            },
 
             # "full": {
             #     "ahri": "captures/champions/ahri.png",

@@ -247,11 +247,11 @@ def determine_deceive_install_location() -> str | None:
     Tries to determine the install location of Deceive.
 
     Returns:
-    If successful, a string of the determined location, if not, None.
+        If successful, a string of the determined location, if not, None.
     """
     # Check downloads folder first. Might just find it
     downloads_path = str(pathlib.Path.home() / "Downloads")
-    for root, dirs, files in os.walk(downloads_path):   # pylint: disable=unused-variable
+    for root, dirs, files in os.walk(downloads_path):  # pylint: disable=unused-variable
         for file in files:
             if "Deceive.exe" in file:
                 logger.debug("Found Deceive in Downloads folder")

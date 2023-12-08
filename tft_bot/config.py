@@ -269,7 +269,7 @@ def get_install_location_deceive() -> str | None:
     Gets the path of Deceive.exe.
 
     Returns:
-    String containing path or None if empty.
+        String containing path or None if empty.
     """
     return _SELF.get("install_location_deceive") or None
 
@@ -279,6 +279,6 @@ def update_deceive_config(update: bool) -> None:
     Updates whether the bot should use Deceive or not.
 
     Args:
-    update: The new bool that should be used henceforth
+        update: The new bool that should be used henceforth
     """
     _SELF["use_deceive"] = update

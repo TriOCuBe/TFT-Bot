@@ -538,7 +538,8 @@ def determine_minimum_round() -> tuple[bool, int]:
     If OCR is turned off, returns (False, minimum_round) with minimum_round being the major round (like 1, 3, 4).
     If the round isn't determined, returns (False, 0)
     """
-    if not config.get_round_ocr_config() or config.get_tesseract_location(system_helpers=system_helpers) is None:
+    tesseract_location = config.get_tesseract_location(system_helpers=system_helpers)
+    if not config.get_round_ocr_config() or tesseract_location is None:
         output = 0
 
         if get_on_screen_in_game(CONSTANTS["game"]["round"]["krugs_inactive"], 0.9) or get_on_screen_in_game(
@@ -569,7 +570,7 @@ def determine_minimum_round() -> tuple[bool, int]:
 
         return (False, output)
 
-    current_round = get_round_with_ocr(tesseract_location=config.get_tesseract_location(system_helpers=system_helpers))
+    current_round = get_round_with_ocr(tesseract_location=tesseract_location)
     if current_round is not None:
         # take first element of string and turn it into int
         # return int(current_round[0])
@@ -975,6 +976,10 @@ def main():
 
     repository_url = "https://github.com/Kyrluckechuck/tft-bot"
     logger.info(f"Welcome! Please feel free to ask questions or contribute at {repository_url}")
+
+    while True:
+        restart_league_client()
+        time.sleep(5)
 
     check_for_new_version(repository_url=repository_url)
     wait_for_start_confirmation()

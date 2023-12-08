@@ -253,6 +253,12 @@ def queue() -> None:  # pylint: disable=too-many-branches
         if not PLAY_NEXT_GAME:
             evaluate_next_game_logic()
 
+        if not LCU_INTEGRATION.client_connected():
+            logger.warning("Client is not connected or sending confusing messages, restarting the client")
+            restart_league_client()
+            time.sleep(5)
+            continue
+
         if LCU_INTEGRATION.session_expired():
             logger.warning("Our login session expired, restarting the client")
             restart_league_client()
@@ -289,7 +295,9 @@ def queue() -> None:  # pylint: disable=too-many-branches
             continue
 
         if not LCU_INTEGRATION.create_lobby():
-            time.sleep(5)
+            time.sleep(3)
+        # give it a couple seconds to let the client stabilize the lobby
+        time.sleep(2)
     loading_match()
 
 
@@ -794,6 +802,7 @@ def update_riot_client_constants(riot_client_install_location: str) -> None:
         riot_client_install_location (str): The determined location for the executables
     """
     logger.debug(rf"Updating riot client install location to {riot_client_install_location}")
+    logger.debug(rf"{riot_client_install_location}{CONSTANTS['executables']['riot_client']['client_services']}")
     CONSTANTS["executables"]["riot_client"][
         "client_services"
     ] = rf"{riot_client_install_location}{CONSTANTS['executables']['riot_client']['client_services']}"

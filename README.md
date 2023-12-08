@@ -9,6 +9,10 @@
 
 This is an auto TFT bot, with some decent logic built in.
 
+> [!NOTE]
+> Supports TFT Set 10
+
+
 > ⚠️ WARNING
 > While users had reported bans while utilizing the older executable releases, we have not heard reports since removing those and switching to running via Python directly.
 

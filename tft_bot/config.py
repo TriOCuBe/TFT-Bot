@@ -223,14 +223,14 @@ def get_tesseract_location(system_helpers) -> str | None:
 
     Args:
         system_helpers: Dependency injected system_helpers module.
-    
+
     Returns:
         String or None
     """
     tesseract_location: str = system_helpers.determine_tesseract_ocr_install_location() + "\\tesseract.exe"
     if not os.path.isfile(tesseract_location):
         return None
-    
+
     return tesseract_location
 
 

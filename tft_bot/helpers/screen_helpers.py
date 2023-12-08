@@ -500,35 +500,12 @@ def get_items() -> list:
     if not league_bounding_box:
         return 0
 
-    width = league_bounding_box.get_width()
-    height = league_bounding_box.get_height()
-
-    resize_x = width / 1920
-    resize_y = height / 1080
-
     item_list = []
     for pos in CONSTANTS["game"]["coordinates"]["items"]:
         offset = calculate_window_click_offset(
             window_title=CONSTANTS["window_titles"]["game"], position_x=pos[0], position_y=pos[1]
         )
         move_to(position_x=offset.position_x, position_y=offset.position_y)
-        
-        # commented out since it wasn't very reliable
-        # item_box = (
-        #     int(offset.position_x + (100 * resize_x)),
-        #     int(offset.position_y + (40 * resize_y)),
-        #     int(offset.position_x + (240 * resize_x)),
-        #     int(offset.position_y + (70 * resize_y)),
-        # )
-
-        # with mss.mss() as screenshot_taker:
-        #     screenshot = screenshot_taker.grab(item_box)
-
-        # pixels = numpy.array(screenshot)
-        # gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
-        # item_name = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG_ITEMS)
-
-        # item_list.append({"coordinates": (offset.position_x, offset.position_y), "item_name": valid_item(item_name)})
         region = (
             0,
             540,
@@ -591,7 +568,7 @@ def check_champion(wanted_traits: list) -> str | None:
             if champion not in checked_champs:
                 search_result = cv2.matchTemplate(gray_scaled, champ_img, cv2.TM_CCOEFF_NORMED)
                 del champ_img
-                _, max_precision, _, max_location = cv2.minMaxLoc(search_result)
+                _, max_precision, _, _ = cv2.minMaxLoc(search_result)
                 if max_precision > 0.95:
                     del screenshot
                     del gray_scaled

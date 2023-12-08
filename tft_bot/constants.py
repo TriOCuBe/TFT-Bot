@@ -210,41 +210,41 @@ CONSTANTS = {
             ]
         },
         "champions": {
-            "trait": {
-                "sorcerer": [
-                    "ahri",
-                    "malzahar",
-                    "orianna",
-                    "silco",
-                    "swain",
-                    "taric",
-                    "velkoz",
-                ],
-                "void": [
-                    "belveth",
-                    "chogath",
-                    "kaisa",
-                    "kassadin",
-                    "malzahar",
-                    "reksai",
-                    "velkoz",
-                ],
-            },
+            # "trait": {
+            #     "sorcerer": [
+            #         "ahri",
+            #         "malzahar",
+            #         "orianna",
+            #         "silco",
+            #         "swain",
+            #         "taric",
+            #         "velkoz",
+            #     ],
+            #     "void": [
+            #         "belveth",
+            #         "chogath",
+            #         "kaisa",
+            #         "kassadin",
+            #         "malzahar",
+            #         "reksai",
+            #         "velkoz",
+            #     ],
+            # },
 
-            "full": {
-                "ahri": "captures/champions/ahri.png",
-                "belveth": "captures/champions/belveth.png",
-                "chogath": "captures/champions/chogath.png",
-                "kaisa": "captures/champions/kaisa.png",
-                "kassadin": "captures/champions/kassadin.png",
-                "malzahar": "captures/champions/malzahar.png",
-                "orianna": "captures/champions/orianna.png",
-                "reksai": "captures/champions/reksai.png",
-                "silco": "captures/champions/silco.png",
-                "swain": "captures/champions/swain.png",
-                "taric": "captures/champions/taric.png",
-                "velkoz": "captures/champions/velkoz.png",
-            }
+            # "full": {
+            #     "ahri": "captures/champions/ahri.png",
+            #     "belveth": "captures/champions/belveth.png",
+            #     "chogath": "captures/champions/chogath.png",
+            #     "kaisa": "captures/champions/kaisa.png",
+            #     "kassadin": "captures/champions/kassadin.png",
+            #     "malzahar": "captures/champions/malzahar.png",
+            #     "orianna": "captures/champions/orianna.png",
+            #     "reksai": "captures/champions/reksai.png",
+            #     "silco": "captures/champions/silco.png",
+            #     "swain": "captures/champions/swain.png",
+            #     "taric": "captures/champions/taric.png",
+            #     "velkoz": "captures/champions/velkoz.png",
+            # }
         }
     },
 }

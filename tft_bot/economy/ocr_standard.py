@@ -15,7 +15,7 @@ class OCRStandardEconomyMode(EconomyMode):
     """
 
     def __init__(self, wanted_traits: list[str], prioritized_order: bool, tesseract_location: str): 
-        super().__init__(wanted_traits, prioritized_order, tesseract_location)
+        super().__init__(wanted_traits, prioritized_order)
         pytesseract.tesseract_cmd = tesseract_location
 
     def loop_decision(self, current_round: int, event: int):

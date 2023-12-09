@@ -14,19 +14,17 @@ class EconomyMode:
     Blueprint class to implement custom economy modes on.
     """
 
-    def __init__(self, wanted_traits: list[str], prioritized_order: bool, tesseract_location: str):
+    def __init__(self, wanted_traits: list[str], prioritized_order: bool):
         """
         Init method to dependency-inject the purchase logic.
         Args:
             wanted_traits: A list of wanted traits.
             prioritized_order: Whether to only buy a trait if the trait before it was bought.
-            tesseract_location: Required to initialize pytesseract. String of path to tesseract.exe
         """
         self.wanted_traits = wanted_traits
         self.prioritized_order = prioritized_order
         self.items: list = []
         self.bench_targets: list[tuple][int, int] = CONSTANTS["game"]["coordinates"]["bench"][:]
-        self.tesseract_location = tesseract_location
 
     def loop_decision(self, current_round: int, event: int) -> None:
         """
@@ -185,7 +183,7 @@ class EconomyMode:
 
             click_to(position_x=point.position_x, position_y=point.position_y, action="right")
 
-            champion = check_champion(self.tesseract_location, self.wanted_traits)
+            champion = check_champion(self.wanted_traits)
             bench_champions.append(champion)
 
         return bench_champions
@@ -204,7 +202,7 @@ class EconomyMode:
 
             click_to(position_x=point.position_x, position_y=point.position_y, action="right")
 
-            champion = check_champion(self.tesseract_location, self.wanted_traits)
+            champion = check_champion(self.wanted_traits)
             board_champions.append(champion)
 
         return board_champions

@@ -1,7 +1,7 @@
 import mss.tools
 import numpy
 from pytesseract import pytesseract
-from time import sleep
+import time
 import cv2
 from tft_bot.helpers import system_helpers
 from tft_bot import config
@@ -29,11 +29,18 @@ from tft_bot import config
 
 # _TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=abcdefghjklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -c page_separator=""'
 config.load_config(r".\output")
-tesseract_location = config.get_tesseract_location(system_helpers=system_helpers)
+# tesseract_location = config.get_tesseract_location(system_helpers=system_helpers)
+# pytesseract.tesseract_cmd = tesseract_location
+
+# gray_scaled_pixels = cv2.imread('image.png', 0)
 # detected = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
+# print(detected)
 
 from tft_bot.helpers.screen_helpers import check_champion
 
-champion = check_champion(tesseract_location=tesseract_location, wanted_traits=["mosher", "guardian"])
-
+print("sleeping 5s")
+time.sleep(5)
+start = time.time()
+champion = check_champion(wanted_traits=["mosher", "guardian"])
+print(time.time() - start)
 print(champion)

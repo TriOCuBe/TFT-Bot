@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import cv2
 from loguru import logger
-import mss
+import mss.tools
 import numpy
 from pytesseract import pytesseract
 import win32gui
@@ -486,7 +486,7 @@ def valid_item(item: str) -> str | None:
     )
 
 
-_TESSERACT_CONFIG_ITEMS = '--oem 3 --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz -c page_separator=""'
+_TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=abcdefghjklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -c page_separator=""'
 def get_items() -> list:
     """
     Checks every position for items and looks if there is one present.
@@ -544,7 +544,7 @@ def valid_champion(champion: str, valid_champions: list[str]) -> str | None:
     )
 
 
-def check_champion(tesseract_location, wanted_traits: list) -> str | None:
+def check_champion(wanted_traits: list) -> str | None:
     """
     Checks if and what champion is displayed on the right-hand side of the screen.
 
@@ -576,16 +576,20 @@ def check_champion(tesseract_location, wanted_traits: list) -> str | None:
 
     with mss.mss() as screenshot_taker:
         screenshot = screenshot_taker.grab(region)
+        # mss.tools.to_png(screenshot.rgb, screenshot.size, output="image.png")
 
     pixels = numpy.array(screenshot)
     gray_scaled = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
+    
+    from ..config import get_tesseract_location
+    from ..helpers import system_helpers
 
-    pytesseract.tesseract_cmd = tesseract_location
+    pytesseract.tesseract_cmd = get_tesseract_location(system_helpers=system_helpers)
     valid_champions = []
     for trait in wanted_traits:
         for champion in CONSTANTS["game"]["champions"]["trait"][trait]:
             if champion not in valid_champions:
                 valid_champions.append(champion)
 
-    detected_champ = pytesseract.image_to_string(~gray_scaled, config=_TESSERACT_CONFIG)
+    detected_champ = pytesseract.image_to_string(~gray_scaled, config=_TESSERACT_CONFIG).lower()
     return valid_champion(detected_champ, valid_champions)

@@ -278,9 +278,6 @@ def get_on_screen_multiple_any(window_title: str, paths: list[str], precision: f
     return False
 
 
-_TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=0123456789 -c page_separator=""'
-
-
 # essentially copied from https://github.com/jfd02/TFT-OCR-BOT/blob/ea3eb15d3f96109a616eb9f3508db14347ac0339/game_functions.py#L13
 def get_round_with_ocr(tesseract_location) -> str | None:
     """
@@ -317,6 +314,7 @@ def get_round_with_ocr(tesseract_location) -> str | None:
 
     pixels = numpy.array(screenshot)
     gray_scaled_pixels = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
+    _TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=0123456789 -c page_separator=""'
     game_round: str = pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG)
     
     del screenshot
@@ -367,6 +365,7 @@ def get_gold_with_ocr() -> int:
     del screenshot
     del pixels
 
+    _TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=0123456789 -c page_separator=""'
     return int(pytesseract.image_to_string(~gray_scaled_pixels, config=_TESSERACT_CONFIG) or 0)
 
 
@@ -486,7 +485,6 @@ def valid_item(item: str) -> str | None:
     )
 
 
-_TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=abcdefghjklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -c page_separator=""'
 def get_items() -> list:
     """
     Checks every position for items and looks if there is one present.
@@ -580,7 +578,7 @@ def check_champion(wanted_traits: list) -> str | None:
 
     pixels = numpy.array(screenshot)
     gray_scaled = cv2.cvtColor(pixels, cv2.COLOR_BGR2GRAY)
-    
+
     from ..config import get_tesseract_location
     from ..helpers import system_helpers
 
@@ -591,5 +589,6 @@ def check_champion(wanted_traits: list) -> str | None:
             if champion not in valid_champions:
                 valid_champions.append(champion)
 
+    _TESSERACT_CONFIG = '--oem 3 --psm 7 -c tessedit_char_whitelist=abcdefghjklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -c page_separator=""'
     detected_champ = pytesseract.image_to_string(~gray_scaled, config=_TESSERACT_CONFIG).lower()
     return valid_champion(detected_champ, valid_champions)

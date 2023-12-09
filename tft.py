@@ -986,10 +986,6 @@ def main():
     repository_url = "https://github.com/Kyrluckechuck/tft-bot"
     logger.info(f"Welcome! Please feel free to ask questions or contribute at {repository_url}")
 
-    while True:
-        restart_league_client()
-        time.sleep(5)
-
     check_for_new_version(repository_url=repository_url)
     wait_for_start_confirmation()
 

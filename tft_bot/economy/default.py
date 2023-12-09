@@ -9,7 +9,7 @@ from tft import GAME_CLIENT_INTEGRATION
 
 from ..helpers import screen_helpers
 from .base import EconomyMode
-from ..config import get_item_config
+# from ..config import get_item_config
 
 
 class DefaultEconomyMode(EconomyMode):

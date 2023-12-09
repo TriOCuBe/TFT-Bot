@@ -14,7 +14,7 @@ class OCRStandardEconomyMode(EconomyMode):
     OCR standard economy mode implementation.
     """
 
-    def __init__(self, wanted_traits: list[str], prioritized_order: bool, tesseract_location: str):
+    def __init__(self, wanted_traits: list[str], prioritized_order: bool, tesseract_location: str): 
         super().__init__(wanted_traits, prioritized_order, tesseract_location)
         pytesseract.tesseract_cmd = tesseract_location
 
